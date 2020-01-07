@@ -1,0 +1,46 @@
+:scrollbar:
+:data-uri:
+:toc2:
+:imagesdir: images
+
+:numbered:
+
+== Description
+This Show&Tell is aimed to share some of the most important concepts and features of the new technology adopted by RHEL 8 to manage and implement containers, using podman, buildah and skopeo. 
+
+Duration: 4h with 2 breaks
+
+Audience: IT Managers, Architects and technical staff who operates Linux
+
+== New Container Technology
+In RHEL 8 the docker package is replaced by the Container Tools module, which consists of Podman, Buildah, Skopeo and several other tidbits. These tools are compatible with the OCI specifications which means they can find, run, build and share containers with other tools that target the OCI standards including Docker CE, Docker EE, Kata Containers, CRI-O, and other container engines, registries, and tools. You can build with Buildah, and run with CRI-O. You can copy images from an AWS container registry to a local Podman instance. The OCI standards offer greater flexibility and choice.
+
+== Open Container Initiative
+The Open Container Initiative (OCI) is a lightweight, open governance structure (project), formed under the auspices of the Linux Foundation, for the express purpose of creating open industry standards around container formats and runtime. 
+
+The OCI currently contains two specifications: the Runtime Specification (runtime-spec) and the Image Specification (image-spec). The Runtime Specification outlines how to run a “filesystem bundle” that is unpacked on disk. At a high-level an OCI implementation would download an OCI Image then unpack that image into an OCI Runtime filesystem bundle. At this point the OCI Runtime Bundle would be run by an OCI Runtime.
+
+== What is a Container
+
+=== Architecture
+
+=== Common concepts
+
+== New Tools for this era
+=== What is podman?
+==== Common Ground
+==== Using podman on RHEL
+
+= What is Buildah?
+==== Common Ground
+==== Using buildah on RHEL
+
+== What is Skopeo
+==== Common Ground
+==== Using skopeo on RHEL
+
+== WebConsole (cockpit) with containers
+=== Installing the cockpit-podman plugin
+=== Managing a container lifecycle inside webconsole
+
+== Resources and beyond
