@@ -6,7 +6,7 @@
 = RHEL 8 New Container tools
 
 == Description
-This Show&Tell is aimed to share some of the most important concepts and features of the new technology adopted by RHEL 8 to manage and implement containers, using podman, buildah and skopeo. 
+This Show&Tell is aimed to share some of the most important concepts and features of the new technology adopted by RHEL 8 to manage and implement containers, using podman, buildah and skopeo.
 
 Duration: 4h with 2 breaks
 
@@ -18,7 +18,7 @@ Audience: IT Managers, Architects and technical staff who operates Linux
 In RHEL 8 the docker package is replaced by the Container Tools module, which consists of Podman, Buildah, Skopeo and several other tidbits. These tools are compatible with the OCI specifications which means they can find, run, build and share containers with other tools that target the OCI standards including Docker CE, Docker EE, Kata Containers, CRI-O, and other container engines, registries, and tools. You can build with Buildah, and run with CRI-O. You can copy images from an AWS container registry to a local Podman instance. The OCI standards offer greater flexibility and choice.
 
 == Open Container Initiative
-The Open Container Initiative (OCI) is a lightweight, open governance structure (project), formed under the auspices of the Linux Foundation, for the express purpose of creating open industry standards around container formats and runtime. 
+The Open Container Initiative (OCI) is a lightweight, open governance structure (project), formed under the auspices of the Linux Foundation, for the express purpose of creating open industry standards around container formats and runtime.
 
 The OCI currently contains two specifications: the Runtime Specification (runtime-spec) and the Image Specification (image-spec). The Runtime Specification outlines how to run a “filesystem bundle” that is unpacked on disk. At a high-level an OCI implementation would download an OCI Image then unpack that image into an OCI Runtime filesystem bundle. At this point the OCI Runtime Bundle would be run by an OCI Runtime.
 
@@ -35,12 +35,12 @@ Container images become containers at runtime and in the case of Docker containe
 An image is a file that can be pulled down form a repository server, then used locally as a mount point for a starting container.
 
 === Container Image Format
-Is the format every container technology provider has defined to the image file. Nevertheless nowadays is more common to see this format pledged to to the format defined by the Open Container Innitiative (OCI). Basically this format define the layers and the metadata inside the container image.
+Is the format every container technology provider has defined to the image file. Nevertheless nowadays is more common to see this format pledged to to the format defined by the Open Container Initiative (OCI). Basically this format define the layers and the metadata inside the container image.
 
 This OCI image format propose a container image comprised of tar files for each layer and a manifest in json format.
 
 === The Container Engine
-Users ussually emits requests such as pulling images, running containers, etc. This requests are accepted by a software called the container engine. The container engine, in RHEL 8, run the container from an image using runc, which is a, OCI compliant runtime. 
+Users usually emits requests such as pulling images, running containers, etc. This requests are accepted by a software called the container engine. The container engine, in RHEL 8, run the container from an image using runc, which is a, OCI compliant runtime.
 
 === Image layer
 
@@ -52,17 +52,17 @@ When an image builder creates a new repository, they will label the best image l
 
 === Repository
 
-Repositories are made of layers and metadata that defines an image. Ussually we refer to a repository as a container image.
+Repositories are made of layers and metadata that defines an image. Usually we refer to a repository as a container image.
 
-When we specify a repository on the command line, the Container Engine is doing a serach on the refistry servers that are configured in its configuration files.
+When we specify a repository on the command line, the Container Engine is doing a search on the registry servers that are configured in its configuration files.
 
 === Container runtime
 
-A container runtime is a softeare which is in charge of several actions and responsabilities:
+A container runtime is a software which is in charge of several actions and responsibilities:
 
 * User input management
-* Input over an API tipically used by others
-* Handeling the metadata which will be passed to the container Container Runtime 
+* Input over an API typically used by others
+* Handling the metadata which will be passed to the container Container Runtime
 * Using user input for overriding defaults
 * Using defaults specified by the container image
 * Getting the Container Images from the Registry Server
@@ -74,13 +74,13 @@ runc is the OCI compliant runtime most used by users and developers nowadays.
 
 === Namespace
 
-Namespaces separate groups of repositories. The namespace is typically the username of the person sharing the image, but can also be a group name, or a logical name. For example, Red Hat uses the namespace to separate groups of repositories based on products listed on the Red Hat Federated Registry server. 
+Namespaces separate groups of repositories. The namespace is typically the username of the person sharing the image, but can also be a group name, or a logical name. For example, Red Hat uses the namespace to separate groups of repositories based on products listed on the Red Hat Federated Registry server.
 
 === Kernel Namespace
 
 A kernel namespace is different from a namespace in which the former enables each container to have it’s own mount points, network interfaces, user identifiers, process identifiers, etc.
 
-Tipically, a regular Linux process is created using a version of exec() system call. When a container is created, the container engine makes the request to the kernel with a special system call called clone(), which in consequence creates the process ith its own virtual mount points, process ids, user ids, network interfaces, hostname, etc, benefiting the process isolation from the regular processes.
+Typically, a regular Linux process is created using a version of exec() system call. When a container is created, the container engine makes the request to the kernel with a special system call called clone(), which in consequence creates the process ith its own virtual mount points, process ids, user ids, network interfaces, hostname, etc, benefiting the process isolation from the regular processes.
 
 === Container
 
@@ -94,30 +94,30 @@ A container host is an Operating System Instance in charge of running the proces
 
 === Registry Server
 
-It is a server which stores repositories. Ussually when the repository is not locally cached, it can be pulled from different registries. For exampl eRed Hat Enterprise Linux is configured to pull repositories from registry.access.redhat.com first, then it will try docker.io (Docker Hub) and quay.io.
+It is a server which stores repositories. Usually when the repository is not locally cached, it can be pulled from different registries. For example Red Hat Enterprise Linux is configured to pull repositories from registry.access.redhat.com first, then it will try docker.io (Docker Hub) and quay.io.
 
 === Orchestration
 
-The orchestration comes into the scene when scalability and control is necessary in a consistent way. What a contriner orchestrator does is:
+The orchestration comes into the scene when scalability and control is necessary in a consistent way. What a container orchestration does is:
 
-* Schedules container workloads into a cluster dinamically.
+* Schedules container workloads into a cluster dynamically.
 * Defines standard file formats for maintaining all metadata.
 
-The capabilities that are obtained by an orchestrator could be the following.
+The capabilities that are obtained by an orchestration system could be the following.
 
 * Consistency
 * Automation
 * Assistance on flowcharts otherwise manual
 
-Red Hat Openshift is a good example of a container orchestrator.
+Red Hat Openshift is a good example of a container orchestration.
 
 == New Tools for this era
 
-=== What is podman?
+=== What is Podman?
 
 Podman is an open-source project that is available on most Linux platforms and resides on GitHub. It is a daemonless container engine for developing, managing, and running Open Container Initiative (OCI) containers and container images on your Linux System. Podman provides a Docker-compatible command line front end that can simply alias the Docker cli, `alias docker=podman`.
 
-In Red Hat Enterprise Linux exists a way to mimic the docker cli installing podman-docker package, which gives Docker's administrators the look and feel of Docker command line. 
+In Red Hat Enterprise Linux exists a way to mimic the docker cli installing podman-docker package, which gives Docker's administrators the look and feel of Docker command line.
 
 Containers under the control of Podman can either be run by root or by a non-privileged user. Podman manages the entire container ecosystem which includes pods, containers, container images, and container volumes using the libpod library. Podman specializes in all of the commands and functions that help you to maintain and modify OCI container images, such as pulling and tagging. It allows you to create, run, and maintain those containers created from those images in a production environment.
 
@@ -155,11 +155,12 @@ In this session we are going to do several activities related to the following w
 
 === Going with the basics
 
-* Understand how podman works in general
+* Understand how Podman works in general
 * Install RHEL 8 container tools module
 * Playing around with containers
 - Play with Podman command
 - Configure Registries
+- Install podman-docker package
 - Search for registries
 - Pull an image with an application installed ready to be used
 - Inspect images installed on the host
@@ -168,9 +169,9 @@ In this session we are going to do several activities related to the following w
 
 === Container building
 
-* Create a Dockerfile file 
+* Create a Dockerfile file
 - Choose the base
-- Update and install packages and libraries need by the service is going tio be installed in the image
+- Update and install packages and libraries need by the service is going to be installed in the image
 - Copy the source code to the image
 - Define the start command to run the service once the container is started
 
@@ -181,7 +182,7 @@ In this session we are going to do several activities related to the following w
 * Test the service
 * Backup the image
 
-=== WebConsole to manage containers with podman
+=== WebConsole to manage containers with Podman
 
 * Installing the cockpit-podman plugin
 * Managing a container lifecycle inside webconsole
@@ -198,4 +199,3 @@ Sources
 *
 *
 *
-
