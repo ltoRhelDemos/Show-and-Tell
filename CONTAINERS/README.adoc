@@ -123,7 +123,7 @@ Containers under the control of Podman can either be run by root or by a non-pri
 
 source: https://podman.io/whatis.html
 
-= What is Buildah?
+=== What is Buildah?
 
 Buildah is a command-line tool for building Open Container Initiative-compatible images quickly and easily. It can act as a drop-in replacement for the Docker daemon’s docker build command but is flexible enough to allow you to build images with whatever tools you prefer to use. Buildah is easy to incorporate into scripts and build pipelines, and best of all, it doesn’t require a running container daemon to build its image.
 
@@ -133,7 +133,7 @@ Podman uses Buildah’s build functionality under the covers to create a contain
 
 source: https://opensource.com/article/18/6/getting-started-buildah
 
-== What is Skopeo?
+=== What is Skopeo?
 
 Skopeo is a command line utility that performs various operations on container images and image repositories. it Can work with OCI images as well as the original Docker v2 images.
 
@@ -181,7 +181,7 @@ In this session we are going to do several activities related to the following w
 * Test the service
 * Backup the image
 
-== WebConsole to manage containers with podman
+=== WebConsole to manage containers with podman
 
 * Installing the cockpit-podman plugin
 * Managing a container lifecycle inside webconsole
