@@ -109,13 +109,19 @@ The capabilities that are obtained by an orchestrator could be the following.
 
 Red Hat Openshift is a good example of a container orchestrator.
 
-
-
-
-== Architecture
 == New Tools for this era
+
 === What is podman?
+
 ==== Common Ground
+Podman is an open-source project that is available on most Linux platforms and resides on GitHub. It is a daemonless container engine for developing, managing, and running Open Container Initiative (OCI) containers and container images on your Linux System. Podman provides a Docker-compatible command line front end that can simply alias the Docker cli, `alias docker=podman`.
+
+In Red Hat Enterprise Linux exists a way to mimic the docker cli installing podman-docker package, which gives Docker's administrators the look and feel of Docker command line. 
+
+Containers under the control of Podman can either be run by root or by a non-privileged user. Podman manages the entire container ecosystem which includes pods, containers, container images, and container volumes using the libpod library. Podman specializes in all of the commands and functions that help you to maintain and modify OCI container images, such as pulling and tagging. It allows you to create, run, and maintain those containers created from those images in a production environment.
+
+^(2)^ source: https://podman.io/whatis.html
+
 ==== Using podman on RHEL
 
 = What is Buildah?
