@@ -3,14 +3,14 @@
 :toc2:
 :imagesdir: images
 
-:numbered:
-
 == Description
 This Show&Tell is aimed to share some of the most important concepts and features of the new technology adopted by RHEL 8 to manage and implement containers, using podman, buildah and skopeo. 
 
 Duration: 4h with 2 breaks
 
 Audience: IT Managers, Architects and technical staff who operates Linux
+
+:numbered:
 
 == New Container Technology
 In RHEL 8 the docker package is replaced by the Container Tools module, which consists of Podman, Buildah, Skopeo and several other tidbits. These tools are compatible with the OCI specifications which means they can find, run, build and share containers with other tools that target the OCI standards including Docker CE, Docker EE, Kata Containers, CRI-O, and other container engines, registries, and tools. You can build with Buildah, and run with CRI-O. You can copy images from an AWS container registry to a local Podman instance. The OCI standards offer greater flexibility and choice.
@@ -38,6 +38,32 @@ Is the format every container technology provider has defined to the image file.
 This OCI image format propose a container image comprised of tar files for each layer and a manifest in json format.
 
 === The Container Engine
+Users ussually emits requests such as pulling images, running containers, etc. This requests are accepted by a software called the container engine. The container engine, in RHEL 8, run the container from an image using runc, which is a, OCI compliant runtime. 
+
+=== OCI compliant runtime runc
+
+A runtime is in charge of several actions and responsabilities:
+
+* User input management
+* Input over an API tipically used by others
+* Handeling the metadata which will be passed to the container Container Runtime 
+* Using user input for overriding defaults
+* Using defaults specified by the container image
+* Getting the Container Images from the Registry Server
+* Managing the container image for decompressing and expanding it on disk
+* Preparing a mount point for the container
+* Calling the Container Runtime
+
+=== Container
+
+A container is an instance of a container image comprised of standard Linux processes which are ussually created using clone() system call.
+
+=== Container Host
+
+A container host is an Operating System Instance in charge of running the processes that compose a container. This host could be a physical, an on premise virtual machine or a cloud virtual instance.
+
+=== Registry Server
+
 
 == Architecture
 == New Tools for this era
