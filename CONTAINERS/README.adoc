@@ -40,9 +40,23 @@ This OCI image format propose a container image comprised of tar files for each 
 === The Container Engine
 Users ussually emits requests such as pulling images, running containers, etc. This requests are accepted by a software called the container engine. The container engine, in RHEL 8, run the container from an image using runc, which is a, OCI compliant runtime. 
 
-=== OCI compliant runtime runc
+=== Image layer
 
-A runtime is in charge of several actions and responsabilities:
+An image is made of one or several layers. Layers are connected together in a parent-child relationship, so each layer states the change between itself and the parent layer.
+
+=== Tag
+
+When an image builder creates a new repository, they will label the best image layer to use, and this label is called a tag. These tags can refer to versions of software in a repository. One of these tags, which is a special one, is "latest" that point outs to the latest version in a repository.
+
+=== Repository
+
+Repositories are made of layers and metadata that defines an image. Ussually we refer to a repository as a container image.
+
+When we specify a repository on the command line, the Container Engine is doing a serach on the refistry servers that are configured in its configuration files.
+
+=== Container runtime
+
+A container runtime is a softeare which is in charge of several actions and responsabilities:
 
 * User input management
 * Input over an API tipically used by others
@@ -54,15 +68,48 @@ A runtime is in charge of several actions and responsabilities:
 * Preparing a mount point for the container
 * Calling the Container Runtime
 
+runc is the OCI compliant runtime most used by users and developers nowadays.
+
+=== Namespace
+
+Namespaces separate groups of repositories. The namespace is typically the username of the person sharing the image, but can also be a group name, or a logical name. For example, Red Hat uses the namespace to separate groups of repositories based on products listed on the Red Hat Federated Registry server. 
+
+=== Kernel Namespace
+
+A kernel namespace is different from a namespace in which the former enables each container to have it’s own mount points, network interfaces, user identifiers, process identifiers, etc.
+
+Tipically, a regular Linux process is created using a version of exec() system call. When a container is created, the container engine makes the request to the kernel with a special system call called clone(), which in consequence creates the process ith its own virtual mount points, process ids, user ids, network interfaces, hostname, etc, benefiting the process isolation from the regular processes.
+
 === Container
 
 A container is an instance of a container image comprised of standard Linux processes which are ussually created using clone() system call.
+
+Red Hat Enterprise Linux implements Linux Containers using core technologies such as Control Groups (Cgroups) for Resource Management, Namespaces for Process Isolation, SELinux for Security, enabling secure multi-tenancy and reducing the potential for security exploits. All this is meant to provide you with an environment to producing and running enterprise-quality containers.
 
 === Container Host
 
 A container host is an Operating System Instance in charge of running the processes that compose a container. This host could be a physical, an on premise virtual machine or a cloud virtual instance.
 
 === Registry Server
+
+It is a server which stores repositories. Ussually when the repository is not locally cached, it can be pulled from different registries. For exampl eRed Hat Enterprise Linux is configured to pull repositories from registry.access.redhat.com first, then it will try docker.io (Docker Hub) and quay.io.
+
+=== Orchestration
+
+The orchestration comes into the scene when scalability and control is necessary in a consistent way. What a contriner orchestrator does is:
+
+* Schedules container workloads into a cluster dinamically.
+* Defines standard file formats for maintaining all metadata.
+
+The capabilities that are obtained by an orchestrator could be the following.
+
+* Consistency
+* Automation
+* Assistance on flowcharts otherwise manual
+
+Red Hat Openshift is a good example of a container orchestrator.
+
+
 
 
 == Architecture
