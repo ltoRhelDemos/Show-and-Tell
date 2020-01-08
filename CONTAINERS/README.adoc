@@ -125,12 +125,77 @@ source: https://podman.io/whatis.html
 
 = What is Buildah?
 
-== What is Skopeo
+Buildah is a command-line tool for building Open Container Initiative-compatible images quickly and easily. It can act as a drop-in replacement for the Docker daemon’s docker build command but is flexible enough to allow you to build images with whatever tools you prefer to use. Buildah is easy to incorporate into scripts and build pipelines, and best of all, it doesn’t require a running container daemon to build its image.
+
+Podman can be used to build containers, so what is the difference wirth Buildah?.
+
+Podman uses Buildah’s build functionality under the covers to create a container image, but the two projects have differences. The most important difference between Podman and Buildah is their concept of a container. Podman allows users to create traditional containers and the intent of these containers is to be controlled through the entirety of a container life cycle. Buildah containers, on the other hand, are really created to allow content to be added to the container image. Each project has a separate internal representation of a container that is not shared. Because of this you cannot see Podman containers from within Buildah or vice versa. However the internal representation of a container image is the same between Buildah and Podman. In consequence, any container image that has been created, pulled or modified by one can be seen and used by the other.
+
+source: https://opensource.com/article/18/6/getting-started-buildah
+
+== What is Skopeo?
+
+Skopeo is a command line utility that performs various operations on container images and image repositories. it Can work with OCI images as well as the original Docker v2 images.
+
+Skopeo works with API V2 registries such as Docker registries, the Atomic registry, private registries, local directories and local OCI-layout directories. Skopeo does not require a daemon to be running to perform these operations which consist of:
+
+* Copying an image from and to various storage mechanisms. For example you can copy images from one registry to another, without requiring privilege.
+
+* Inspecting a remote image showing its properties including its layers, without requiring you to pull the image to the host.
+
+* Deleting an image from an image repository.
+
+* When required by the repository, skopeo can pass the appropriate credentials and certificates for authentication.
+
+source: https://github.com/containers/skopeo
 
 == Let's get hands dirty
 
-== WebConsole (cockpit) with containers
-=== Installing the cockpit-podman plugin
-=== Managing a container lifecycle inside webconsole
+In this session we are going to do several activities related to the following workflow:
+
+=== Going with the basics
+
+* Understand how podman works in general
+* Install RHEL 8 container tools module
+* Playing around with containers
+- Play with Podman command
+- Configure Registries
+- Search for registries
+- Pull an image with an application installed ready to be used
+- Inspect images installed on the host
+- Run a container from that image
+- Access the service the running container is exposing
+
+=== Container building
+
+* Create a Dockerfile file 
+- Choose the base
+- Update and install packages and libraries need by the service is going tio be installed in the image
+- Copy the source code to the image
+- Define the start command to run the service once the container is started
+
+=== Running and testing the container
+
+* List the local images
+* Run the container from the local image
+* Test the service
+* Backup the image
+
+== WebConsole to manage containers with podman
+
+* Installing the cockpit-podman plugin
+* Managing a container lifecycle inside webconsole
 
 == Resources and beyond
+
+Sources
+
+*
+*
+*
+*
+*
+*
+*
+*
+
