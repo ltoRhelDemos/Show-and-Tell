@@ -26,10 +26,20 @@ A container is a standard unit of software that packages up code and all its dep
 Container images become containers at runtime and in the case of Docker containers - images become containers when they run on Docker Engine. Available for both Linux and Windows-based applications, containerized software will always run the same, regardless of the infrastructure. Containers isolate software from its environment and ensure that it works uniformly despite differences for instance between development and staging. ^(1)^
 
 ^(1)^ source: https://www.docker.com/resources/what-container
-=== Architecture
 
-=== Common concepts
+== Some Terminology
 
+=== Container Image
+An image is a file that can be pulled down form a repository server, then used locally as a mount point for a starting container.
+
+=== Container Image Format
+Is the format every container technology provider has defined to the image file. Nevertheless nowadays is more common to see this format pledged to to the format defined by the Open Container Innitiative (OCI). Basically this format define the layers and the metadata inside the container image.
+
+This OCI image format propose a container image comprised of tar files for each layer and a manifest in json format.
+
+=== The Container Engine
+
+== Architecture
 == New Tools for this era
 === What is podman?
 ==== Common Ground
