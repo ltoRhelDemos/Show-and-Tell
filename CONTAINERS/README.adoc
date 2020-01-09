@@ -168,10 +168,11 @@ In this session we are going to do several activities related to the following w
 
 - Configure Registries
 
-  You can configure which and the order of the rgistries to be consulted in a search procedure with podman.
-
 [source,bash]
 -----------------
+## You can configure which and the order of the rgistries to be consulted in a search procedure with podman.
+
+
 # more /etc/containers/registries.conf
 
 # This is a system-wide configuration file used to
@@ -187,19 +188,7 @@ In this session we are going to do several activities related to the following w
 [registries.search]
 registries = ['registry.redhat.io', 'registry.access.redhat.com', 'quay.io', 'docker.io']
 
-# If you need to access insecure registries, add the registry's fully-qualified name.
-# An insecure registry is one that does not have a valid SSL certificate or only does HTTP.
-[registries.insecure]
-registries = []
-
-
-# If you need to block pull access from a registry, uncomment the section below
-# and add the registries fully-qualified name.
-#
-# Docker only
-[registries.block]
-registries = []
-
+...
 -----------------
   
 - Install podman-docker package
