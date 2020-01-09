@@ -267,13 +267,72 @@ The info parameter of podman command give us come useful information including t
   - quay.io
   - docker.io
   
+
+Let's search forthe ubi image of RHEL 8.
+
+[source,bash]
+-----------------
+# podman search ubi8 | grep  registry.access.redhat.com
+
+redhat.com   registry.access.redhat.com/ubi8                       The Universal Base Image is designed and eng...   0
+redhat.com   registry.access.redhat.com/openjdk/openjdk-11-rhel8   OpenJDK S2I image for Java Applications on U...   0
+redhat.com   registry.access.redhat.com/openjdk/openjdk-8-rhel8    OpenJDK 1.8 Image for Java Applications base...   0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-21             .NET Core 2.1 SDK and Runtime on RHEL 8           0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-30             .NET Core 3.0 SDK and Runtime on RHEL 8           0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-30-runtime     .NET Core 3.0 runtime only on RHEL 8              0
+redhat.com   registry.access.redhat.com/ubi8/go-toolset            Platform for building and running Go 1.11.5 ...   0
+redhat.com   registry.access.redhat.com/ubi8/perl-526              Platform for building and running Perl 5.26 ...   0
+redhat.com   registry.access.redhat.com/ubi8/python-36             Platform for building and running Python 3.6...   0
+redhat.com   registry.access.redhat.com/ubi8/ruby-25               Platform for building and running Ruby 2.5 a...   0
+redhat.com   registry.access.redhat.com/ubi8/nodejs-10             Platform for building and running Node.js 10...   0
+redhat.com   registry.access.redhat.com/ubi8/nodejs-12             Platform for building and running Node.js 12...   0
+redhat.com   registry.access.redhat.com/ubi8/php-72                Platform for building and running PHP 7.2 ap...   0
+redhat.com   registry.access.redhat.com/ubi8/php-73                Platform for building and running PHP 7.3 ap...   0
+redhat.com   registry.access.redhat.com/ubi8/python-27             Platform for building and running Python 2.7...   0
+redhat.com   registry.access.redhat.com/ubi8/ruby-26               Platform for building and running Ruby 2.6 a...   0
+redhat.com   registry.access.redhat.com/ubi8/s2i-core              Base image which allows using of source-to-i...   0
+redhat.com   registry.access.redhat.com/ubi8/ubi                   Provides the latest release of the Red Hat U...   0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-21-runtime     Provides the latest release of Red Hat Enter...   0
+redhat.com   registry.access.redhat.com/ubi8/s2i-base              Base image with essential libraries and tool...   0
+redhat.com   registry.access.redhat.com/ubi8/ubi-init              Provides the latest release of the Red Hat U...   0
+redhat.com   registry.access.redhat.com/ubi8/ubi-minimal           Provides the latest release of the Minimal R...   0
+redhat.com   registry.access.redhat.com/ubi8-minimal               The Universal Base Image Minimal is a stripp...   0
+redhat.com   registry.access.redhat.com/ubi8-init                  The Universal Base Image Init is designed to...   0
+-----------------
+
+*Pull the RHEL 8 ubi image for use it
+
+[source,bash]
+-----------------
+# podman pull registry.access.redhat.com/ubi8/ubi
+Trying to pull registry.access.redhat.com/ubi8/ubi...Getting image source signatures
+Copying blob fd8daf2668d1 done
+Copying blob cb3c77f9bdd8 done
+Copying config 096cae65a2 done
+Writing manifest to image destination
+Storing signatures
+096cae65a2078ff26b3a2f82b28685b6091e4e2823809d45aef68aa2316300c7
+
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED       SIZE
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago   239 MB
+-----------------
+
+With this image we will going to build our own container with a chatbot application.
+
+*Pull an image with an application installed ready to be used*
+
+The final goal of a container is to service to people or other applications to compose a more robust or elaborated service.
+
+For example, nextcloud is a nice Dropbox clone that can be used right out the box.
+
 Let's search for nextcloud image on any of the registries defined in the configuration file.
 
 [source,bash]
 -----------------
 # yum search nextcloud
 
-*INDEX       NAME                                                   DESCRIPTION                                       STARS   OFFICIAL   AUTOMATED*
+INDEX       NAME                                                   DESCRIPTION                                       STARS   OFFICIAL   AUTOMATED
 quay.io     quay.io/rootlogin/nextcloud                            # Nextcloud  Blazing fast image containing N...   0
 quay.io     quay.io/crazymax/nextcloud                             **Moved to [DockerHub](https://hub.docker.co...   0
 ...
@@ -283,11 +342,175 @@ docker.io   docker.io/wonderfall/nextcloud                         All-in-one al
 ...
 -----------------
 
+The output has been truncated for simplicity. The nextcloud container was found on quay and docker registries. Let's pull the official docker image.
 
-- Pull an image with an application installed ready to be used
-- Inspect images installed on the host
-- Run a container from that image
-- Access the service the running container is exposing
+[source,bash]
+-----------------
+#podman pull docker.io/library/nextcloud
+Trying to pull docker.io/library/nextcloud...Getting image source signatures
+Copying blob 83d8859e9744 done
+Copying blob 85cf4fc86478 done
+Copying blob 8ec398bc0356 done
+Copying blob 970dadf4ccb6 done
+Copying blob d6b7434b63a2 done
+Copying blob 8c04561117a4 done
+Copying blob 814ae7711d3c done
+Copying blob 4896fed78b6b done
+Copying blob 9c3d824d0ad5 done
+Copying blob 9e316fd5b3b3 done
+Copying blob 578b40496c37 done
+Copying blob 280386098458 done
+Copying blob 11a7c8596b56 done
+Copying blob 46017765526c done
+Copying blob e74d71e9611d done
+Copying blob 8d04e75769f6 done
+Copying blob d71822075f1a done
+Copying blob b5b721156f26 done
+Copying blob c749306a7cbf done
+Copying blob d41cc464d579 done
+Copying blob 6561bcc8c65b done
+Copying config 3cd599c50a done
+Writing manifest to image destination
+Storing signatures
+3cd599c50aec3e6612bfea1fc91e32912a17ecdfb33780f7ceed096b8627c573
+-----------------
+
+*Inspect images installed on the host*
+
+podman can assit you to inspect an image.
+
+[source,bash]
+-----------------
+# podman inspect registry.access.redhat.com/ubi8/ubi
+[
+    {
+        "Id": "096cae65a2078ff26b3a2f82b28685b6091e4e2823809d45aef68aa2316300c7",
+        "Digest": "sha256:9e3ba956fab8788c71645d85a7ad21023a6ebc2b7e48eb2940e91b0904d47a94",
+        "RepoTags": [
+            "registry.access.redhat.com/ubi8/ubi:latest"
+        ],
+        "RepoDigests": [
+            "registry.access.redhat.com/ubi8/ubi@sha256:9e3ba956fab8788c71645d85a7ad21023a6ebc2b7e48eb2940e91b0904d47a94"
+        ],
+        "Parent": "",
+        "Comment": "",
+        "Created": "2019-12-10T17:54:10.824568Z",
+        "Config": {
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "container=oci"
+            ],
+            "Cmd": [
+                "/bin/bash"
+            ],
+            "Labels": {
+                "architecture": "x86_64",
+                "authoritative-source-url": "registry.access.redhat.com",
+                "build-date": "2019-12-10T17:53:44.032126",
+                "com.redhat.build-host": "cpt-1004.osbs.prod.upshift.rdu2.redhat.com",
+                "com.redhat.component": "ubi8-container",
+                "com.redhat.license_terms": "https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI",
+                "description": "The Universal Base Image is designed and engineered to be the base layer for all of your containerized applications, middleware and utilities. This base image is freely redistributable, but Red Hat only supports Red Hat technologies through subscriptions for Red Hat products. This image is maintained by Red Hat and updated regularly.",
+                "distribution-scope": "public",
+                "io.k8s.description": "The Universal Base Image is designed and engineered to be the base layer for all of your containerized applications, middleware and utilities. This base image is freely redistributable, but Red Hat only supports Red Hat technologies through subscriptions for Red Hat products. This image is maintained by Red Hat and updated regularly.",
+                "io.k8s.display-name": "Red Hat Universal Base Image 8",
+                "io.openshift.expose-services": "",
+                "io.openshift.tags": "base rhel8",
+                "maintainer": "Red Hat, Inc.",
+                "name": "ubi8",
+                "release": "328",
+                "summary": "Provides the latest release of Red Hat Universal Base Image 8.",
+                "url": "https://access.redhat.com/containers/#/registry.access.redhat.com/ubi8/images/8.1-328",
+                "vcs-ref": "c42933bcdbf9f1c232e981a5e40de257c3534c8e",
+                "vcs-type": "git",
+                "vendor": "Red Hat, Inc.",
+                "version": "8.1"
+            }
+        },...
+]
+-----------------
+
+We can see a lot of info useful for admin purposes. This image is for RHEL 8.1 and was created on 2019-12-10
+
+*Run a container from that image*
+
+Let's start the nextcloud container. In this case, this a container with an application giving a service. Our container will be run starting all the modules and software required for service nextcloud, so we need to run this container in backgound.
+
+[source,bash]
+-----------------
+# podman run --name=nextcloud -d -p 8080:80 docker.io/library/nextcloud
+a26221d2aba4338206a7a7d5b51ccdd76f9eb9e51e6332e7667e127d908071a4
+
+#podman ps
+CONTAINER ID  IMAGE                               COMMAND               CREATED         STATUS             PORTS                 NAMES
+a26221d2aba4  docker.io/library/nextcloud:latest  /entrypoint.sh ap...  20 seconds ago  Up 19 seconds ago  0.0.0.0:8080->80/tcp  nextcloud
+-----------------
+
+Let's see if the service is up and running?
+
+[source,bash]
+-----------------
+# curl http://192.168.56.116:8080
+<!DOCTYPE html>
+<html class="ng-csp" data-placeholder-focus="false" lang="en" data-locale="en" >
+        <head
+ data-requesttoken="O5MhATiYUvPIj5vuTFzrXcfnBKrWIuYTHAABMzIMwAk=:DcFrOXDLCpyb/9SXdWWCDPSqceLuaqxJT3JAAQZbmEA=">
+                <meta charset="utf-8">
+                <title>
+                Nextcloud               </title>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+                                <meta name="apple-itunes-app" content="app-id=1125420102">
+                                <meta name="theme-color" content="#0082c9">
+                <link rel="icon" href="/core/img/favicon.ico">
+                <link rel="apple-touch-icon" href="/core/img/favicon-touch.png">
+                <link rel="mask-icon" sizes="any" href="/core/img/favicon-mask.svg" color="#0082c9">
+                <link rel="manifest" href="/core/img/manifest.json">
+                <link rel="stylesheet" href="/core/css/guest.css?v=ba222ded25d957b900c03bef914333cd">
+                <script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/dist/main.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/mimetype.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/mimetypelist.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/select2-toggleselect.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/search/js/search.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/setup.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/search/js/searchprovider.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/files/fileinfo.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/files/client.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/installation.js?v=ba222ded25d957b900c03bef914333cd"></script>
+                        </head>
+        <body id="body-login">
+                <noscript>
+        <div id="nojavascript">
+                <div>
+                        This application requires JavaScript for correct operation. Please <a href="https://www.enable-javascript.com/" target="_blank" rel="noreferrer noopener">enable JavaScript</a> and reload the page.          </div>
+        </div>
+</noscript>
+                                <div class="wrapper">
+...
+        <p class="info">
+                <span class="icon-info-white"></span>
+                Need help?              <a target="_blank" rel="noreferrer noopener" href="https://docs.nextcloud.com/server/17/go.php?to=admin-install">See the documentation ↗</a>
+        </p>
+</form>
+                                </main>
+                        </div>
+                </div>
+                <footer role="contentinfo">
+                        <p class="info">
+                                <a href="https://nextcloud.com" target="_blank" rel="noreferrer noopener">Nextcloud</a> – a safe home for all your data      </p>
+                </footer>
+        </body>
+</html>
+-----------------
+
+To access the nextcloud service simply open a brower and type http://192.168-56.x:8080
+
+In this case, the service is a web service. In case you have other king of protocol you must need to undersdtanding first to access such service. This is going to be covered later.
+
+Let's run the RHE 8 ubi container.
+
+
+
 - running rootless
 
 === Container building
@@ -298,12 +521,24 @@ docker.io   docker.io/wonderfall/nextcloud                         All-in-one al
 - Copy the source code to the image
 - Define the start command to run the service once the container is started
 
+
 === Running and testing the container
 
-* List the local images
-* Run the container from the local image
-* Test the service
-* Backup the image
+*List the local images*
+*Run the container from the local image*
+*Test the service*
+*Backup the image*
+
+[source,bash]
+-----------------
+# podman save -o ubi8_latest.tar registry.access.redhat.com/ubi8/ubi
+ 
+# ls -lh
+
+total 228M
+-rw-r--r--. 1 root root 228M Jan  9 12:13 ubi8_latest.tar
+
+-----------------
 
 === WebConsole to manage containers with Podman
 
