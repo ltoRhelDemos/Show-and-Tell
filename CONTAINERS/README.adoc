@@ -259,6 +259,31 @@ We have issued a "docker info" command to inspect our containers environment ins
 
 *Search for registries*
 
+The info parameter of podman command give us come useful information including the registries where, by default, the enginde look for images.
+
+  search:
+  - registry.redhat.io
+  - registry.access.redhat.com
+  - quay.io
+  - docker.io
+  
+Let's search for nextcloud image on any of the registries defined in the configuration file.
+
+[source,bash]
+-----------------
+# yum search nextcloud
+
+*INDEX       NAME                                                   DESCRIPTION                                       STARS   OFFICIAL   AUTOMATED*
+quay.io     quay.io/rootlogin/nextcloud                            # Nextcloud  Blazing fast image containing N...   0
+quay.io     quay.io/crazymax/nextcloud                             **Moved to [DockerHub](https://hub.docker.co...   0
+...
+docker.io   docker.io/library/nextcloud                            A safe home for all your data                     1232    [OK]
+docker.io   docker.io/linuxserver/nextcloud                        A Nextcloud container, brought to you by Lin...   193
+docker.io   docker.io/wonderfall/nextcloud                         All-in-one alpine-based Nextcloud image.          79         
+...
+-----------------
+
+
 - Pull an image with an application installed ready to be used
 - Inspect images installed on the host
 - Run a container from that image
