@@ -509,6 +509,67 @@ In this case, the service is a web service. In case you have other king of proto
 
 Let's run the RHE 8 ubi container.
 
+[source,bash]
+-----------------
+# podman run -ti registry.access.redhat.com/ubi8/ubi:latest /bin/bash
+
+[root@8295cb3cba6b /]# yum update
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)                                                                      2.6 MB/s |  14 MB     00:05
+Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)                                                                         3.1 MB/s |  13 MB     00:04
+Red Hat Universal Base Image 8 (RPMs) - BaseOS                                                                                419 kB/s | 760 kB     00:01
+Red Hat Universal Base Image 8 (RPMs) - AppStream                                                                             829 kB/s | 3.1 MB     00:03
+Red Hat Universal Base Image 8 (RPMs) - CodeReady Builder                                                                     8.3 kB/s | 9.1 kB     00:01
+Last metadata expiration check: 0:00:01 ago on Thu Jan  9 21:00:31 2020.
+Dependencies resolved.
+==============================================================================================================================================================
+ Package                           Architecture               Version                              Repository                                            Size
+==============================================================================================================================================================
+Upgrading:
+ gdb-gdbserver                     x86_64                     8.2-6.el8_0                          rhel-8-for-x86_64-appstream-rpms                     435 k
+ setup                             noarch                     2.12.2-2.el8_1.1                     rhel-8-for-x86_64-baseos-rpms                        180 k
+
+Transaction Summary
+==============================================================================================================================================================
+Upgrade  2 Packages
+
+Total download size: 615 k
+Is this ok [y/N]: y
+Downloading Packages:
+(1/2): gdb-gdbserver-8.2-6.el8_0.x86_64.rpm                                                                                   519 kB/s | 435 kB     00:00
+(2/2): setup-2.12.2-2.el8_1.1.noarch.rpm                                                                                      210 kB/s | 180 kB     00:00
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                                         715 kB/s | 615 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                                      1/1
+  Upgrading        : setup-2.12.2-2.el8_1.1.noarch                                                                                                        1/4
+warning: /etc/shadow created as /etc/shadow.rpmnew
+
+  Running scriptlet: setup-2.12.2-2.el8_1.1.noarch                                                                                                        1/4
+  Upgrading        : gdb-gdbserver-8.2-6.el8_0.x86_64                                                                                                     2/4
+  Cleanup          : setup-2.12.2-2.el8_0.1.noarch                                                                                                        3/4
+  Cleanup          : gdb-gdbserver-8.2-6.el8.x86_64                                                                                                       4/4
+  Running scriptlet: gdb-gdbserver-8.2-6.el8.x86_64                                                                                                       4/4
+  Verifying        : gdb-gdbserver-8.2-6.el8_0.x86_64                                                                                                     1/4
+  Verifying        : gdb-gdbserver-8.2-6.el8.x86_64                                                                                                       2/4
+  Verifying        : setup-2.12.2-2.el8_1.1.noarch                                                                                                        3/4
+  Verifying        : setup-2.12.2-2.el8_0.1.noarch                                                                                                        4/4
+Installed products updated.
+
+Upgraded:
+  gdb-gdbserver-8.2-6.el8_0.x86_64                                                setup-2.12.2-2.el8_1.1.noarch
+
+Complete!
+-----------------
+
+[NOTE] 
+Pood run execute the bash shell and with -ti set an interactive session where we can interact with the operating system as if we were on the host itself. In this case we executed a yum update.
 
 
 - running rootless
