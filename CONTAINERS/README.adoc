@@ -156,9 +156,18 @@ In this session we are going to do several activities related to the following w
 === Going with the basics
 
 * Understand how Podman works in general
+
 * Install RHEL 8 container tools module
+
+[source,bash]
+-----------------
+# yum module install container-tools -y
+-----------------
+
 * Playing around with containers
+
 - Play with Podman command
+
 - Configure Registries
 - Install podman-docker package
 - Search for registries
