@@ -770,16 +770,12 @@ STEP 4: RUN pip3 install flask
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
 Collecting flask
   Downloading https://files.pythonhosted.org/packages/9b/93/628509b8d5dc749656a9641f4caf13540e2cdec85276964ff8f43bbb1d3b/Flask-1.1.1-py2.py3-none-any.whl (94kB)
-    100% |████████████████████████████████| 102kB 2.6MB/s
 Collecting Werkzeug>=0.15 (from flask)
   Downloading https://files.pythonhosted.org/packages/ce/42/3aeda98f96e85fd26180534d36570e4d18108d62ae36f87694b476b83d6f/Werkzeug-0.16.0-py2.py3-none-any.whl (327kB)
-    100% |████████████████████████████████| 327kB 1.9MB/s
 Collecting Jinja2>=2.10.1 (from flask)
   Downloading https://files.pythonhosted.org/packages/65/e0/eb35e762802015cab1ccee04e8a277b03f1d8e53da3ec3106882ec42558b/Jinja2-2.10.3-py2.py3-none-any.whl (125kB)
-    100% |████████████████████████████████| 133kB 6.2MB/s
 Collecting click>=5.1 (from flask)
   Downloading https://files.pythonhosted.org/packages/fa/37/45185cb5abbc30d7257104c434fe0b07e5a195a6847506c074527aa599ec/Click-7.0-py2.py3-none-any.whl (81kB)
-    100% |████████████████████████████████| 81kB 5.2MB/s
 Collecting itsdangerous>=0.24 (from flask)
   Downloading https://files.pythonhosted.org/packages/76/ae/44b03b253d6fade317f32c24d100b3b35c2239807046a4c953c7b89fa49e/itsdangerous-1.1.0-py2.py3-none-any.whl
 Collecting MarkupSafe>=0.23 (from Jinja2>=2.10.1->flask)
@@ -932,7 +928,6 @@ STEP 4: RUN pip3 install nltk
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
 Collecting nltk
   Downloading https://files.pythonhosted.org/packages/f6/1d/d925cfb4f324ede997f6d47bea4d9babba51b49e87a767c170b77005889d/nltk-3.4.5.zip (1.5MB)
-    100% |████████████████████████████████| 1.5MB 652kB/s
 Requirement already satisfied: six in /usr/lib/python3.6/site-packages (from nltk)
 Installing collected packages: nltk
   Running setup.py install for nltk ... done
@@ -942,7 +937,6 @@ STEP 5: RUN pip3 install numpy
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
 Collecting numpy
   Downloading https://files.pythonhosted.org/packages/62/20/4d43e141b5bc426ba38274933ef8e76e85c7adea2c321ecf9ebf7421cedf/numpy-1.18.1-cp36-cp36m-manylinux1_x86_64.whl (20.1MB)
-    100% |████████████████████████████████| 20.2MB 46kB/s
 Installing collected packages: numpy
 Successfully installed numpy-1.18.1
 23895d7e4e9d5113d54aa5a1a08692e504cb9c3184fc728e79ad8f3e65076737
@@ -950,12 +944,10 @@ STEP 6: RUN pip3 install tflearn
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
 Collecting tflearn
   Downloading https://files.pythonhosted.org/packages/16/ec/e9ce1b52e71f6dff3bd944f020cef7140779e783ab27512ea7c7275ddee5/tflearn-0.3.2.tar.gz (98kB)
-    100% |████████████████████████████████| 102kB 3.2MB/s
 Requirement already satisfied: numpy in /usr/local/lib64/python3.6/site-packages (from tflearn)
 Requirement already satisfied: six in /usr/lib/python3.6/site-packages (from tflearn)
 Collecting Pillow (from tflearn)
   Downloading https://files.pythonhosted.org/packages/19/5e/23dcc0ce3cc2abe92efd3cd61d764bee6ccdf1b667a1fb566f45dc249953/Pillow-7.0.0-cp36-cp36m-manylinux1_x86_64.whl (2.1MB)
-    100% |████████████████████████████████| 2.1MB 287kB/s
 Installing collected packages: Pillow, tflearn
   Running setup.py install for tflearn ... done
 Successfully installed Pillow-7.0.0 tflearn-0.3.2
@@ -964,53 +956,41 @@ STEP 7: RUN pip3 install tensorflow
 WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
 Collecting tensorflow
   Downloading https://files.pythonhosted.org/packages/de/f0/96fb2e0412ae9692dbf400e5b04432885f677ad6241c088ccc5fe7724d69/tensorflow-1.14.0-cp36-cp36m-manylinux1_x86_64.whl (109.2MB)
-    100% |████████████████████████████████| 109.2MB 7.2kB/s
 Collecting astor>=0.6.0 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/c3/88/97eef84f48fa04fbd6750e62dcceafba6c63c81b7ac1420856c8dcc0a3f9/astor-0.8.1-py2.py3-none-any.whl
 Collecting tensorflow-estimator<1.15.0rc0,>=1.14.0rc0 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/3c/d5/21860a5b11caf0678fbc8319341b0ae21a07156911132e0e71bffed0510d/tensorflow_estimator-1.14.0-py2.py3-none-any.whl (488kB)
-    100% |████████████████████████████████| 491kB 1.6MB/s
 Collecting wrapt>=1.11.1 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/23/84/323c2415280bc4fc880ac5050dddfb3c8062c2552b34c2e512eb4aa68f79/wrapt-1.11.2.tar.gz
 Collecting wheel>=0.26 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/00/83/b4a77d044e78ad1a45610eb88f745be2fd2c6d658f9798a15e384b7d57c9/wheel-0.33.6-py2.py3-none-any.whl
 Collecting protobuf>=3.6.1 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/ca/ac/838c8c8a5f33a58132dd2ad2a30329f6ae1614a9f56ffb79eaaf71a9d156/protobuf-3.11.2-cp36-cp36m-manylinux1_x86_64.whl (1.3MB)
-    100% |████████████████████████████████| 1.3MB 563kB/s
 Requirement already satisfied: six>=1.10.0 in /usr/lib/python3.6/site-packages (from tensorflow)
 Collecting absl-py>=0.7.0 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/1a/53/9243c600e047bd4c3df9e69cfabc1e8004a82cac2e0c484580a78a94ba2a/absl-py-0.9.0.tar.gz (104kB)
-    100% |████████████████████████████████| 112kB 2.6MB/s
 Collecting google-pasta>=0.1.6 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/c3/fd/1e86bc4837cc9a3a5faf3db9b1854aa04ad35b5f381f9648fbe81a6f94e4/google_pasta-0.1.8-py3-none-any.whl (57kB)
-    100% |████████████████████████████████| 61kB 4.5MB/s
 Collecting gast>=0.2.0 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/1f/04/4e36c33f8eb5c5b6c622a1f4859352a6acca7ab387257d4b3c191d23ec1d/gast-0.3.2.tar.gz
 Requirement already satisfied: numpy<2.0,>=1.14.5 in /usr/local/lib64/python3.6/site-packages (from tensorflow)
 Collecting tensorboard<1.15.0,>=1.14.0 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/91/2d/2ed263449a078cd9c8a9ba50ebd50123adf1f8cfbea1492f9084169b89d9/tensorboard-1.14.0-py3-none-any.whl (3.1MB)
-    100% |████████████████████████████████| 3.2MB 309kB/s
 Collecting grpcio>=1.8.6 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/8b/9b/ba5d094f979325fdba696bafa9ee23cc50b8fc60481e3d2a9e13d76817dc/grpcio-1.26.0-cp36-cp36m-manylinux1_x86_64.whl (2.5MB)
-    100% |████████████████████████████████| 2.5MB 264kB/s
 Collecting termcolor>=1.1.0 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/8a/48/a76be51647d0eb9f10e2a4511bf3ffb8cc1e6b14e9e4fab46173aa79f981/termcolor-1.1.0.tar.gz
 Collecting keras-applications>=1.0.6 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/71/e3/19762fdfc62877ae9102edf6342d71b28fbfd9dea3d2f96a882ce099b03f/Keras_Applications-1.0.8-py3-none-any.whl (50kB)
-    100% |████████████████████████████████| 51kB 2.8MB/s
 Collecting keras-preprocessing>=1.0.5 (from tensorflow)
   Downloading https://files.pythonhosted.org/packages/28/6a/8c1f62c37212d9fc441a7e26736df51ce6f0e38455816445471f10da4f0a/Keras_Preprocessing-1.1.0-py2.py3-none-any.whl (41kB)
-    100% |████████████████████████████████| 51kB 3.2MB/s
 Requirement already satisfied: setuptools in /usr/lib/python3.6/site-packages (from protobuf>=3.6.1->tensorflow)
 Collecting markdown>=2.6.8 (from tensorboard<1.15.0,>=1.14.0->tensorflow)
   Downloading https://files.pythonhosted.org/packages/c0/4e/fd492e91abdc2d2fcb70ef453064d980688762079397f779758e055f6575/Markdown-3.1.1-py2.py3-none-any.whl (87kB)
-    100% |████████████████████████████████| 92kB 4.3MB/s
 Collecting werkzeug>=0.11.15 (from tensorboard<1.15.0,>=1.14.0->tensorflow)
   Downloading https://files.pythonhosted.org/packages/ce/42/3aeda98f96e85fd26180534d36570e4d18108d62ae36f87694b476b83d6f/Werkzeug-0.16.0-py2.py3-none-any.whl (327kB)
-    100% |████████████████████████████████| 327kB 1.5MB/s
 Collecting h5py (from keras-applications>=1.0.6->tensorflow)
   Downloading https://files.pythonhosted.org/packages/60/06/cafdd44889200e5438b897388f3075b52a8ef01f28a17366d91de0fa2d05/h5py-2.10.0-cp36-cp36m-manylinux1_x86_64.whl (2.9MB)
-    100% |████████████████████████████████| 2.9MB 280kB/s
 Installing collected packages: astor, tensorflow-estimator, wrapt, wheel, protobuf, absl-py, google-pasta, gast, markdown, grpcio, werkzeug, tensorboard, termcolor, h5py, keras-applications, keras-preprocessing, tensorflow
   Running setup.py install for wrapt ... done
   Running setup.py install for absl-py ... done
