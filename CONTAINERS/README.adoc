@@ -1108,22 +1108,141 @@ A third way could be using curl.
 </html>
 -----------------
 
-*Backup the image*
+*Saving the images*
+
+Podman can be usedto save images to an archive file or directory and restore it later to another container environment. 
 
 [source,bash]
 -----------------
-# podman save -o ubi8_latest.tar registry.access.redhat.com/ubi8/ubi
- 
+# podman save -o ansiblewebchat_0.1 localhost/ansiblewebchat_0.1
+# podman save -o ansiblechatbotengine_0.1 localhost/ansiblechatbotengine_0.1
+
 # ls -lh
+total 1.4G
+-rw-r--r--. 1 root root 1.1G Jan 10 07:48 ansiblechatbotengine_0.1.tar
+-rw-r--r--. 1 root root 351M Jan 10 07:48 ansiblewebchat_0.1.tar
+drwxr-xr-x. 3 root root   42 Jan 10 06:57 engine
+drwxr-xr-x. 4 root root   29 Jan 10 06:56 python-ansible-chatbot
+drwxr-xr-x. 3 root root   42 Jan 10 07:04 webchat
+-----------------
 
-total 228M
--rw-r--r--. 1 root root 228M Jan  9 12:13 ubi8_latest.tar
+we can remove our images recently created to emulate a fresh installation and load (restore) our containers.
 
+[source,bash]
+-----------------
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED          SIZE
+localhost/ansiblewebchat_0.1          latest   5ae1eced8c19   40 minutes ago   368 MB
+localhost/ansiblechatbotengine_0.1    latest   f73ae2090435   45 minutes ago   1.13 GB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago      239 MB
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago      239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago     645 MB
+k8s.gcr.io/pause                      3.1      da86e6ba6ca1   2 years ago      747 kB
+
+# podman rmi 5ae1eced8c19
+0c5389a12c04b161bc79a0a357ddbb1b298d6aba9adb2214653e23e614d725d8
+07de6a13f349b98d880d0b93f3e96f957ab3f46366dfbe34e610624f39f01faa
+f96188da434271eb13b58d2786e2f504581d1e345c68b802ad36a44d20ae6251
+6b88ef84d9c7174483ffda4fe8a18a0e6923bf4b1e9f66446e87934beb28ebc5
+5ae1eced8c198e1525e2b5736b085dca4489f60fe3263315086820f39fa8bdd9
+
+# podman rmi f73ae2090435
+1c16f704450d66f3b0d4e1c8c88be4538a798a486ddbbeb83e235eafefd55a24
+9fd00ef6c888c33c2d4b948e2a112f65fa55f2cda22b9372a2663b5537994cc1
+953bc94ab55f5d411b3cd4b7e4039961f157542c3ce604ecc184e91631d3125c
+1db973aeea4b99268ecf977f037c9fd0edbe1d55db1349e62801ad3d4536d5b5
+c516f6ab9eb2189ba2c3bbe60f2f28d6f5faceaabac353ca6596ff3dd8f33e38
+6844d76fee817aa9cf649c5c9be5484bca91274332479dfe2891840cc9b97888
+1ba47472b0f2d7dc31f33b6d023aeaa9a069ec44583c13bcb71dbd5ceedff869
+488ab17965a112348899711dd58e9b4c20a1b9fbfde0ec5be788f925f1cc87fc
+7e3a65cd5e25d06b598c548d6c99631663a542282e7e73301fca2ef5095fdf7c
+f73ae2090435c43deaff4a4749cd2283b66be34e4e67f35e388b9d1c41c79646
+
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED        SIZE
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago    239 MB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago    239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago   645 MB
+k8s.gcr.io/pause                      3.1      da86e6ba6ca1   2 years ago    747 kB
+-----------------
+
+Now, restore the containers and run again to re-instantiate the service.
+
+[source,bash]
+-----------------
+# podman load -i ansiblewebchat_0.1.tar
+
+Getting image source signatures
+Copying blob aaef544432d3 done
+Copying blob 9f06c28ef392 done
+Copying blob e956ae04a50a done
+Copying blob 3cc03d64532c done
+Copying blob c630f5c3e169 skipped: already exists
+Copying blob 4bd7408cc1c8 skipped: already exists
+Copying config 5ae1eced8c done
+Writing manifest to image destination
+Storing signatures
+Loaded image(s): localhost/ansiblewebchat_0.1:latest
+
+# podman load -i ansiblechatbotengine_0.1.tar
+
+Getting image source signatures
+Copying blob d273dfdee6be done
+Copying blob 4bd7408cc1c8 skipped: already exists
+Copying blob 9f06c28ef392 skipped: already exists
+Copying blob e956ae04a50a skipped: already exists
+Copying blob 8dd71635abb5 done
+Copying blob c630f5c3e169 skipped: already exists
+Copying blob 34bc8b9f1a4f done
+Copying blob 7c69c6565a87 done
+Copying blob 8210a781aca6 done
+Copying config f73ae20904 done
+Writing manifest to image destination
+Storing signatures
+Loaded image(s): localhost/ansiblechatbotengine_0.1:latest
+
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED             SIZE
+localhost/ansiblewebchat_0.1          latest   5ae1eced8c19   About an hour ago   368 MB
+localhost/ansiblechatbotengine_0.1    latest   f73ae2090435   About an hour ago   1.13 GB
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago         239 MB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago         239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago        645 MB
+k8s.gcr.io/pause                      3.1      da86e6ba6ca1   2 years ago         747 kB
+-----------------
+
+Let's run again environment.
+
+[source,bash]
+-----------------
+#  podman run -ti --rm --pod=new:webchatpod --name=ansiblewebchat -d -p 8080:8080 localhost/ansiblewebchat_0.1
+0b5f2841bd0e7bcdb85c3526519605c562dcc32e2f06543f9def31bbc493cb78
+
+#  podman run -ti --rm --pod=webchatpod --name=ensibleengine -d ansiblechatbotengine_0.1
+0937c466416f35f9612a53717d7efed17e9b18b249e943f6a25fdd13e67ca55a
+
+# podman ps
+CONTAINER ID  IMAGE                                      COMMAND               CREATED         STATUS             PORTS  NAMES
+0937c466416f  localhost/ansiblechatbotengine_0.1:latest  /usr/bin/python3 ...  14 seconds ago  Up 14 seconds ago         ensibleengine
+0b5f2841bd0e  localhost/ansiblewebchat_0.1:latest        /usr/bin/python3 ...  42 seconds ago  Up 41 seconds ago         ansiblewebchat
 -----------------
 
 === WebConsole to manage containers with Podman
 
 * Installing the cockpit-podman plugin
+[source,bash]
+-----------------
+#  yum install cockpit-podman
+
+#  podman run -ti --rm --pod=webchatpod --name=ensibleengine -d ansiblechatbotengine_0.1
+0937c466416f35f9612a53717d7efed17e9b18b249e943f6a25fdd13e67ca55a
+
+# podman ps
+CONTAINER ID  IMAGE                                      COMMAND               CREATED         STATUS             PORTS  NAMES
+0937c466416f  localhost/ansiblechatbotengine_0.1:latest  /usr/bin/python3 ...  14 seconds ago  Up 14 seconds ago         ensibleengine
+0b5f2841bd0e  localhost/ansiblewebchat_0.1:latest        /usr/bin/python3 ...  42 seconds ago  Up 41 seconds ago         ansiblewebchat
+-----------------
+
 * Managing a container lifecycle inside webconsole
 
 == Resources and beyond
