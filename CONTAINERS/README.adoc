@@ -695,7 +695,6 @@ Total download size: 615 k
 Downloading Packages:
 (1/2): setup-2.12.2-2.el8_1.1.noarch.rpm        548 kB/s | 180 kB     00:00
 (2/2): gdb-gdbserver-8.2-6.el8_0.x86_64.rpm     1.3 MB/s | 435 kB     00:00
---------------------------------------------------------------------------------
 Total                                           1.8 MB/s | 615 kB     00:00
 Running transaction check
 Transaction check succeeded.
@@ -749,7 +748,7 @@ Downloading Packages:
 (1/3): python3-setuptools-39.2.0-5.el8.noarch.r 745 kB/s | 163 kB     00:00
 (2/3): python36-3.6.8-2.module+el8.1.0+3334+5cb  77 kB/s |  19 kB     00:00
 (3/3): python3-pip-9.0.3-15.el8.noarch.rpm       75 kB/s |  19 kB     00:00
---------------------------------------------------------------------------------
+
 Total                                           760 kB/s | 201 kB     00:00
 Running transaction check
 Transaction check succeeded.
@@ -864,7 +863,7 @@ Total download size: 615 k
 Downloading Packages:
 (1/2): setup-2.12.2-2.el8_1.1.noarch.rpm        574 kB/s | 180 kB     00:00
 (2/2): gdb-gdbserver-8.2-6.el8_0.x86_64.rpm     1.1 MB/s | 435 kB     00:00
---------------------------------------------------------------------------------
+
 Total                                           1.6 MB/s | 615 kB     00:00
 Running transaction check
 Transaction check succeeded.
@@ -918,7 +917,6 @@ Downloading Packages:
 (1/3): python3-pip-9.0.3-15.el8.noarch.rpm       65 kB/s |  19 kB     00:00
 (2/3): python36-3.6.8-2.module+el8.1.0+3334+5cb  59 kB/s |  19 kB     00:00
 (3/3): python3-setuptools-39.2.0-5.el8.noarch.r 491 kB/s | 163 kB     00:00
---------------------------------------------------------------------------------
 Total                                           599 kB/s | 201 kB     00:00
 Running transaction check
 Transaction check succeeded.
