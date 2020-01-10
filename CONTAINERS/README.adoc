@@ -1238,8 +1238,6 @@ Thant's it, you can now from webconsole manage the lifecycle of images and conta
 
 == Resources and beyond
 
-Sources
-
 * https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index/[BUILDING, RUNNING, AND MANAGING CONTAINERS^]  
 
 * https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/container-command-line-reference_building-running-and-managing-containers[ CONTAINER COMMAND-LINE REFERENCE^]  
