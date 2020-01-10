@@ -639,11 +639,177 @@ First things first. We need to create a directory tree to get things with some s
 # cp python-ansible-chatbot/src/* engine/chatbotApp/. webchat/chatbotApp/.
 -----------------
 
-Let's build the engine container.
+Let's build the web chat container.
 
 [source,bash]
 -----------------
-# cd engine
+# cd /root/containers/webchat
+# vim Dockerfile
+
+*Dockerfile content*
+FROM registry.access.redhat.com/ubi8/ubi
+
+RUN yum update -y
+RUN yum install python36 -y
+
+RUN pip3 install flask
+
+CMD ["mkdir","/root/chatbot"]
+
+COPY /chatbotApp/* /root/chatbot/
+
+WORKDIR /root/chatbot
+
+CMD ["/usr/bin/python3","webChat.py","title=Ansible_Chatter","subtitle=Latam_Techonology_Office","comment=Mantained by adirgan@redhat.com","questionSentence=What_you_need_to_Know?","buttonText=Ask", "botName=Ansible_Expert", "botName=Ansible_Expert"]
+-----------------
+
+Now, we need to build the container. 
+
+[source,bash]
+-----------------
+# podman build -t ansiblewebchat_0.1 .
+# podman build -t ansiblewebchat_0.1 .
+STEP 1: FROM registry.access.redhat.com/ubi8/ubi
+STEP 2: RUN yum update -y
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Red Hat Enterprise Linux 8 for x86_64 - BaseOS  3.8 MB/s |  13 MB     00:03
+Red Hat Enterprise Linux 8 for x86_64 - AppStre 3.3 MB/s |  14 MB     00:04
+Red Hat Universal Base Image 8 (RPMs) - BaseOS  223 kB/s | 760 kB     00:03
+Red Hat Universal Base Image 8 (RPMs) - AppStre 1.2 MB/s | 3.1 MB     00:02
+Red Hat Universal Base Image 8 (RPMs) - CodeRea 6.2 kB/s | 9.1 kB     00:01
+Dependencies resolved.
+================================================================================
+ Package       Arch   Version            Repository                        Size
+================================================================================
+Upgrading:
+ setup         noarch 2.12.2-2.el8_1.1   rhel-8-for-x86_64-baseos-rpms    180 k
+ gdb-gdbserver x86_64 8.2-6.el8_0        rhel-8-for-x86_64-appstream-rpms 435 k
+
+Transaction Summary
+================================================================================
+Upgrade  2 Packages
+
+Total download size: 615 k
+Downloading Packages:
+(1/2): setup-2.12.2-2.el8_1.1.noarch.rpm        548 kB/s | 180 kB     00:00
+(2/2): gdb-gdbserver-8.2-6.el8_0.x86_64.rpm     1.3 MB/s | 435 kB     00:00
+--------------------------------------------------------------------------------
+Total                                           1.8 MB/s | 615 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Upgrading        : gdb-gdbserver-8.2-6.el8_0.x86_64                       1/4
+  Upgrading        : setup-2.12.2-2.el8_1.1.noarch                          2/4
+warning: /etc/shadow created as /etc/shadow.rpmnew
+
+  Running scriptlet: setup-2.12.2-2.el8_1.1.noarch                          2/4
+  Cleanup          : setup-2.12.2-2.el8_0.1.noarch                          3/4
+  Cleanup          : gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+  Running scriptlet: gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+  Verifying        : setup-2.12.2-2.el8_1.1.noarch                          1/4
+  Verifying        : setup-2.12.2-2.el8_0.1.noarch                          2/4
+  Verifying        : gdb-gdbserver-8.2-6.el8_0.x86_64                       3/4
+  Verifying        : gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+Installed products updated.
+
+Upgraded:
+  setup-2.12.2-2.el8_1.1.noarch         gdb-gdbserver-8.2-6.el8_0.x86_64
+
+Complete!
+7e01ddcaa846a0d2907ae970b38c495e76af95b37f53acfaed6083c9fb776564
+STEP 3: RUN yum install python36 -y
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Last metadata expiration check: 0:00:17 ago on Fri Jan 10 11:45:03 2020.
+Dependencies resolved.
+================================================================================
+ Package              ArchVersion                              Repository                       Size
+================================================================================
+Installing:
+ python36             x86_643.6.8-2.module+el8.1.0+3334+5cb623d7 rhel-8-for-x86_64-appstream-rpms 19 k
+Installing dependencies:
+ python3-setuptools   noarch39.2.0-5.el8                         rhel-8-for-x86_64-baseos-rpms    163 k
+ python3-pip          noarch9.0.3-15.el8                         rhel-8-for-x86_64-appstream-rpms 19 k
+Enabling module streams:
+ python36             3.6
+
+Transaction Summary
+================================================================================
+Install  3 Packages
+
+Total download size: 201 k
+Installed size: 466 k
+Downloading Packages:
+(1/3): python3-setuptools-39.2.0-5.el8.noarch.r 745 kB/s | 163 kB     00:00
+(2/3): python36-3.6.8-2.module+el8.1.0+3334+5cb  77 kB/s |  19 kB     00:00
+(3/3): python3-pip-9.0.3-15.el8.noarch.rpm       75 kB/s |  19 kB     00:00
+--------------------------------------------------------------------------------
+Total                                           760 kB/s | 201 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Installing       : python3-setuptools-39.2.0-5.el8.noarch                 1/3
+  Installing       : python3-pip-9.0.3-15.el8.noarch                        2/3
+  Installing       : python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   3/3
+  Running scriptlet: python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   3/3
+  Verifying        : python3-setuptools-39.2.0-5.el8.noarch                 1/3
+  Verifying        : python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   2/3
+  Verifying        : python3-pip-9.0.3-15.el8.noarch                        3/3
+Installed products updated.
+
+Installed:
+  python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64
+  python3-setuptools-39.2.0-5.el8.noarch
+  python3-pip-9.0.3-15.el8.noarch
+
+Complete!
+125564775c7fbfe3adad166ad95c8c3749fb9a3bf4c5320ff2baacae0af73cdb
+STEP 4: RUN pip3 install flask
+WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
+Collecting flask
+  Downloading https://files.pythonhosted.org/packages/9b/93/628509b8d5dc749656a9641f4caf13540e2cdec85276964ff8f43bbb1d3b/Flask-1.1.1-py2.py3-none-any.whl (94kB)
+    100% |████████████████████████████████| 102kB 2.6MB/s
+Collecting Werkzeug>=0.15 (from flask)
+  Downloading https://files.pythonhosted.org/packages/ce/42/3aeda98f96e85fd26180534d36570e4d18108d62ae36f87694b476b83d6f/Werkzeug-0.16.0-py2.py3-none-any.whl (327kB)
+    100% |████████████████████████████████| 327kB 1.9MB/s
+Collecting Jinja2>=2.10.1 (from flask)
+  Downloading https://files.pythonhosted.org/packages/65/e0/eb35e762802015cab1ccee04e8a277b03f1d8e53da3ec3106882ec42558b/Jinja2-2.10.3-py2.py3-none-any.whl (125kB)
+    100% |████████████████████████████████| 133kB 6.2MB/s
+Collecting click>=5.1 (from flask)
+  Downloading https://files.pythonhosted.org/packages/fa/37/45185cb5abbc30d7257104c434fe0b07e5a195a6847506c074527aa599ec/Click-7.0-py2.py3-none-any.whl (81kB)
+    100% |████████████████████████████████| 81kB 5.2MB/s
+Collecting itsdangerous>=0.24 (from flask)
+  Downloading https://files.pythonhosted.org/packages/76/ae/44b03b253d6fade317f32c24d100b3b35c2239807046a4c953c7b89fa49e/itsdangerous-1.1.0-py2.py3-none-any.whl
+Collecting MarkupSafe>=0.23 (from Jinja2>=2.10.1->flask)
+  Downloading https://files.pythonhosted.org/packages/b2/5f/23e0023be6bb885d00ffbefad2942bc51a620328ee910f64abe5a8d18dd1/MarkupSafe-1.1.1-cp36-cp36m-manylinux1_x86_64.whl
+Installing collected packages: Werkzeug, MarkupSafe, Jinja2, click, itsdangerous, flask
+Successfully installed Jinja2-2.10.3 MarkupSafe-1.1.1 Werkzeug-0.16.0 click-7.0 flask-1.1.1 itsdangerous-1.1.0
+4169f6f9047002ac92a0c74e4141c9f950a04269ea1f5753f1850f7df69db162
+STEP 5: CMD ["mkdir","/root/chatbot"]
+2c974cf0c23321b1bbc910cadc389838d517028cc7787eb476f383e5dc0e9a37
+STEP 6: COPY /chatbotApp/* /root/chatbot/
+77ce9f864d4fb14759cf2a20b01339aab7e87293f67a139c2f1b293d77bfebe7
+STEP 7: WORKDIR /root/chatbot
+e198ac4b38dcbb1705988125d44c846e97305027d45bb5f985ab86d28953cbd2
+STEP 8: CMD ["/usr/bin/python3","webChat.py","title=Ansible_Chatter","subtitle=Latam_Techonology_Office","comment=Mantained by adirgan@redhat.com","questionSentence=What_you_need_to_Know?","buttonText=Ask", "botName=Ansible_Expert", "botName=Ansible_Expert"]
+STEP 9: COMMIT ansiblewebchat_0.1
+4ce07810a2228c3c1b871eb5cf004d6e183f2c6c7c672deab9ad044a92a745e6
+-----------------
+
+Let's continue with the chatbot engine.
+
+[source,bash]
+-----------------
+# cd /root/containers/engine
 # vim Dockerfile
 
 *Dockerfile content*
@@ -666,44 +832,12 @@ WORKDIR /root/chatbot
 CMD ["/usr/bin/python3","serviceProvider.py"]
 -----------------
 
-Now, we need to build the container. 
+Now, we build the container. 
 
 [source,bash]
 -----------------
-# podman build -t chatbotengine .
------------------
+# podman build -t ansiblechatbotengine_0.1 .
 
-Let's continue with the chatbot web interface.
-
-[source,bash]
------------------
-# cd webchat
-# vim Dockerfile
-
-*Dockerfile content*
-FROM registry.access.redhat.com/ubi8/ubi
-
-RUN yum update -y
-RUN yum install python36 -y
-
-RUN pip3 install nltk
-
-CMD ["mkdir","/root/chatbot"]
-
-COPY /chatbotApp/* /root/chatbot/
-
-WORKDIR /root/chatbot
-
-CMD ["/usr/bin/python3","serviceProvider.py"]
------------------
-
-Now, we need to build the container. 
-
-[source,bash]
------------------
-# podman build -t chatbotengine .
-
-podman build -t chatbotengine_0.1 .
 STEP 1: FROM registry.access.redhat.com/ubi8/ubi
 STEP 2: RUN yum update -y
 Updating Subscription Management repositories.
@@ -907,20 +1041,9 @@ b89e969d82ac4035d17f6160a881c78111a122c8bf2ad74c71588b235339d3f2
 STEP 11: CMD ["/usr/bin/python3","serviceProvider.py"]
 STEP 12: COMMIT chatbotengine_0.1
 70a8e5aa0055644404bc4a24eca27a3692b1296894f9a8c625e3c7cc2eba1b48
-
 -----------------
 
-
-
-
------------------
-
-
-Choose the base
-Update and install packages and libraries need by the service is going to be installed in the image
-Copy the source code to the image
-Define the start command to run the service once the container is started
-
+Our engine container has been created successfully.
 
 === Running and testing the container
 
