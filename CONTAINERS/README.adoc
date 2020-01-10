@@ -680,15 +680,12 @@ Red Hat Universal Base Image 8 (RPMs) - BaseOS  223 kB/s | 760 kB     00:03
 Red Hat Universal Base Image 8 (RPMs) - AppStre 1.2 MB/s | 3.1 MB     00:02
 Red Hat Universal Base Image 8 (RPMs) - CodeRea 6.2 kB/s | 9.1 kB     00:01
 Dependencies resolved.
-================================================================================
  Package       Arch   Version            Repository                        Size
-================================================================================
 Upgrading:
  setup         noarch 2.12.2-2.el8_1.1   rhel-8-for-x86_64-baseos-rpms    180 k
  gdb-gdbserver x86_64 8.2-6.el8_0        rhel-8-for-x86_64-appstream-rpms 435 k
 
 Transaction Summary
-================================================================================
 Upgrade  2 Packages
 
 Total download size: 615 k
@@ -727,9 +724,7 @@ Unable to read consumer identity
 Subscription Manager is operating in container mode.
 Last metadata expiration check: 0:00:17 ago on Fri Jan 10 11:45:03 2020.
 Dependencies resolved.
-================================================================================
  Package              ArchVersion                              Repository                       Size
-================================================================================
 Installing:
  python36             x86_643.6.8-2.module+el8.1.0+3334+5cb623d7 rhel-8-for-x86_64-appstream-rpms 19 k
 Installing dependencies:
@@ -739,7 +734,6 @@ Enabling module streams:
  python36             3.6
 
 Transaction Summary
-================================================================================
 Install  3 Packages
 
 Total download size: 201 k
@@ -848,15 +842,12 @@ Red Hat Universal Base Image 8 (RPMs) - BaseOS  186 kB/s | 760 kB     00:04
 Red Hat Universal Base Image 8 (RPMs) - AppStre 1.2 MB/s | 3.1 MB     00:02
 Red Hat Universal Base Image 8 (RPMs) - CodeRea 7.2 kB/s | 9.1 kB     00:01
 Dependencies resolved.
-================================================================================
  Package       Arch   Version            Repository                        Size
-================================================================================
 Upgrading:
  setup         noarch 2.12.2-2.el8_1.1   rhel-8-for-x86_64-baseos-rpms    180 k
  gdb-gdbserver x86_64 8.2-6.el8_0        rhel-8-for-x86_64-appstream-rpms 435 k
 
 Transaction Summary
-================================================================================
 Upgrade  2 Packages
 
 Total download size: 615 k
@@ -896,9 +887,7 @@ Unable to read consumer identity
 Subscription Manager is operating in container mode.
 Last metadata expiration check: 0:00:18 ago on Fri Jan 10 11:17:07 2020.
 Dependencies resolved.
-================================================================================
  Package              ArchVersion                              Repository                       Size
-================================================================================
 Installing:
  python36             x86_643.6.8-2.module+el8.1.0+3334+5cb623d7 rhel-8-for-x86_64-appstream-rpms 19 k
 Installing dependencies:
@@ -908,7 +897,6 @@ Enabling module streams:
  python36             3.6
 
 Transaction Summary
-================================================================================
 Install  3 Packages
 
 Total download size: 201 k
