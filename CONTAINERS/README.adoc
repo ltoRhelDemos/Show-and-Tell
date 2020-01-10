@@ -1230,26 +1230,19 @@ CONTAINER ID  IMAGE                                      COMMAND               C
 === WebConsole to manage containers with Podman
 
 * Installing the cockpit-podman plugin
+
 [source,bash]
 -----------------
 #  yum install cockpit-podman
-
-#  podman run -ti --rm --pod=webchatpod --name=ensibleengine -d ansiblechatbotengine_0.1
-0937c466416f35f9612a53717d7efed17e9b18b249e943f6a25fdd13e67ca55a
-
-# podman ps
-CONTAINER ID  IMAGE                                      COMMAND               CREATED         STATUS             PORTS  NAMES
-0937c466416f  localhost/ansiblechatbotengine_0.1:latest  /usr/bin/python3 ...  14 seconds ago  Up 14 seconds ago         ensibleengine
-0b5f2841bd0e  localhost/ansiblewebchat_0.1:latest        /usr/bin/python3 ...  42 seconds ago  Up 41 seconds ago         ansiblewebchat
 -----------------
 
-* Managing a container lifecycle inside webconsole
+Thant's it, you can now from webconsole manage the lifecycle of images and containers.
 
 == Resources and beyond
 
 Sources
 
-*
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index/[BUILDING, RUNNING, AND MANAGING CONTAINERS^]  
 *
 *
 *
