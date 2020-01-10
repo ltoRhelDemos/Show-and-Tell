@@ -439,7 +439,7 @@ Let's start the nextcloud container. In this case, this a container with an appl
 
 [source,bash]
 -----------------
-# podman run --name=nextcloud -d -p 8080:80 docker.io/library/nextcloud
+# podman run --rm --name=nextcloud -d -p 8080:80 docker.io/library/nextcloud
 a26221d2aba4338206a7a7d5b51ccdd76f9eb9e51e6332e7667e127d908071a4
 
 #podman ps
@@ -636,8 +636,8 @@ First things first. We need to create a directory tree to get things with some s
 # cd ansibleChatbot
 # mkdir -p engine/chatbotApp webchat/chatbotApp
 # git clone https://github.com/ltoRhelDemos/python-ansible-chatbot.git
-# cp python-ansible-chatbot/src/* engine/chatbotApp/. webchat/chatbotApp/.
------------------
+# cp python-ansible-chatbot/src/* webchat/chatbotApp/.
+# cp python-ansible-chatbot/src/* engine/chatbotApp/.
 
 Let's build the web chat container.
 
@@ -668,7 +668,7 @@ Now, we need to build the container.
 [source,bash]
 -----------------
 # podman build -t ansiblewebchat_0.1 .
-# podman build -t ansiblewebchat_0.1 .
+
 STEP 1: FROM registry.access.redhat.com/ubi8/ubi
 STEP 2: RUN yum update -y
 Updating Subscription Management repositories.
@@ -1045,11 +1045,102 @@ STEP 12: COMMIT chatbotengine_0.1
 
 Our engine container has been created successfully.
 
-=== Running and testing the container
+=== Running and testing our service
 
 *List the local images*
-*Run the container from the local image*
+[source,bash]
+-----------------
+# podman images
+
+REPOSITORY                            TAG      IMAGE ID       CREATED          SIZE
+localhost/ansiblewebchat_0.1          latest   5ae1eced8c19   13 seconds ago   368 MB
+localhost/ansiblechatbotengine_0.1    latest   f73ae2090435   4 minutes ago    1.13 GB
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago      239 MB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago      239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago     645 MB
+-----------------
+
+*The need of a POD"
+
+The webchat service needs to communicate with the engine layer and both services are exposing different ports and protocols. We only need to expose the webchat port which is 8080 through http.- The engine only needs to communicate with the webchat and they need to be in the same network namespace so the webchat service only needs to communicate with localhost:9095. For the two containers to be in the same network namespace we need to create a common pod in which each container lives.
+
+For this purpose we are going to create the pod when we start the webchat container, as we´ll see in the next seccion.
+
+*Run the WEBCHAT container*
+
+[source,bash]
+-----------------
+# podman run -ti --rm --pod=new:webchatpod --name=webchat -d -p 8080:8080 ansiblewebchat_0.1
+
+# podman ps
+CONTAINER ID  IMAGE                                COMMAND               CREATED             STATUS                 PORTS                   NAMES
+621c9968b211  localhost/ansiblewebchat_0.1:latest  /usr/bin/python3 ...  About a minute ago  Up About a minute ago  0.0.0.0:8080->8080/tcp  webchat
+-----------------
+
+*Run the engine container*
+
+[source,bash]
+-----------------
+# podman run -ti --rm --pod=webchatpod --name=ensibleenginet -d ansiblechatbotengine_0.1
+
+# podman ps
+CONTAINER ID  IMAGE                                      COMMAND               CREATED        STATUS            PORTS                   NAMES
+978f3eff94bc  localhost/ansiblechatbotengine_0.1:latest  /usr/bin/python3 ...  3 seconds ago  Up 3 seconds ago  0.0.0.0:8080->8080/tcp  ensibleenginet
+621c9968b211  localhost/ansiblewebchat_0.1:latest        /usr/bin/python3 ...  2 minutes ago  Up 2 minutes ago  0.0.0.0:8080->8080/tcp  webchat
+-----------------
+
 *Test the service*
+
+Now we can test our service is up & running accessing http://192.168.56.116:8080/chat in a web browser to expose a web interface.
+
+Other way to access the service is through the api that this service expose.
+
+http://192.168.56.116:8080/api?command=chat&question=what_is_ansible?
+
+The output should be like this:
+
+[source,bash]
+-----------------
+{
+"response": {
+"answer": "Ansible is a radically simple IT automation engine that automates cloud provisioning, configuration management, application deployment, intra-service orchestration, and many other IT needs.",
+"tag": "ansible"
+},
+"status": "(OK)"
+}
+-----------------
+
+A third way could be using curl.
+
+[source,bash]
+-----------------
+# curl http://192.168.56.116:8080/chat
+
+<html>
+
+<head>
+<title>Ansible Chatter</title>
+</head>
+
+<body>
+<h1 style="color:#a10000;line-height:20px">Ansible Chatter</h1>
+<h2 style="color:#a10000;line-height:5px">Latam Techonology Office</h2>
+<h6 style="color:#a10000;line-height:3px">Mantained by adirgan@redhat.com</h6>
+<hr     >
+
+<form method="POST">
+    What you need to Know? <input type="text" name="question">
+    <input type="submit" value="Ask">
+</form>
+<hr>
+
+<h4 style="color:#05157a;line-height:5px">Ansible Expert Response</h4>
+<h4 style="border:1px solid #05157a;color:#05157a">###    </h4>
+
+</body>
+</html>
+-----------------
+
 *Backup the image*
 
 [source,bash]
