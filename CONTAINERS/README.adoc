@@ -3,12 +3,10 @@
 :toc2:
 :imagesdir: images
 
-= RHEL 8 New Container tools
+= RHEL 8 New Container tools - LTO Show & Tell Series
 
 == Description
 This Show&Tell is aimed to share some of the most important concepts and features of the new technology adopted by RHEL 8 to manage and implement containers, using podman, buildah and skopeo.
-
-Duration: 4h with 2 breaks
 
 Audience: IT Managers, Architects and technical staff who operates Linux
 
