@@ -1242,11 +1242,17 @@ Thant's it, you can now from webconsole manage the lifecycle of images and conta
 
 Sources
 
-https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index/[BUILDING, RUNNING, AND MANAGING CONTAINERS^]  
-*
-*
-*
-*
-*
-*
-*
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index/[BUILDING, RUNNING, AND MANAGING CONTAINERS^]  
+
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/container-command-line-reference_building-running-and-managing-containers[ CONTAINER COMMAND-LINE REFERENCE^]  
+
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/getting_started_with_containers/using_red_hat_universal_base_images_standard_minimal_and_runtimes[USING RED HAT UNIVERSAL BASE IMAGES (STANDARD, MINIMAL, AND RUNTIMES)^]  
+
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/working-with-container-images_building-running-and-managing-containers[WORKING WITH CONTAINER IMAGES)^]  
+
+
+
+
+
+
+
