@@ -664,6 +664,15 @@ CMD ["/usr/bin/python3","webChat.py","title=Ansible_Chatter","subtitle=Latam_Tec
 
 Now, we need to build the container. 
 
+[NOTE] YOU MUST LOG-IN IN registry.access.redhat.com with your Red Hat credentials or a developer account which is free.
+
+[source,bash]
+-----------------
+# podman login registry.access.redhat.com
+username:
+password:
+-----------------
+
 [source,bash]
 -----------------
 # podman build -t ansiblewebchat_0.1 .
