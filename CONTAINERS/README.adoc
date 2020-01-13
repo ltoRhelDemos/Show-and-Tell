@@ -630,8 +630,8 @@ First things first. We need to create a directory tree to get things with some s
 [source,bash]
 -----------------
 # cd /root
-# mkdir ansibleChatbot
-# cd ansibleChatbot
+# mkdir containers
+# cd containers
 # mkdir -p engine/chatbotApp webchat/chatbotApp
 # git clone https://github.com/ltoRhelDemos/python-ansible-chatbot.git
 # cp python-ansible-chatbot/src/* webchat/chatbotApp/.
