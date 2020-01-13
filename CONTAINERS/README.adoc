@@ -1034,7 +1034,7 @@ registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago      2
 docker.io/library/nextcloud           latest   9f69908039fd   6 months ago     645 MB
 -----------------
 
-*The need of a POD"
+*The need of a POD*
 
 The webchat service needs to communicate with the engine layer and both services are exposing different ports and protocols. We only need to expose the webchat port which is 8080 through http.- The engine only needs to communicate with the webchat and they need to be in the same network namespace so the webchat service only needs to communicate with localhost:9095. For the two containers to be in the same network namespace we need to create a common pod in which each container lives.
 
