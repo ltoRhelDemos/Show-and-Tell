@@ -448,7 +448,7 @@ done
 
 This escenario is simulated but can be used for showing how the optimization process transcur noticing the change in use of the logical and the physical disks. 
 
-*Undoing the changes*
+== Undoing the changes
  
 What you’ll see in the following lines is a way to undo all the steps followed for creating the vdo volume, due to the fact that not only important to build but to de-construct.
 
