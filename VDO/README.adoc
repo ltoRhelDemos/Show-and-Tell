@@ -140,5 +140,133 @@ VDO depends on the following software:
 * LVM
 * Python 2.7
 
+== Common use cases 
 
+VDO can be used for several use cases commonly present in the majority of enterprises nowadays. Some of the use cases have strong patterns that VDO exploits for maximizing the optimization process.
+
+A VDO volume can store the following types of data that are good candidates for being optimized.
+
+* VMs and Container
+* Logs consolidation
+* Session recordings
+* Home Directories
+* Backups
+
+*Red Hat estimates some optimizations depending on the use case.*
+
+When hosting active VMs or containers, Red Hat recommends provisioning storage at a 10:1 logical to physical ratio: that is, if you are utilizing 1 TB of physical storage, you would present it as 10 TB of logical storage.
+
+For object storage, such as the type provided by Ceph, Red Hat recommends using a 3:1 logical to physical ratio: that is, 1 TB of physical storage would present as 3 TB logical storage.
+
+In any case though, the optimization ratio is determined by the behavior and characteristics of the data stored, so it is very important to sit a VDO Volume on top a flexible volume like LVM for expanding space as needed.
+
+== Deployment Scenarios
+
+Because VDO exposes its deduplicated storage as a standard Linux block device, you can use it with standard file systems, iSCSI and FC target drivers, or as unified storage.
+ 
+Some possible deployment scenarios are listed below:
+ 
+*As a repository for VM disks*
+
+image::vdo-fig6.png[]
+
+*A shared file system* 
+
+image::vdo-fig7.png[]
+
+*An iSCSI Target*
+
+image::vdo-fig8.png[]
+
+*Multiple LVMs on an optimized volume*
+
+image::vdo-fig9.png[]
+
+*Encrypted Volume*
+
+== So, let’s install VDO in the host and configure an optimized volume!
+ 
+For using VDO, it is necessary to install the following packages:
+
+[source, bash]
+------------------
+[root@server ~]# yum install vdo kmod-kvdo
+------------------
+
+Once installed, let's create a vdo volume on top of a RAID device. We have present 2 disks of 8GB: sdb, sdbc.
+ 
+But first take a look at the block diagram to check what we are going to do with the command line.
+
+image::vdo-fig10.png[]
+
+[source, bash]
+------------------
+[root@server ~]#  mdadm --create --verbose /dev/md0 --level=mirror --raid-devices=2 /dev/sdb /dev/sdc
+
+[root@server ~]#  watch cat /proc/mdstat 
+------------------
+
+After having a RAID device we need to create a volume group called vg1 on top of that, based on the best practice of having a volume management tool for adding space as needed.
+
+[source, bash]
+------------------
+[root@server ~]# vgcreate vg1 /dev/md0
+------------------
+
+Then we need to create a Logical Volume called lv1 to have flexibility for future growth. The logical volume created is 4G of size, and it can grow up to 8G.
+
+[source, bash]
+------------------
+[root@server ~]# lvcreate vg1 -L 4G -n lv1
+------------------
+
+Once this is created we have the underlying block device for creating the VDO volume called vdovolume. The logical size is going to be the double of the physical size configured which is 4G.
+
+
+[source, bash]
+------------------
+[root@server ~]# vdo create --name=vdovolume --device=/dev/mapper/vg1-lv1 --vdoLogicalSize=8G --writePolicy=async --vdoSlabSize=512M
+
+Creating VDO vdovolume
+Starting VDO vdovolume
+Starting compression on VDO vdovolume
+VDO instance 5 volume is ready at /dev/mapper/vdovolume
+------------------
+
+After this we need to create a format and mount the device.
+
+[source, bash]
+------------------
+[root@server ~]# mkfs.xfs /dev/mapper/vdovolume
+
+meta-data=/dev/mapper/vdovolume  isize=512    agcount=4, agsize=524288 blks
+         =                       sectsz=4096  attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1
+data     =                       bsize=4096   blocks=2097152, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=4096  sunit=1 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+[root@server ~]# mkdir /data
+
+[root@server ~]# mount /dev/mapper/vdovolume /data
+
+[root@server ~]# df -kh /data
+Filesystem             Size  Used Avail Use% Mounted 
+/dev/mapper/vdovolume  8.0G   90M  8.0G   2% /data
+
+[root@server ~]# vdostats --hu
+Device                    Size      Used Available Use% Space saving%
+/dev/mapper/vdovolume      4.0G      3.0G   1021.8M  75%           99%
+------------------
+
+If we want to persist the volume after a boot we need to create an entry on the fstab file in /etc.
+
+[source, bash]
+------------------
+/dev/mapper/vdovolume /data auto _netdev,x-systemd.device-timeout=0,x-systemd.requires=vdo.service 0 0
+------------------
 
