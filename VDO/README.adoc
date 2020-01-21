@@ -37,10 +37,108 @@ That's why VDO is so convenient for putting in place optimization mechanisms tha
 
 VDO applies three different algorithms in a sequence for achieving great optimizations in the storage layer.
 
-* Zero-Block Elimination: any block that consists exclusively of zeros is identified and recorded only in a special place for metadata. This means that VDO only store in physical disk Blocks that contain something other than zeros. This is the first thing VDO executes over the data analyzed.
+* *Zero-Block Elimination*: any block that consists exclusively of zeros is identified and recorded only in a special place for metadata. This means that VDO only store in physical disk Blocks that contain something other than zeros. This is the first thing VDO executes over the data analyzed.
 
-* Deduplication: After the data is parsed and it is free of blocks of zeroes it is processed to determine whether it is redundant or not (data that has been written before). The redundancy of this data is checked through metadata maintained by the UDS (Universal Deduplication Service) kernel module which is a fundamental part of VDO. Any block of data that is found written before will not be written again, instead,  the metadata will be updated to point out to the original copy of the block already stored in disk.  
+* *Deduplication*: After the data is parsed and it is free of blocks of zeroes it is processed to determine whether it is redundant or not (data that has been written before). The redundancy of this data is checked through metadata maintained by the UDS (Universal Deduplication Service) kernel module which is a fundamental part of VDO. Any block of data that is found written before will not be written again, instead,  the metadata will be updated to point out to the original copy of the block already stored in disk.  
 
-* Compression: Once these 2 phases are accomplished, LZ4 compression is applied to the remaining data blocks. The compressed blocks are then stored together into fixed length (4 KB) blocks and stored on disks.  There is a speed up optimization when a single physical block comprise many compressed blocks, in such a way readings can be benefited.
+* *Compression*: Once these 2 phases are accomplished, LZ4 compression is applied to the remaining data blocks. The compressed blocks are then stored together into fixed length (4 KB) blocks and stored on disks.  There is a speed up optimization when a single physical block comprise many compressed blocks, in such a way readings can be benefited.
+
+image::vdo-fig1.png[]
+
+After this 3-phase process VDO can optimize data big time, but this optimization depends on the very nature of the data stored on disk, so special caution about in which cases VDO could be a good tool to have between the block device and the filesystem.
+
+== VDO architecture and components 
+
+The VDO solution consists of kvdo, uds and command line tools.
+
+*The VDO Kernel Module (kvd)*
+
+The kvdo Linux kernel module provides block-layer deduplication services within the Linux Device Mapper layer. In the Linux kernel, Device Mapper serves as a generic framework for managing pools of block storage, allowing the insertion of block-processing modules into the storage stack between the kernel's block interface and the actual storage device drivers.
+
+The kvdo module is exposed as a block device that can be accessed directly for block storage or presented through one of the many available Linux file systems, such as XFS or ext4. 
+
+When kvdo receives a request to read a (logical) block of data from a VDO volume, it maps the requested logical block to the underlying physical block and then reads and returns the requested data.
+
+*The UDS Kernel Module (uds)*
+
+The UDS index provides the foundation of the VDO product. For each new piece of data, it quickly determines if that piece is identical to any previously stored piece of data. If the index finds a match, the storage system can then internally reference the existing item to avoid storing the same information more than once.
+
+The UDS index runs inside the kernel as the uds kernel module.
+
+*Command line tools*
+
+Tools like vdo and vdostats for configuring and managing optimized storage.
+
+*What is a VDO Volume?*
+
+VDO uses a block device as a storage, which can be made of an aggregation of physical storage consisting of one or more disks, partitions, or even flat files. When a VDO volume is created by a storage management tool, VDO reserves space from the volume for both a UDS index and the VDO volume, which interact together to provide deduplicated block storage to users and applications. 
+
+image::vdo-fig2.png[]
+
+*Slabs*
+
+The physical storage of the VDO volume is divided into a number of slabs, each of which is a contiguous region of the physical space. All of the slabs for a given volume will be of the same size, which may be any power of 2 multiple of 128 MB up to 32 GB.
+
+The default slab size is 2 GB. A single VDO volume may have up to 8096 slabs. Therefore, in the default configuration with 2 GB slabs, the maximum allowed physical storage is 16 TB. When using 32 GB slabs, the maximum allowed physical storage is 256 TB. At least one entire slab is reserved by VDO for metadata, and therefore cannot be used for storing user data.
+
+Slab size has no effect on the performance of the VDO volume.
+
+Recommended slap sizes:
+
+image::vdo-fig3.png[]
+
+*Physical storage*
+
+A VDO volume is a thinly provisioned block device. It is best practice to place the volume on top of storage that can be expanded at a later time such as an LVM volume. 
+
+A single VDO volume can be configured to use up to 256 TB of physical storage.
+
+*Logical Size*
+
+The logical volume size defaults to the available physical volume size. 
+
+VDO currently supports any logical size up to 254 times the size of the physical volume with an absolute maximum logical size of 4PB.
+
+*Write modes*
+
+VDO supports two write modes: sync and async. When VDO is in sync mode, writes to the VDO device are acknowledged when the underlying storage has written the data permanently. When VDO is in async mode, writes are acknowledged before being written to persistent storage.
+
+It is critical to set the VDO write policy to match the behavior of the underlying storage. By default, VDO write policy is set to the auto option, which selects the appropriate policy automatically.
+
+== VDO Requirements
+
+*RAM*
+
+Each VDO volume has two distinct memory requirements:
+
+* The VDO module requires 370 MB plus an additional 268 MB per each 1 TB of physical storage managed.
+
+* The Universal Deduplication Service (UDS) index requires a minimum of 250 MB of DRAM, which is also the default amount that deduplication uses.  UDS uses an average of 4 bytes per entry in memory (including cache).
+
+*Storage*
+
+VDO requires storage for two types of data: metadata and UDS index:
+
+* The first type of VDO metadata uses approximately 1 MB for each 4 GB of physical storage plus an additional 1 MB per slab.
+
+* The second type of VDO metadata consumes approximately 1.25 MB for each 1 GB of logical storage, rounded up to the nearest slab.
+
+* The amount of storage required for the UDS index depends on the type of index and the amount of RAM allocated to the index. For each 1 GB of RAM, a dense UDS index uses 17 GB of storage, and a sparse UDS index will use 170 GB of storage.
+
+*Some examples of VDO Storage and Memory Requirements for Primary Storage*
+
+image::vdo-fig4.png[]
+
+*Some examples of VDO Storage and Memory Requirements for Backup Storage*
+
+image::vdo-fig5.png[]
+
+*Software*
+
+VDO depends on the following software:
+
+* LVM
+* Python 2.7
+
 
 
