@@ -1,0 +1,25 @@
+:scrollbar:
+:data-uri:
+:toc2:
+:imagesdir: images
+
+= RED HAT INSIGHTS: UNDERSTANDING WHAT'S INSIDE - LTO Show & Tell Series
+
+== Description
+This Show&Tell is aimed to share some of the most important concepts and features of Insights and hiow it can help to customer looking for stability, availability, security and performance in their Operating System Grid.
+
+Audience: IT Managers, Architects and technical staff who operates Linux
+
+:numbered:
+
+== Introduction
+As existing workloads evolve and deployments grow in size and complexity, risk management is a key challenge for enterprise IT. To succeed, operations departments need to rapidly deploy new environments and ensure systems scale reliably. Red Hat® Insights helps customers benefit from the experience and technical knowledge of Red Hat Certified Engineers (RHCEs®) and makes it easier for users to identify, prioritize, and resolve issues before business operations are affected.
+
+Red Hat Insights provides highly scalable, prescriptive analytics across complete, hybrid infrastructures. Red Hat Insights is also now included in all supported versions of Red Hat Enterprise Linux®, enabling users to proactively detect issues, enhance visibility into their deployments, improve security, and prescribe remediation through familiar tools like Red Hat Satellite.
+
+Delivered as a Software-as-a-Service (SaaS) offering, Red Hat Insights takes advantage of Red Hat’s industry expertise as a leader in open source software to generate tailored remediations in real time.
+
+Red Hat Insights uses intelligent data to pinpoint technical risks and help IT resolve problems before business is affected. This modern, integrated platform supports operational analytics and automated resolution across physical, virtual, container, and private and public cloud environments.
+
+
+
