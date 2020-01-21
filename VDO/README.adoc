@@ -184,6 +184,8 @@ image::vdo-fig9.png[]
 
 *Encrypted Volume*
 
+image::vdo-fig10.png[]
+
 == So, let’s install VDO in the host and configure an optimized volume!
  
 For using VDO, it is necessary to install the following packages:
@@ -197,7 +199,7 @@ Once installed, let's create a vdo volume on top of a RAID device. We have prese
  
 But first take a look at the block diagram to check what we are going to do with the command line.
 
-image::vdo-fig10.png[]
+image::vdo-fig11.png[]
 
 [source, bash]
 ------------------
