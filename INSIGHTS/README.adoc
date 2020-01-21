@@ -62,4 +62,120 @@ The automated versions can be located at ansible or puppet links.
 
 Is good practice to configure the servers you want to subscribe to insights through a proxy, so the server aren't exposed directly to a public connection. 
 
+== What does insights client when it is registering the server?
+
+The client starts a protocol to get the server registered looking at the subscription validity. If the subscription is valid and up to date, the server is registered.
+
+The client try to register the instance through port 443 on
+
+[source,bash]
+---------------------
+https://cert-api.access.redhat.com/r/insights/uploads
+---------------------
+
+After a successful registration, the client creates an autonomous task for uploading data daily. 
+
+In RHEL versions 7.4 and below versions, it uses cron and creates an entry in /etc/cron.daily.
+
+I RHEL versions 7.5 and above, it uses a timer in systemd that can be changed using
+
+[source,bash]
+---------------------
+[root@server ~]# systemctl edit insights-client.timer
+The file can be found at /usr/lib/systemd/system/.
+---------------------
+
+Please refer to “Creating Custom Schedule for Red Hat Insights Uploads”.
+
+In big environments is desirable not to make all servers upload data at the same time. For this reason there is a random delay time variable called RandomizedDelaySec that can be changed in the timer file to resolve the bulk uploads that can impact the network.
+
+After the configuration of a scheduled task, insights client start the first data collection which is sent to insights service right away.
+
+After this, the registration process finish. The next upload will happen automatically daily and the service is set permanently. The data uploaded can be seen at the service portal.
+
+== What data is sent to Red Hat Insights service?
+
+The data collected by insights could be reviewed and validated using --no-upload keyword as follows.
+
+[source,bash]
+---------------------
+[root@server ~]# insights-client --no-upload
+Starting to collect Insights data for server
+Archive saved at /var/tmp/h517f24d/insights-server-20190923155120.tar.gz
+---------------------
+
+In this example a compressed file is stored in a random generated folder in /var/tmp. The files collected are configuration files and the output of different commands that are sent to the service for analysis and recommendations.
+
+You can also refer to “System Information Collected by Red Hat Insights”
+
+Also you can refer to the information depicted in the uploader.json from the insights api.
+
+== Can I exclude data?
+
+The information sent to the insights service is related mostly to the server configuration. Nevertheless, some customers could have the need of not sending all the information, that by default, insights collect.
+
+In this case, customers could decide to trim the information collected or obfuscate hostnames and/or ip addresses as needed.
+
+For obfuscating hostname and/or ip address, edit the file 
+
+[source,bash]
+---------------------
+/etc/insights-client/insights-client.conf 
+---------------------
+
+Uncomment the following lines and set to True.
+
+[source,bash]
+---------------------
+# Obfuscate IP addresses
+#obfuscate=False
+
+# Obfuscate hostname. Requires obfuscate=True.
+#obfuscate_hostname=False
+---------------------
+
+[NOTE]
+Obfuscating IP addresses and host names will cause difficulties in identifying systems in the Insights UI. For instance, host0 will be displayed for all systems if host names are obfuscated. When registering systems to Red Hat Insights be sure to use the --display-name option to set a UI name to avoid this issue.
+
+[source,bash]
+---------------------
+# Display name for registration
+#display_name=
+---------------------
+
+The Red Hat Insights collection agent has the ability to exclude (blacklist) entire files, specific commands, specific patterns, and specific keywords from the data that is sent to Red Hat.
+
+To enable these exclusions, you must create a file called */etc/insights-client/remove.conf* and specify this file in the remove_file line of */etc/insights-client/insights-client.conf*, as in the following example:
+
+[source,bash]
+---------------------
+remove_file=/etc/insights-client/remove.conf
+---------------------
+
+An example of a remove.conf file is below.
+
+[source,bash]
+---------------------
+[remove]
+files=/etc/cluster/cluster.conf,/etc/hosts
+commands=/bin/dmesg
+patterns=password,username
+---------------------
+
+See the detailed procedure in *“Opting Out of Sending Metadata from Red Hat Insights Client”*.
+
+Any omission of metadata will impact any analysis related to the data avoided.
+ 
+== Force to upload data to Insights Service
+
+When you apply remediation steps to your servers could be useful to refresh the information of servers touched by the procedures implemented. This could be done using the client without parameters.
+
+[source,bash]
+---------------------
+[root@server ~]# insights-client
+Starting to collect Insights data for server
+Uploading Insights data.
+Successfully uploaded report from archimedes to account xxxxxxxxx.
+---------------------
+
 
