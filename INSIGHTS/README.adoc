@@ -278,3 +278,8 @@ It is important to notice that these are demonstration scripts and commands. Ens
 
 == How to connect the servers to the service?
 
+Insights can be connected in several ways to Insights Service. The simplest way is the direct connection in which the server is exposed to the internet so the insights client can send the information collected directly to the red hat servers.
+
+Each server send their information to the insights server for real-time analysis.
+
+image::insights-fig1.png[]
