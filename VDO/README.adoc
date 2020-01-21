@@ -1,0 +1,46 @@
+:scrollbar:
+:data-uri:
+:toc2:
+:imagesdir: images
+
+= VDO: The disk optimizer for your datacenter! - LTO Show & Tell Series
+
+== Description
+This Show&Tell is aimed to share some of the most important concepts and features of the Virtual Data optimizer data reduction layer.
+
+Audience: IT Managers, Architects and technical staff who operates Linux
+
+:numbered:
+
+== Introduction
+
+All new generation applications are producing and consuming a big amount of data every day, every hour and even every minute. 
+
+Social media and The Internet of Things (IoT) are in this race to fill out lots and lots of disks globally. This enormous amount of data is susceptible to be analysed by Big Data and Artificial Intelligence algorithms to produce more swallowable information to get insights in order to produce actionable tasks and for understanding better and be more accurate in any aspect of this new information era.
+
+The uncontrollable growth of this data needs to be stored in @traditional disks, that although every day is cheaper, they are not at the same pace of data production. This reality is in front of us and it is not going to stop, so we need to implement mechanisms for saving storage space to store more data in less physical space. 
+
+In the old days, compression algorithms like zip or gzip were in place at the userland domain. Every file we wanted to shrink in space needed to be passed through an application in charge of compress it to produce a more storage optimized format. This needed to be triggered by applications or users on demand, so where not as practical as it may be believed.
+
+So, something better is needed to insert in this equation. Something more automated and transparent to users or applications. That is why some techniques and mechanisms have come out to aim for the space savings goal.
+That is the case with VDO. The virtual data optimizer is a kernel module that is in charge of applying optimization algorithms to data in order to reduce their disk occupation.
+
+It works as an optimization layer between the disk driver and the filesystem, applying in real time algorithms of compression, deduplication and zero-block elimination to store a transformed data which occupy less space than the original source.
+
+This way users or applications do not notice this intervention, so not needing to be informed or modified to deal with volumes now optimized. 
+
+== Some Concepts to tune us well!
+
+VDO sits on top of any block device and below the filesystem, so applications and users can transparently use the disk as usual without taking care about underlying optimization architecture in place.
+
+That's why VDO is so convenient for putting in place optimization mechanisms that can be used for many use cases in the customer's organization.
+
+VDO applies three different algorithms in a sequence for achieving great optimizations in the storage layer.
+
+* Zero-Block Elimination: any block that consists exclusively of zeros is identified and recorded only in a special place for metadata. This means that VDO only store in physical disk Blocks that contain something other than zeros. This is the first thing VDO executes over the data analyzed.
+
+* Deduplication: After the data is parsed and it is free of blocks of zeroes it is processed to determine whether it is redundant or not (data that has been written before). The redundancy of this data is checked through metadata maintained by the UDS (Universal Deduplication Service) kernel module which is a fundamental part of VDO. Any block of data that is found written before will not be written again, instead,  the metadata will be updated to point out to the original copy of the block already stored in disk.  
+
+* Compression: Once these 2 phases are accomplished, LZ4 compression is applied to the remaining data blocks. The compressed blocks are then stored together into fixed length (4 KB) blocks and stored on disks.  There is a speed up optimization when a single physical block comprise many compressed blocks, in such a way readings can be benefited.
+
+
