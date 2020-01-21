@@ -21,5 +21,45 @@ Delivered as a Software-as-a-Service (SaaS) offering, Red Hat Insights takes adv
 
 Red Hat Insights uses intelligent data to pinpoint technical risks and help IT resolve problems before business is affected. This modern, integrated platform supports operational analytics and automated resolution across physical, virtual, container, and private and public cloud environments.
 
+== How to install the client
+
+The client for RHEL 8 is installed by default. In case other version (version>=6.4) the installation is pretty straightforward.
+
+Before any installation you need to register the server with the appropriate subscription, which has to be active.
+
+[source,bash]
+---------------------
+[root@server ~]# subscription-manager register --auto-attach
+---------------------
+
+The installation of the client is as follows . Remember to register the server to insights after the rpm installation.
+
+*RHEL version < 8*
+
+[source,bash]
+---------------------
+[root@server ~]# yum install redhat-access-insights
+[root@server ~]#  redhat-access-insights --register
+Automatic scheduling for Insights has been enabled.
+Starting to collect Insights data for archimedes
+Uploading Insights data.
+Successfully uploaded report from archimedes to account xxxxxxxx.
+---------------------
+
+*RHEL version 8*
+
+[source,bash]
+---------------------
+[root@server ~]# yum install insights-client
+[root@server ~]#  insights-clients --register
+Automatic scheduling for Insights has been enabled.
+Starting to collect Insights data for archimedes
+Uploading Insights data.
+Successfully uploaded report from archimedes to account xxxxxxxx.
+---------------------
+
+The automated versions can be located at ansible or puppet links.
+
+Is good practice to configure the servers you want to subscribe to insights through a proxy, so the server aren't exposed directly to a public connection. 
 
 
