@@ -283,3 +283,104 @@ Insights can be connected in several ways to Insights Service. The simplest way 
 Each server send their information to the insights server for real-time analysis.
 
 image::insights-fig1.png[]
+
+The second way is through a proxy server. In this mode the server is not exposed directly to the internet, which is a good security practice. In this connection model the server send the it’s information to the proxy and this forward it to insights servers.
+
+image::insights-fig2.png[]
+
+A third way is through Satellite, in which the application integrates Insights and acts as a proxy for establishing a curtain. 
+
+Satellite could be used as a single control pane for management and monitoring the health of the servers
+
+image::insights-fig3.png[]
+
+Integrated with ansible could execute command the execution of the remediation playbooks proposed by Insights.
+
+The connection will depend on the particular aspects of each and every customer.
+
+== A brief tour of Insights Web GUI.
+
+The Insights service presents itself on a web gui which can be accessed anywhere. The following screenshots shows the main parts of the tool.
+
+To access the tool only need to go to:
+
+https://cloud.redhat.com/insights/overview
+
+The first screen you’ll see is the dashboard. The dashboard is the window to reality. It shows what is identified in all servers registered.
+
+A classification is depicted in the top-right corner of the tool. This classification is very useful due to the fact that any issue identified is segmented in four categories: Availability, Stability, Performance and Security, which in turn guide the customer to which rules have matched the customer’s platform and help identify very rapidly which servers are affected in which category.
+
+image::insights-fig4.png[]
+
+Another interesting part of the dashboard is the severity classification. All the issued are classified into four other categories related to severity: Critical, Important, moderate and Low.
+
+Having this to segmented spaces let the customer identify and prioritize in an easier way how to start their plan for remediation.
+
+Now, let’s see the left part of this first screen of this tool. Such is the case of the main mane of options that list Overview (our dashboard), Rules, Inventory and Remediation.
+
+image::insights-fig5.png[]
+
+In the tab of Rules, the customer can read all the issues (rules that match) encountered in all servers registered to the service. 
+
+The list also shows the Total Risk, Servers affected and, in case a playbook exists, a green check indicating a playbook is available for the remediation of the issue.
+
+Each issue or rule matched is a link that can be followed to understand and obtain detailed information of the issue. Also when we click on the rule it is possible to see which systems are affected to go through the link proposed to navigate to the server.
+
+image::insights-fig6.png[]
+
+The Inventory link proposes another view of the tool for accessing directly the servers affected and see all the rules that match identifying possible issued to be resolved.
+
+image::insights-fig7.png[]
+
+Clicking the server we are redirected to enter view specific to the host selected.
+
+image::insights-fig8.png[]
+
+We can see four horizontal tabs that by default select “General Information” of the server.
+
+The tab “Insights” shows all the rules (issues) identified in the server selected.
+
+image::insights-fig9.png[]
+
+The description of each rule and the remediation steps are described.
+
+Selecting one or several rules allows us to generate an Ansible Playbook if available.
+
+image::insights-fig10.png[]
+
+The tab “Vulnerabilities” shows CVEs identified on the server.
+
+image::insights-fig11.png[]
+
+The tab “Compliance” could be used in conjunction with openScap for generating compliance reports.
+
+In the left menu the item “Remediation”, will show all the playbooks generated for different combinations created by admins for remediate groups or individual servers.
+
+Also, we can manage all playbooks (ie. delete them), download them for modify or view them and then send them to the Ansible Engine Tower for the automated remediation execution.
+
+image::insights-fig12.png[]
+
+== The Rights Message of Insights!
+ 
+Insights is a great tool, at no cost for our customers. 
+
+The predictive nature of it could help our customers to anticipate problems in its environments, giving administrators the time to plan the possible remediations needed to have an up to date platform without risks.
+
+Insights is a Diagnostic tool because all the issues identified for certain servers establishes a server diagnostic that describes the risks at which the server is exposed.
+
+The diagnostic is complemented with a fair amount of information which turns Insights into a Descriptive tool. In fact, every issue is well documented and linked with the original sources for better understanding of the issue itself, with its risks, likelihood and risk of change involved.
+
+One cool thing about Insights is its capability to be Prescriptive. In this sense, Insights not only identify an issue, but also propose the remediation steps tested by Red Hat. 
+
+In some cases, Insights is capable of sharing with the customer Ansible Playbooks in which the remediation steps are included. This way not only the remediation is proposed but a way of automate it.
+
+== Conclusions
+
+Insights is a valuable tool for all our customers. After RHEL 8 Announcement, in may 2019, insights become a fundamental part of Red Hat Subscription. Customers can install and use it in every RHEL registered server.
+
+What customers obtain from this tool is so valuable that it will transform how they interact and operate their operating environment fabric based on Red Hat Enterprise Linux.
+
+RHEL is the first Intelligent operating system and it is ready to serve to the mission critical data centers, using Insights.
+
+
+
