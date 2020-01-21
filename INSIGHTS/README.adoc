@@ -178,4 +178,103 @@ Uploading Insights data.
 Successfully uploaded report from archimedes to account xxxxxxxxx.
 ---------------------
 
+== Unregistering a server
+
+A server can be unregistered using the command line. 
+
+[source,bash]
+---------------------
+[root@server ~]# insights-client --unregister
+Successfully unregistered from the Red Hat Insights Service
+---------------------
+
+== Integrating Insights with others: using the API with python
+
+Insights expose a powerful API in order to interact with the service.
+
+A good article to start with is “Managing the Insights API”
+
+Using python for interacting with python is very fun and easy.
+
+A very simple class for listing the servers and IDs registered to insights.
+
+[source,bash]
+---------------------
+import json
+import sys
+from pprint import pprint
+
+try:
+    import requests
+except ImportError:
+    print("Please install the python-requests module.")
+    sys.exit(-1)
+
+SSL_VERIFY = True
+
+###############################################                
+class InsightsRequest:
+
+	def __init__(self):
+		self.data = None
+		self.rules=None
+		self.credentials = loadCredentials()
+	#------------------------
+	def fetchHostsInfo(self):
+		r = requests.get(
+"https://cloud.redhat.com/api/inventory/v1/hosts",
+			auth=(self.credentials["username"], self.credentials["password"]),
+			verify=SSL_VERIFY,
+			params="")
+		self.data = r.json()
+		return r.json()
+
+	#------------------------
+	def getHostsInfo(self):
+		return self.data
+
+	#------------------------
+	def getRegisteredHostsDisplayNames(self):
+		returnValue = []
+		if self.data != None:
+			for host in self.data["results"]: returnValue.append(host["display_name"])
+	
+	#------------------------
+	def getRegisteredHostsIds(self):
+		returnValue = []
+		if self.data != None:
+			for host in self.data["results"]: returnValue.append([host["display_name"],host["id"]])		
+		return returnValue
+		
+###############################################                
+def loadCredentials():
+	
+	# ~ The format of credentials.txt must be
+	# ~ {
+		# ~ "username":"your username",
+		# ~ "password":"your password"
+	# ~ }
+
+	json_data = None
+	with open('credentials.txt', 'r') as f:
+		data = f.read()
+		json_data = json.loads(data)
+		
+	return json_data
+		
+###############################################                
+if __name__=='__main__':
+#----------------------------------------------
+	
+	insightsData = InsightsRequest()
+	
+	insightsData.fetchHostsInfo()
+	
+	for serverId in insightsData.getRegisteredHostsIds(): 
+       print(serverId)
+---------------------
+
+It is important to notice that these are demonstration scripts and commands. Ensure you review these scripts carefully before use, and replace any variable, user names, passwords, and other information to suit your own demonstration deployment.
+
+== How to connect the servers to the service?
 
