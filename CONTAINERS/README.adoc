@@ -327,7 +327,7 @@ Let's search for nextcloud image on any of the registries defined in the configu
 
 [source,bash]
 -----------------
-# yum search nextcloud
+# podman search nextcloud
 
 INDEX       NAME                                                   DESCRIPTION                                       STARS   OFFICIAL   AUTOMATED
 quay.io     quay.io/rootlogin/nextcloud                            # Nextcloud  Blazing fast image containing N...   0
