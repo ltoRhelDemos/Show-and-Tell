@@ -634,8 +634,8 @@ First things first. We need to create a directory tree to get things with some s
 # cd containers
 # mkdir -p engine/chatbotApp webchat/chatbotApp
 # git clone https://github.com/ltoRhelDemos/python-ansible-chatbot.git
-# cp python-ansible-chatbot/src/* webchat/chatbotApp/.
-# cp python-ansible-chatbot/src/* engine/chatbotApp/.
+# cp python-ansible-chatbot/* webchat/chatbotApp/.
+# cp python-ansible-chatbot/* engine/chatbotApp/.
 -----------------
 
 Let's build the web chat container.
