@@ -1,0 +1,16 @@
+:scrollbar:
+:data-uri:
+:toc2:
+:imagesdir: images
+
+= Securing Linux Servers and auditing security policies with OpenSCAP - LTO Show & Tell Series
+
+== Description
+This Show&Tell is aimed to share some of the most important concepts and features of OpenSCAP as a tool for auditing security policies.
+
+Audience: IT Managers, Architects, IT security specialists and technical staff who operates Linux
+
+:numbered:
+
+== Introduction
+
