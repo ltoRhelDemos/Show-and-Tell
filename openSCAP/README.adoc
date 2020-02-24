@@ -14,3 +14,33 @@ Audience: IT Managers, Architects, IT security specialists and technical staff w
 
 == Introduction
 
+== Need for Audting Security Poilicies
+
+== What is OpenSCAP?
+
+== Installing OpenSCAP
+
+=== The OpenSCAP server
+
+=== The OpenSCAP Base
+
+=== The OpenSCAP Daemon
+
+==== Installing the Daemon
+
+=== The OpenSCAP Workbench
+
+=== The security guide for SCAP
+
+=== Purpose of XCCDF and OVAL Policies
+
+=== Scanning the RHEL infrastructure with OSCAP
+
+=== Running regular scans with OpenSCAP Daemon
+
+=== Scanning the RHEL infrastructure with OpenSCAP Workbench
+
+=== Interpreting the results
+
+=== Automating OpenSCAP installation with Ansible
+
