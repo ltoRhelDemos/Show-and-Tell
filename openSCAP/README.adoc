@@ -20,11 +20,13 @@ Audience: IT Managers, Architects, IT security specialists and technical staff w
 
 == Installing OpenSCAP
 
-=== The OpenSCAP server
+=== The OpenSCAP oscap command line utility
+
+This utility enables us to scan systems validating security compliance content and generating reports and guides based on the scans and evaluations made. This is the front end to the OpenSCAP library and groups.
 
 [source, bash]
 ------------------------
-*# yum install -y openscap-scanner*
+# yum install -y openscap-scanner
 
 Updating Subscription Management repositories.
 Last metadata expiration check: 0:01:45 ago on Tue 25 Feb 2020 03:18:32 PM EST.
@@ -68,16 +70,72 @@ Installed:
 Complete!
 ------------------------
 
+=== The security guide for SCAP
+
+Before we can start using oscap we need to install or import security content. For this excersice we can install the SCAP Security Guide (SSG) package that contains the currently most evolved and elaborated set of security polices for Linux systems
+
+[source, bash]
+---------------------------
+# yum install scap-security-guide
+
+Updating Subscription Management repositories.
+Last metadata expiration check: 0:11:12 ago on Tue 25 Feb 2020 03:29:45 PM EST.
+Dependencies resolved.
+========================================================================================================================================
+ Package                            Architecture          Version                        Repository                                       Size
+========================================================================================================================================Installing:
+ scap-security-guide                noarch                0.1.46-1.el8                   rhel-8-for-x86_64-appstream-rpms                6.6 M
+
+Transaction Summary
+========================================================================================================================================
+Install  1 Package
+
+Total download size: 6.6 M
+Installed size: 173 M
+Is this ok [y/N]: y
+Downloading Packages:
+scap-security-guide-0.1.46-1.el8.noarch.rpm                                                                    4.7 MB/s | 6.6 MB     00:01
+----------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                          4.7 MB/s | 6.6 MB     00:01
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                       1/1
+  Installing       : scap-security-guide-0.1.46-1.el8.noarch                                                                               1/1
+  Running scriptlet: scap-security-guide-0.1.46-1.el8.noarch                                                                               1/1
+  Verifying        : scap-security-guide-0.1.46-1.el8.noarch                                                                               1/1
+Installed products updated.
+
+Installed:
+  scap-security-guide-0.1.46-1.el8.noarch
+
+Complete!
+---------------------------
+
+After the installation SSG security content will be available in the following directory.
+
+[source, bash]
+--------------------------
+ ls /usr/share/xml/scap/ssg/content/
+
+ssg-firefox-cpe-dictionary.xml  ssg-jre-ds-1.2.xml            ssg-rhel6-ocil.xml            ssg-rhel7-xccdf.xml
+ssg-firefox-cpe-oval.xml        ssg-jre-ds.xml                ssg-rhel6-oval.xml            ssg-rhel8-cpe-dictionary.xml
+ssg-firefox-ds-1.2.xml          ssg-jre-ocil.xml              ssg-rhel6-xccdf.xml           ssg-rhel8-cpe-oval.xml
+ssg-firefox-ds.xml              ssg-jre-oval.xml              ssg-rhel7-cpe-dictionary.xml  ssg-rhel8-ds-1.2.xml
+ssg-firefox-ocil.xml            ssg-jre-xccdf.xml             ssg-rhel7-cpe-oval.xml        ssg-rhel8-ds.xml
+ssg-firefox-oval.xml            ssg-rhel6-cpe-dictionary.xml  ssg-rhel7-ds-1.2.xml          ssg-rhel8-ocil.xml
+ssg-firefox-xccdf.xml           ssg-rhel6-cpe-oval.xml        ssg-rhel7-ds.xml              ssg-rhel8-oval.xml
+ssg-jre-cpe-dictionary.xml      ssg-rhel6-ds-1.2.xml          ssg-rhel7-ocil.xml            ssg-rhel8-xccdf.xml
+ssg-jre-cpe-oval.xml            ssg-rhel6-ds.xml              ssg-rhel7-oval.xml
+--------------------------
+
 
 === The OpenSCAP Base
 
-=== The OpenSCAP Daemon
-
-==== Installing the Daemon
-
 === The OpenSCAP Workbench
 
-=== The security guide for SCAP
 
 === Purpose of XCCDF and OVAL Policies
 
