@@ -22,6 +22,52 @@ Audience: IT Managers, Architects, IT security specialists and technical staff w
 
 === The OpenSCAP server
 
+[source, bash]
+------------------------
+yum install -y openscap-scanner
+Updating Subscription Management repositories.
+Last metadata expiration check: 0:01:45 ago on Tue 25 Feb 2020 03:18:32 PM EST.
+Dependencies resolved.
+===============================================================================================================================================
+ Package                          Architecture           Version                        Repository                                        Size
+===============================================================================================================================================
+Installing:
+ openscap-scanner                 x86_64                 1.3.1-1.el8                    rhel-8-for-x86_64-appstream-rpms                  66 k
+Installing dependencies:
+ openscap                         x86_64                 1.3.1-1.el8                    rhel-8-for-x86_64-appstream-rpms                 3.3 M
+
+Transaction Summary
+===============================================================================================================================================
+Install  2 Packages
+
+Total download size: 3.4 M
+Installed size: 58 M
+Downloading Packages:
+(1/2): openscap-scanner-1.3.1-1.el8.x86_64.rpm                                                                 100 kB/s |  66 kB     00:00
+(2/2): openscap-1.3.1-1.el8.x86_64.rpm                                                                         4.4 MB/s | 3.3 MB     00:00
+-----------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                          4.5 MB/s | 3.4 MB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                       1/1
+  Installing       : openscap-1.3.1-1.el8.x86_64                                                                                           1/2
+  Running scriptlet: openscap-1.3.1-1.el8.x86_64                                                                                           1/2
+  Installing       : openscap-scanner-1.3.1-1.el8.x86_64                                                                                   2/2
+  Running scriptlet: openscap-scanner-1.3.1-1.el8.x86_64                                                                                   2/2
+  Verifying        : openscap-scanner-1.3.1-1.el8.x86_64                                                                                   1/2
+  Verifying        : openscap-1.3.1-1.el8.x86_64                                                                                           2/2
+Installed products updated.
+
+Installed:
+  openscap-scanner-1.3.1-1.el8.x86_64                                        openscap-1.3.1-1.el8.x86_64
+
+Complete!
+------------------------
+
+
 === The OpenSCAP Base
 
 === The OpenSCAP Daemon
