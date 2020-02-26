@@ -76,7 +76,7 @@ Before we can start using oscap we need to install or import security content. F
 
 [source, bash]
 ---------------------------
-# yum install scap-security-guide
+# yum install -y scap-security-guide
 
 Updating Subscription Management repositories.
 Last metadata expiration check: 0:11:12 ago on Tue 25 Feb 2020 03:29:45 PM EST.
@@ -131,8 +131,133 @@ ssg-jre-cpe-dictionary.xml      ssg-rhel6-ds-1.2.xml          ssg-rhel7-ocil.xml
 ssg-jre-cpe-oval.xml            ssg-rhel6-ds.xml              ssg-rhel7-oval.xml
 --------------------------
 
+== Getting info from using oscap
 
-=== The OpenSCAP Base
+The oscap utility can process files conforming to many of the formats used by the utility. In order to process the given file with SCAP content, we need to understand how to use oscap with the given file type. We can open and read the file, or use the info module of oscap which parses the file and extracts relevant information in human-readable format.
+
+for example, let´s see the content of ssg-rhel7-ds-1.2.xml and ssg-rhel8-ds-1.2.xml
+
+[source, bash]
+-------------------------
+#  oscap info /usr/share/xml/scap/ssg/content/ssg-rhel7-ds-1.2.xml
+
+Document type: Source Data Stream
+Imported: 2019-09-02T06:09:15
+
+Stream: scap_org.open-scap_datastream_from_xccdf_ssg-rhel7-xccdf-1.2.xml
+Generated: (null)
+Version: 1.2
+Checklists:
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-xccdf-1.2.xml
+                Status: draft
+                Generated: 2019-09-02
+                Resolved: true
+                Profiles:
+                        Title: OSPP - Protection Profile for General Purpose Operating Systems v4.2.1
+                                Id: xccdf_org.ssgproject.content_profile_ospp
+                        Title: NIST National Checklist Program Security Guide
+                                Id: xccdf_org.ssgproject.content_profile_ncp
+                        Title: DRAFT - ANSSI DAT-NT28 (minimal)
+                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_minimal
+                        Title: DRAFT - ANSSI DAT-NT28 (enhanced)
+                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_enhanced
+                        Title: DRAFT - ANSSI DAT-NT28 (intermediary)
+                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_intermediary
+                        Title: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 7
+                                Id: xccdf_org.ssgproject.content_profile_pci-dss
+                        Title: Health Insurance Portability and Accountability Act (HIPAA)
+                                Id: xccdf_org.ssgproject.content_profile_hipaa
+                        Title: DRAFT - ANSSI DAT-NT28 (high)
+                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_high
+                        Title: Standard System Security Profile for Red Hat Enterprise Linux 7
+                                Id: xccdf_org.ssgproject.content_profile_standard
+                        Title: [DRAFT] DISA STIG for Red Hat Enterprise Linux Virtualization Host (RHELH)
+                                Id: xccdf_org.ssgproject.content_profile_rhelh-stig
+                        Title: VPP - Protection Profile for Virtualization v. 1.0 for Red Hat Enterprise Linux Hypervisor (RHELH)
+                                Id: xccdf_org.ssgproject.content_profile_rhelh-vpp
+                        Title: DISA STIG for Red Hat Enterprise Linux 7
+                                Id: xccdf_org.ssgproject.content_profile_stig
+                        Title: Criminal Justice Information Services (CJIS) Security Policy
+                                Id: xccdf_org.ssgproject.content_profile_cjis
+                        Title: Unclassified Information in Non-federal Information Systems and Organizations (NIST 800-171)
+                                Id: xccdf_org.ssgproject.content_profile_cui
+                        Title: C2S for Red Hat Enterprise Linux 7
+                                Id: xccdf_org.ssgproject.content_profile_C2S
+                        Title: Red Hat Corporate Profile for Certified Cloud Providers (RH CCP)
+                                Id: xccdf_org.ssgproject.content_profile_rht-ccp
+                Referenced check files:
+                        ssg-rhel7-oval.xml
+                                system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                        ssg-rhel7-ocil.xml
+                                system: http://scap.nist.gov/schema/ocil/2
+                        https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL7.xml
+                                system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-pcidss-xccdf-1.2.xml
+                Status: draft
+                Generated: 2019-09-02
+                Resolved: true
+                Profiles:
+                        Title: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 7
+                                Id: xccdf_org.ssgproject.content_profile_pci-dss_centric
+                Referenced check files:
+                        ssg-rhel7-oval.xml
+                                system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+                        ssg-rhel7-ocil.xml
+                                system: http://scap.nist.gov/schema/ocil/2
+                        https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL7.xml
+                                system: http://oval.mitre.org/XMLSchema/oval-definitions-5
+Checks:
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-oval.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-ocil.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-cpe-oval.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-oval.xml000
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-ocil.xml000
+Dictionaries:
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-cpe-dictionary.xml
+-------------------------
+
+We can filter for Title keyword to list only the name of profiles using the following.
+
+[source, bash]
+------------------------
+# oscap info /usr/share/xml/scap/ssg/content/ssg-rhel8-ds-1.2.xml | egrep '(Title|Id)'
+
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-xccdf-1.2.xml
+                        Title: Protection Profile for General Purpose Operating Systems
+                                Id: xccdf_org.ssgproject.content_profile_ospp
+                        Title: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8
+                                Id: xccdf_org.ssgproject.content_profile_pci-dss
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-oval.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-ocil.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-oval.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-dictionary.xml
+------------------------
+
+In the case of RHEL 8 the number of profiles is far less than RHEL 7, just because longevity of each product in the market.
+
+=== Scanning a host
+
+The oscap utility can scan systems against the SCAP content represented by both an XCCDF (The eXtensible Configuration Checklist Description Format) benchmark and OVAL (Open Vulnerability and Assessment Language) definitions. The security policy can be in the form of a single OVAL or XCCDF file or multiple separate XML files where each file represents a different component (XCCDF, OVAL, CPE, CVE, and others). The result of a scan can be printed to both standard output and an XML file. The result file can then be further processed by oscap in order to generate a report in a human-readable format. 
+
+For this exercise we are going to scan the system first, using a SSCDF, no remediations will executed int this very first step. We need to understan how far we are to comply with the profile selected.
+
+RHEL 8 has to possible profiles available.
+
+Title: *Protection Profile for General Purpose Operating Systems*
+Id: xccdf_org.ssgproject.content_profile_ospp
+Title: *PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8*
+Id: xccdf_org.ssgproject.content_profile_pci-dss
+
+Let´s scan first with protection profile for general purpose OS, then we will try to scan with the PCI-DSS protection profile and see the differences.
+
+[source, bash]
+-------------------------
+# oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_ospp \
+--results scan-xccdf-results.xml \
+--report  scan-xccdf-results.html \
+/usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml
+-------------------------
+
 
 === The OpenSCAP Workbench
 
