@@ -241,7 +241,7 @@ The oscap utility can scan systems against the SCAP content represented by both 
 
 For this exercise we are going to scan the system first, using a SSCDF, no remediations will executed int this very first step. We need to understan how far we are to comply with the profile selected.
 
-RHEL 8 has two possible profiles available.
+By the time we wrote this Show & Tell documentation, RHEL 8 had two possible profiles available.
 
 Title: *Protection Profile for General Purpose Operating Systems*
    Id: xccdf_org.ssgproject.content_profile_ospp
@@ -304,58 +304,76 @@ Result  fail
 ...
 -------------------------
 
-From this file we can create a report like file in which the title and result are joined together.
+From this file we can create a "report like" file in which the title and result are joined together.
 
 [source, bash]
 -------------------------
-# cat scan-xccdf-results.txt | egrep '(Title|Result)' |  awk '{if (NR%2) {printf("%s", $0)} else {printf " --> (%s)\n",$2} } '| cut -d' ' -f2- > scan-xccdf-report.txt
+# cat scan-xccdf-results.txt | egrep '(Title|Result)' |  awk '{if (NR%2) {printf("%s", $0)} else {printf " --> (%s)\n",$2} } '| cut -f2- > scan-xccdf-report.txt
 
 # more scan-xccdf-report.txt
 
-the Hardware RNG Entropy Gatherer Service --> (pass)
-Automatic Bug Reporting Tool (abrt) --> (pass)
-chrony daemon from acting as server --> (fail)
-network management of chrony daemon --> (fail)
-sssd-ipa Package --> (fail)
-SSSD to run as user sssd --> (fail)
-SSH Root Login --> (fail)
-Use of Strict Mode Checking --> (pass)
-SSH Warning Banner --> (fail)
-Kerberos Authentication --> (pass)
-frequent session key renegotiation --> (fail)
-GSSAPI Authentication --> (fail)
-Host-Based Authentication --> (pass)
-SSH Client Alive Max Count --> (fail)
-SSH Idle Timeout Interval --> (fail)
-SSH Access via Empty Passwords --> (pass)
-Sendmail Package --> (pass)
-fapolicyd Package --> (fail)
-the File Access Policy Service --> (fail)
-fapolicyd to watch all system mountpoints --> (fail)
-the USBGuard Service --> (fail)
-usbguard Package --> (fail)
-USB hubs in USBGuard daemon --> (fail)
-USBGuard daemon audit events using Linux Audit --> (fail)
-Human Interface Devices in USBGuard daemon --> (fail)
-nfs-utils Package --> (pass)
-auditd flush priority --> (pass)
-auditd to use audispd's syslog plugin --> (fail)
-audit according to OSPP requirements --> (fail)
-the audit Subsystem is Installed --> (pass)
-audispd-plugins Package --> (fail)
-Audit Logs to the Disk --> (pass)
-Auditing for Processes Which Start Prior to the Audit Daemon --> (fail)
-Local Events in Audit Logs --> (pass)
-number of records to cause an explicit flush to audit logs --> (pass)
-Audit Backlog Limit for the Audit Daemon --> (fail)
-information before writing to audit logs --> (pass)
-auditd Service --> (pass)
+Enable the Hardware RNG Entropy Gatherer Service --> (pass)
+Uninstall Automatic Bug Reporting Tool (abrt) --> (pass)
+Disable chrony daemon from acting as server --> (fail)
+Disable network management of chrony daemon --> (fail)
+Install sssd-ipa Package --> (fail)
+Configure SSSD to run as user sssd --> (fail)
+Disable SSH Root Login --> (fail)
+Enable Use of Strict Mode Checking --> (pass)
+Enable SSH Warning Banner --> (fail)
+Disable Kerberos Authentication --> (pass)
+Force frequent session key renegotiation --> (fail)
+Disable GSSAPI Authentication --> (fail)
+Disable Host-Based Authentication --> (pass)
+Set SSH Client Alive Max Count --> (fail)
+Set SSH Idle Timeout Interval --> (fail)
+Disable SSH Access via Empty Passwords --> (pass)
+Uninstall Sendmail Package --> (pass)
+Install fapolicyd Package --> (fail)
+Enable the File Access Policy Service --> (fail)
+Enable fapolicyd to watch all system mountpoints --> (fail)
+Enable the USBGuard Service --> (fail)
+Install usbguard Package --> (fail)
+Authorize USB hubs in USBGuard daemon --> (fail)
+Log USBGuard daemon audit events using Linux Audit --> (fail)
+Authorize Human Interface Devices in USBGuard daemon --> (fail)
+Uninstall nfs-utils Package --> (pass)
+Configure auditd flush priority --> (pass)
+Configure auditd to use audispd's syslog plugin --> (fail)
+Configure audit according to OSPP requirements --> (fail)
+Ensure the audit Subsystem is Installed --> (pass)
+Install audispd-plugins Package --> (fail)
+Write Audit Logs to the Disk --> (pass)
+Enable Auditing for Processes Which Start Prior to the Audit Daemon --> (fail)
+Include Local Events in Audit Logs --> (pass)
+Set number of records to cause an explicit flush to audit logs --> (pass)
+Extend Audit Backlog Limit for the Audit Daemon --> (fail)
+Resolve information before writing to audit logs --> (pass)
+Enable auditd Service --> (pass)
 ...
 -------------------------
 
+If we need to have a more understanding of a specific test, we can use the following.
+
+[source, bash]
+-------------------------
+# searchFor="Set SSH Idle Timeout Interval"; awk -v filter="$searchFor" 'BEGIN{RS="\n\n";FS="\n"}{if (match($0, filter)) print $0;}' scan-xccdf-results.txt
+
+Title   Set SSH Idle Timeout Interval
+Rule    xccdf_org.ssgproject.content_rule_sshd_set_idle_timeout
+Ident   CCE-80906-1
+Result  fail
+-------------------------
+
+With the identification we go to and have a detailed information about the RULE and Remediation.
+
+http://static.open-scap.org/ssg-guides/ssg-rhel8-guide-rht-ccp.html
+
+image::rule.png[]
+
 Also a formatted report is creating thanks of using the --report directive. This report looks like this.
 
-
+image::complianceScoring.png[]
 
 === The OpenSCAP Workbench
 
