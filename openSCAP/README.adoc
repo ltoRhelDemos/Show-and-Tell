@@ -241,12 +241,12 @@ The oscap utility can scan systems against the SCAP content represented by both 
 
 For this exercise we are going to scan the system first, using a SSCDF, no remediations will executed int this very first step. We need to understan how far we are to comply with the profile selected.
 
-RHEL 8 has to possible profiles available.
+RHEL 8 has two possible profiles available.
 
 Title: *Protection Profile for General Purpose Operating Systems*
-Id: xccdf_org.ssgproject.content_profile_ospp
+   Id: xccdf_org.ssgproject.content_profile_ospp
 Title: *PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8*
-Id: xccdf_org.ssgproject.content_profile_pci-dss
+   Id: xccdf_org.ssgproject.content_profile_pci-dss
 
 Let´s scan first with protection profile for general purpose OS, then we will try to scan with the PCI-DSS protection profile and see the differences.
 
@@ -255,8 +255,106 @@ Let´s scan first with protection profile for general purpose OS, then we will t
 # oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_ospp \
 --results scan-xccdf-results.xml \
 --report  scan-xccdf-results.html \
-/usr/share/xml/scap/ssg/content/ssg-rhel7-ds.xml
+/usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml \
+| tee scan-xccdf-results.txt
 -------------------------
+
+What oscap is showing in the regular output is being saved on scan-xccdf-results.txt with the *tee* command.
+
+An excerpt of this output is shown using a simple *more* command.
+
+[source, bash]
+-------------------------
+# more scan-xccdf-results.txt
+
+Title   Enable the Hardware RNG Entropy Gatherer Service
+Rule    xccdf_org.ssgproject.content_rule_service_rngd_enabled
+Ident   CCE-82831-9
+Result  pass
+
+Title   Uninstall Automatic Bug Reporting Tool (abrt)
+Rule    xccdf_org.ssgproject.content_rule_package_abrt_removed
+Ident   CCE-80948-3
+Result  pass
+
+Title   Disable chrony daemon from acting as server
+Rule    xccdf_org.ssgproject.content_rule_chronyd_client_only
+Ident   CCE-82988-7
+Result  fail
+
+Title   Disable network management of chrony daemon
+Rule    xccdf_org.ssgproject.content_rule_chronyd_no_chronyc_network
+Ident   CCE-82840-0
+Result  fail
+
+Title   Install sssd-ipa Package
+Rule    xccdf_org.ssgproject.content_rule_package_sssd-ipa_installed
+Ident   CCE-82994-5
+Result  fail
+
+Title   Configure SSSD to run as user sssd
+Rule    xccdf_org.ssgproject.content_rule_sssd_run_as_sssd_user
+Ident   CCE-82072-0
+Result  fail
+
+Title   Disable SSH Root Login
+Rule    xccdf_org.ssgproject.content_rule_sshd_disable_root_login
+Ident   CCE-80901-2
+Result  fail
+...
+-------------------------
+
+From this file we can create a report like file in which the title and result are joined together.
+
+[source, bash]
+-------------------------
+# cat scan-xccdf-results.txt | egrep '(Title|Result)' |  awk '{if (NR%2) {printf("%s", $0)} else {printf " --> (%s)\n",$2} } '| cut -d' ' -f2- > scan-xccdf-report.txt
+
+# more scan-xccdf-report.txt
+
+the Hardware RNG Entropy Gatherer Service --> (pass)
+Automatic Bug Reporting Tool (abrt) --> (pass)
+chrony daemon from acting as server --> (fail)
+network management of chrony daemon --> (fail)
+sssd-ipa Package --> (fail)
+SSSD to run as user sssd --> (fail)
+SSH Root Login --> (fail)
+Use of Strict Mode Checking --> (pass)
+SSH Warning Banner --> (fail)
+Kerberos Authentication --> (pass)
+frequent session key renegotiation --> (fail)
+GSSAPI Authentication --> (fail)
+Host-Based Authentication --> (pass)
+SSH Client Alive Max Count --> (fail)
+SSH Idle Timeout Interval --> (fail)
+SSH Access via Empty Passwords --> (pass)
+Sendmail Package --> (pass)
+fapolicyd Package --> (fail)
+the File Access Policy Service --> (fail)
+fapolicyd to watch all system mountpoints --> (fail)
+the USBGuard Service --> (fail)
+usbguard Package --> (fail)
+USB hubs in USBGuard daemon --> (fail)
+USBGuard daemon audit events using Linux Audit --> (fail)
+Human Interface Devices in USBGuard daemon --> (fail)
+nfs-utils Package --> (pass)
+auditd flush priority --> (pass)
+auditd to use audispd's syslog plugin --> (fail)
+audit according to OSPP requirements --> (fail)
+the audit Subsystem is Installed --> (pass)
+audispd-plugins Package --> (fail)
+Audit Logs to the Disk --> (pass)
+Auditing for Processes Which Start Prior to the Audit Daemon --> (fail)
+Local Events in Audit Logs --> (pass)
+number of records to cause an explicit flush to audit logs --> (pass)
+Audit Backlog Limit for the Audit Daemon --> (fail)
+information before writing to audit logs --> (pass)
+auditd Service --> (pass)
+...
+-------------------------
+
+Also a formatted report is creating thanks of using the --report directive. This report looks like this.
+
 
 
 === The OpenSCAP Workbench
