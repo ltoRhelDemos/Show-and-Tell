@@ -18,7 +18,7 @@ Audience: IT Managers, Architects, IT security specialists and technical staff w
 
 == What is OpenSCAP?
 
-== Installing OpenSCAP
+== Using OpenSCAP
 
 === The OpenSCAP oscap command line utility
 
@@ -239,7 +239,7 @@ In the case of RHEL 8 the number of profiles is far less than RHEL 7, just becau
 
 The oscap utility can scan systems against the SCAP content represented by both an XCCDF (The eXtensible Configuration Checklist Description Format) benchmark and OVAL (Open Vulnerability and Assessment Language) definitions. The security policy can be in the form of a single OVAL or XCCDF file or multiple separate XML files where each file represents a different component (XCCDF, OVAL, CPE, CVE, and others). The result of a scan can be printed to both standard output and an XML file. The result file can then be further processed by oscap in order to generate a report in a human-readable format. 
 
-For this exercise we are going to scan the system first, using a SSCDF, no remediations will executed int this very first step. We need to understan how far we are to comply with the profile selected.
+For this exercise we are going to scan the system first, using a SSCDF, no remediations will executed int this very first step. We need to understand how far we are to comply with the profile selected.
 
 By the time we wrote this Show & Tell documentation, RHEL 8 had two possible profiles available.
 
@@ -248,7 +248,7 @@ Title: *Protection Profile for General Purpose Operating Systems*
 Title: *PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8*
    Id: xccdf_org.ssgproject.content_profile_pci-dss
 
-Let´s scan first with protection profile for general purpose OS, then we will try to scan with the PCI-DSS protection profile and see the differences.
+Let´s scan with protection profile for general purpose OS. We also could chck the system using the pci-dss profile. In both cases, the profile defines de baseline to be acomplished. The oscap can help us to evealuate how far the system is from the profile selected.
 
 [source, bash]
 -------------------------
@@ -259,9 +259,14 @@ Let´s scan first with protection profile for general purpose OS, then we will t
 | tee scan-xccdf-results.txt
 -------------------------
 
-What oscap is showing in the regular output is being saved on scan-xccdf-results.txt with the *tee* command.
+* oscap xccdf eval will evaluate the system using the xccdf file format.
+* --profile select the general purpose server profile.
+* --report send a human readable report to scan-xccdf-results.html.
+* --results build a results file scan-xccdf-results.xml.
+* /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml get the RHEL 8 data stream to execute the scanning process. 
+* The stardar output is redirected to a file using the *tee* command.
 
-An excerpt of this output is shown using a simple *more* command.
+An excerpt of the output is shown using a simple *more* command.
 
 [source, bash]
 -------------------------
@@ -365,28 +370,190 @@ Ident   CCE-80906-1
 Result  fail
 -------------------------
 
-With the identification we go to and have a detailed information about the RULE and Remediation.
+With the identification we go to *http://static.open-scap.org/ssg-guides/ssg-rhel8-guide-rht-ccp.html* and have a detailed information about the RULE and Remediation.
 
 http://static.open-scap.org/ssg-guides/ssg-rhel8-guide-rht-ccp.html
 
-image::rule.png[]
+image::Rule.png[]
 
-Also a formatted report is creating thanks of using the --report directive. This report looks like this.
+Also a formatted report is created thanks of using the --report directive. This report looks like this.
 
 image::complianceScoring.png[]
 
-=== The OpenSCAP Workbench
+=== Making remediations
 
+OpenSCAP allows to automatically remediate systems that have been found in a non-compliant state. For system remediation, an XCCDF file with instructions is required. The scap-security-guide package contains certain remediation instructions.
 
-=== Purpose of XCCDF and OVAL Policies
+System remediation consists of the following steps:
 
-=== Scanning the RHEL infrastructure with OSCAP
+* OpenSCAP performs a regular XCCDF evaluation.
+* An assessment of the results is performed by evaluating the OVAL definitions. Each rule that has failed is marked as a candidate for remediation.
+* OpenSCAP searches for an appropriate fix element, resolves it, prepares the environment, and executes the fix script.
+* Any output of the fix script is captured by OpenSCAP and stored within the rule-result element. The return value of the fix script is stored as well.
+* Whenever OpenSCAP executes a fix script, it immediatelly evaluates the OVAL definition again (to verify that the fix script has been applied correctly). During this second run, if the OVAL evaluation returns success, the result of the rule is fixed, otherwise it is an error.
+* Detailed results of the remediation are stored in an output XCCDF file. It contains two TestResult elements. The first TestResult element represents the scan prior to the remediation. The second TestResult is derived from the first one and contains remediation results.
 
-=== Running regular scans with OpenSCAP Daemon
+There are three modes of operation of OpenSCAP with regard to remediation: online, offline, and review.
+
+==== Online Remediation
+
+Online remediation executes fix elements at the time of scanning. Evaluation and remediation are performed as a part of a single command.
+
+[source, bash]
+-----------------------
+# oscap xccdf eval --remediate \
+--profile xccdf_org.ssgproject.content_profile_ospp \
+--results scan-xccdf-remediation.xml \
+--report  scan-xccdf-remediation.html \
+/usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml \
+| tee scan-xccdf-remediation.txt
+-----------------------
+
+With scan-xccdf-remediation.txt file we can get a petit report with each rule and the result of the remeditation procedure.
+
+[source, bash]
+-----------------------
+# sed -e '1,/Starting Remediation/d' scan-xccdf-remediation.txt | egrep '(Title|Result)' |  awk '{if (NR%2) {printf("%s", $0)} else {printf " --> (%s)\n",$2} } '| cut -f2- > scan-xccdf-remediation-report.txt
+
+# more scan-xccdf-remediation-report.txt
+Disable chrony daemon from acting as server --> (fixed)
+Disable network management of chrony daemon --> (fixed)
+Install sssd-ipa Package --> (fixed)
+Configure SSSD to run as user sssd --> (fixed)
+Disable SSH Root Login --> (fixed)
+Enable SSH Warning Banner --> (fixed)
+Force frequent session key renegotiation --> (fixed)
+Disable GSSAPI Authentication --> (fixed)
+Set SSH Client Alive Max Count --> (fixed)
+Set SSH Idle Timeout Interval --> (fixed)
+Install fapolicyd Package --> (fixed)
+Enable the File Access Policy Service --> (fixed)
+Enable fapolicyd to watch all system mountpoints --> (fixed)
+Enable the USBGuard Service --> (error)
+Install usbguard Package --> (error)
+Authorize USB hubs in USBGuard daemon --> (fixed)
+Log USBGuard daemon audit events using Linux Audit --> (fixed)
+Authorize Human Interface Devices in USBGuard daemon --> (fixed)
+Configure auditd to use audispd's syslog plugin --> (fixed)
+Configure audit according to OSPP requirements --> (fixed)
+...
+-----------------------
+
+==== Offline Remediation
+
+Offline remediation allows us to postpone fix execution. In the first step, the system is only evaluated, and the results are stored in a TestResult element in an XCCDF file.
+
+[source, bash]
+-----------------------
+# oscap xccdf eval \
+--profile xccdf_org.ssgproject.content_profile_ospp \
+--results scan-xccdf-remediation.xml \
+--report  scan-xccdf-remediation.html \
+/usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml \
+| tee scan-xccdf-remediation.txt
+-----------------------
+
+Then we can performa the remediations using scan-xccdf-remediation.xml file.
+
+[source, bash]
+-----------------------
+# oscap xccdf remediate --results scan-xccdf-remediation.html scan-xccdf-remediation.html
+-----------------------
+
+==== Evaluation Remediation
+
+The review mode enables us to store remediation instructions to a file for further review. The remediation content is not executed during this operation.
+
+In this example we are generating a remediation-script.sh file.
+
+[source, bash]
+-----------------------
+# oscap xccdf generate fix --template urn:xccdf:fix:script:sh \
+--profile xccdf_org.ssgproject.content_profile_ospp \
+--output remediation-script.sh --fetch-remote-resources \
+/usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml
+-----------------------
+
+The remediation-script.sh file looks like the following.
+
+[source, bash]
+-----------------------
+# more remediation-script.sh
+###############################################################################
+#
+# Bash Remediation Script for Protection Profile for General Purpose Operating Systems
+#
+# Profile Description:
+# This profile reflects mandatory configuration controls identified in the
+# NIAP Configuration Annex to the Protection Profile for General Purpose
+# Operating Systems (Protection Profile Version 4.2.1).
+# This configuration profile is consistent with CNSSI-1253, which requires
+# U.S. National Security Systems to adhere to certain configuration
+# parameters. Accordingly, this configuration profile is suitable for
+# use in U.S. National Security Systems.
+#
+# Profile ID:  xccdf_org.ssgproject.content_profile_ospp
+# Benchmark ID:  xccdf_org.ssgproject.content_benchmark_RHEL-8
+# Benchmark Version:  0.1.46
+# XCCDF Version:  1.2
+#
+# This file was generated by OpenSCAP 1.3.1 using:
+# $ oscap xccdf generate fix --profile xccdf_org.ssgproject.content_profile_ospp --fix-type bash xccdf-file.xml
+#
+# This Bash Remediation Script is generated from an OpenSCAP profile without preliminary evaluation.
+# It attempts to fix every selected rule, even if the system is already compliant.
+#
+# How to apply this Bash Remediation Script:
+# $ sudo ./remediation-script.sh
+#
+###############################################################################
+
+###############################################################################
+# BEGIN fix (1 / 186) for 'xccdf_org.ssgproject.content_rule_service_rngd_enabled'
+###############################################################################
+(>&2 echo "Remediating rule 1/186: 'xccdf_org.ssgproject.content_rule_service_rngd_enabled'")
+
+SYSTEMCTL_EXEC='/usr/bin/systemctl'
+"$SYSTEMCTL_EXEC" start 'rngd.service'
+"$SYSTEMCTL_EXEC" enable 'rngd.service'
+
+# END fix for 'xccdf_org.ssgproject.content_rule_service_rngd_enabled'
+
+###############################################################################
+# BEGIN fix (2 / 186) for 'xccdf_org.ssgproject.content_rule_package_abrt_removed'
+###############################################################################
+(>&2 echo "Remediating rule 2/186: 'xccdf_org.ssgproject.content_rule_package_abrt_removed'")
+
+# CAUTION: This remediation script will remove abrt
+#          from the system, and may remove any packages
+#          that depend on abrt. Execute this
+#          remediation AFTER testing on a non-production
+#          system!
+
+if rpm -q --quiet "abrt" ; then
+    yum remove -y "abrt"
+fi
+
+# END fix for 'xccdf_org.ssgproject.content_rule_package_abrt_removed'
+...
+-----------------------
 
 === Scanning the RHEL infrastructure with OpenSCAP Workbench
 
-=== Interpreting the results
+We need to install all packages required by SCAP Workbench to function properly, including the scap-workbench package that provides the utility itself. Note that required dependencies, such as the qt and openssh packages, are automatically updated to the newest available version if the packages are already installed on our system.
+
+SCAP Workbench needs a security content to operate. Red Hat recommends to use the SCAP Security Guide (SSG) thet we have installed already.
+
+[source, bash]
+-----------------------
+# sudo yum -y install scap-workbench
+-----------------------
+
+[NOTE]
+If we don't have a X display running we need to forward X11.
+
+
 
 === Automating OpenSCAP installation with Ansible
 
+== Integrating report to Insights
