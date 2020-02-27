@@ -14,13 +14,13 @@ Audience: IT Managers, Architects, IT security specialists and technical staff w
 
 == Introduction
 
-This Show & Tell is intended to give to system administrators a brief introduction to openSCAP. We will describe the tools, how to install it on a Linux environment as RHEL, how to interact with the tool from scanning to remediation. Also we will discussing the integrarion with the RHEL predictive tool called Insights.
+This Show & Tell is intended to give to system administrators a brief introduction to openSCAP. We will describe the tools, how to install it on a Linux environment as RHEL, how to interact with the tool from scanning to remediation. Also we will discuss the integration with the RHEL predictive tool called Insights.
 
 Let's start!
 
-== What is OpenSCAP? 
+== What is OpenSCAP?
 
-OpenSCAP is a group of security tools, standards and policies for performing security compliance checks against the systems by following SCAP, which is the U.S. standard maintained by NIST. The SCAP scanner, which is an engine, reads a security policy and checks whether the system is compliant with it. It goes through out all of the rules defined in the policy, one by one, and reports whether each rule is fulfilled. If all checks pass, the system is compliant with the security policy. If not, the system isn't complaint and need a remediation, that can be executed through scripts or ansible playbooks or letting the tool to remediate each non compliant rule.
+OpenSCAP is a group of security tools, standards and policies for performing security compliance checks against the systems by following SCAP, which is the U.S. standard maintained by NIST. The SCAP scanner, which is an engine, reads a security policy and checks whether the system is compliant with it. It goes throughout all of the rules defined in the policy, one by one, and reports whether each rule is fulfilled. If all checks pass, the system is compliant with the security policy. If not, the system isn't compliant and needs a remediation, that can be executed through scripts or ansible playbooks or letting the tool to remediate each non compliant rule.
 
 == Using OpenSCAP
 
@@ -76,7 +76,7 @@ Complete!
 
 === The security guide for SCAP
 
-Before we can start using oscap we need to install or import security content. For this excersice we can install the SCAP Security Guide (SSG) package that contains the currently most evolved and elaborated set of security polices for Linux systems
+Before we can start using oscap we need to install or import security content. For this exercise we can install the SCAP Security Guide (SSG) package that contains the currently most evolved and elaborated set of security policies for Linux systems.
 
 [source, bash]
 ---------------------------
@@ -158,7 +158,7 @@ scap-security-guide-0.1.48.zip      100%[=======================================
 
 # unzip scap-security-guide-0.1.48.zip
 
-output ommited.
+output omitted.
 
 # cd scap-security-guide-0.1.48
 
@@ -166,13 +166,13 @@ output ommited.
 # cp ssg-rhel8-ds.xml /usr/share/xml/scap/ssg/content/ssg-rhel8-ds-20200115.xml
 --------------------------
 
-After copy the security guides updated in /usr/share/xml/scap/ssg/content/ directory, we can get info from these guides to see if profiles are changed. This is done using the 'info' dirc eof oscap described in the next section.
+After copying the security guides updated in /usr/share/xml/scap/ssg/content/ directory, we can get information from these guides to see if some profiles are changed or added. This is done using the 'info' directive of oscap described in the next section.
 
-=== Getting info for using oscap
+=== Getting information for using oscap
 
 The oscap utility can process files conforming to many of the formats used by the utility. In order to process the given file with SCAP content, we need to understand how to use oscap with the given file type. We can open and read the file, or use the info module of oscap which parses the file and extracts relevant information in human-readable format.
 
-for example, let´s see the content of ssg-rhel8-ds.xml and ssg-rhel8-ds.xml
+For example, let's see the content of ssg-rhel8-ds.xml.
 
 [source, bash]
 -------------------------
@@ -212,7 +212,7 @@ Dictionaries:
         Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-dictionary.xml
 -------------------------
 
-We can filter for Title keyword to list only the name of profiles using the following.
+We can filter for Title to list only the name of profiles.
 
 [source, bash]
 ------------------------
@@ -271,18 +271,11 @@ Now we can see a lot more guides for our RHEL 8 instance.
 
 === Scanning a host
 
-The oscap utility can scan systems against the SCAP content represented by both an XCCDF (The eXtensible Configuration Checklist Description Format) benchmark and OVAL (Open Vulnerability and Assessment Language) definitions. The security policy can be in the form of a single OVAL or XCCDF file or multiple separate XML files where each file represents a different component (XCCDF, OVAL, CPE, CVE, and others). The result of a scan can be printed to both standard output and an XML file. The result file can then be further processed by oscap in order to generate a report in a human-readable format. 
+The oscap utility can scan systems against the SCAP content represented by both, an XCCDF (The eXtensible Configuration Checklist Description Format) benchmark, and OVAL (Open Vulnerability and Assessment Language) definitions. The security policy can be in the form of a single OVAL or XCCDF file or multiple separate XML files where each file represents a different component (XCCDF, OVAL, CPE, CVE, and others). The result of a scan can be printed to both standard output and an XML file. The result file can then be further processed by oscap in order to generate a report in a human-readable format. 
 
-For this exercise we are going to scan the system first, using a SSCDF, no remediations will executed int this very first step. We need to understand how far we are to comply with the profile selected.
+For this exercise we are going to scan the system first, using a XCCDF, no remediations will be executed in this very first step. We need to understand how far we are to comply with the profile selected.
 
-By the time we wrote this Show & Tell documentation, RHEL 8 had two possible profiles available.
-
-Title: *Protection Profile for General Purpose Operating Systems*
-   Id: xccdf_org.ssgproject.content_profile_ospp
-Title: *PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8*
-   Id: xccdf_org.ssgproject.content_profile_pci-dss
-
-Let´s scan with protection profile for general purpose OS. We also could chck the system using the pci-dss profile. In both cases, the profile defines de baseline to be acomplished. The oscap can help us to evealuate how far the system is from the profile selected.
+Let's scan with a protection profile for general purpose OS. We also could check the system using the pci-dss profile. In both cases, the profile defines the baseline to be fulfilled. The oscap can help us to evaluate how far the system is from the profile selected.
 
 [source, bash]
 -------------------------
@@ -298,7 +291,7 @@ Let´s scan with protection profile for general purpose OS. We also could chck t
 * --report send a human readable report to scan-xccdf-results.html.
 * --results build a results file scan-xccdf-results.xml.
 * /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml get the RHEL 8 data stream to execute the scanning process. 
-* The stardar output is redirected to a file using the *tee* command.
+* The standard output is redirected to a file using the *tee* command.
 
 An excerpt of the output is shown using a simple *more* command.
 
@@ -343,7 +336,7 @@ Result  fail
 ...
 -------------------------
 
-From this file we can create a "report like" file in which the title and result are joined together.
+From this output we can create a "report like" file in which the title and result are joined together.
 
 [source, bash]
 -------------------------
@@ -404,19 +397,19 @@ Ident   CCE-80906-1
 Result  fail
 -------------------------
 
-With the identification we go to *http://static.open-scap.org/ssg-guides/ssg-rhel8-guide-rht-ccp.html* and have a detailed information about the RULE and Remediation.
+With the identification we go to *http://static.open-scap.org/ssg-guides/ssg-rhel8-guide-rht-ccp.html* and have detailed information about the RULE and Remediation.
 
 http://static.open-scap.org/ssg-guides/ssg-rhel8-guide-rht-ccp.html
 
 image::Rule.png[]
 
-Also a formatted report is created thanks of using the --report directive. This report looks like this.
+Also a formatted report is created thanks to using the --report directive. This report looks like this.
 
 image::complianceScoring.png[]
 
 === Making remediations
 
-OpenSCAP allows to automatically remediate systems that have been found in a non-compliant state. For system remediation, an XCCDF file with instructions is required. The scap-security-guide package contains certain remediation instructions.
+OpenSCAP allows automatic remediations that have been found in a non-compliant state. For system remediation, an XCCDF file with instructions is required. The scap security guide package contains certain remediation instructions.
 
 System remediation consists of the following steps:
 
@@ -424,12 +417,12 @@ System remediation consists of the following steps:
 * An assessment of the results is performed by evaluating the OVAL definitions. Each rule that has failed is marked as a candidate for remediation.
 * OpenSCAP searches for an appropriate fix element, resolves it, prepares the environment, and executes the fix script.
 * Any output of the fix script is captured by OpenSCAP and stored within the rule-result element. The return value of the fix script is stored as well.
-* Whenever OpenSCAP executes a fix script, it immediatelly evaluates the OVAL definition again (to verify that the fix script has been applied correctly). During this second run, if the OVAL evaluation returns success, the result of the rule is fixed, otherwise it is an error.
+* Whenever OpenSCAP executes a fix script, it immediately evaluates the OVAL definition again (to verify that the fix script has been applied correctly). During this second run, if the OVAL evaluation returns success, the result of the rule is fixed, otherwise it is an error.
 * Detailed results of the remediation are stored in an output XCCDF file. It contains two TestResult elements. The first TestResult element represents the scan prior to the remediation. The second TestResult is derived from the first one and contains remediation results.
 
 There are three modes of operation of OpenSCAP with regard to remediation: online, offline, and review.
 
-==== Online Remediation
+* Online Remediation
 
 Online remediation executes fix elements at the time of scanning. Evaluation and remediation are performed as a part of a single command.
 
@@ -443,7 +436,7 @@ Online remediation executes fix elements at the time of scanning. Evaluation and
 | tee scan-xccdf-remediation.txt
 -----------------------
 
-With scan-xccdf-remediation.txt file we can get a petit report with each rule and the result of the remeditation procedure.
+With scan-xccdf-remediation.txt file we can get a petit report with each rule and the result of the remediation procedure.
 
 [source, bash]
 -----------------------
@@ -473,7 +466,7 @@ Configure audit according to OSPP requirements --> (fixed)
 ...
 -----------------------
 
-==== Offline Remediation
+* Offline Remediation
 
 Offline remediation allows us to postpone fix execution. In the first step, the system is only evaluated, and the results are stored in a TestResult element in an XCCDF file.
 
@@ -487,14 +480,14 @@ Offline remediation allows us to postpone fix execution. In the first step, the 
 | tee scan-xccdf-remediation.txt
 -----------------------
 
-Then we can performa the remediations using scan-xccdf-remediation.xml file.
+Then we can perform the remediations using scan-xccdf-remediation.xml file.
 
 [source, bash]
 -----------------------
 # oscap xccdf remediate --results scan-xccdf-remediation.html scan-xccdf-remediation.html
 -----------------------
 
-==== Evaluation Remediation
+* Evaluation Remediation
 
 The review mode enables us to store remediation instructions to a file for further review. The remediation content is not executed during this operation.
 
@@ -572,6 +565,13 @@ fi
 ...
 -----------------------
 
+If we want to get the playbook for remediate we can execute the following command.
+
+[source, bash]
+-------------------------------
+# oscap xccdf generate fix --fix-type ansible --profile xccdf_org.ssgproject.content_profile_ospp --output remediation-playbook.yml  /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml
+-------------------------------
+
 === Scanning the RHEL infrastructure with OpenSCAP Workbench
 
 SCAP Workbench is a graphical user interface for the SCAP toolset that was designed to provide users with an intuitive GUI for performing scanning and remediation tasks. The SCAP Workbench is a graphical tool and in many environments where Linux servers are running headless without the graphical X environment installed we need to forward X11.
@@ -580,38 +580,38 @@ SCAP Workbench is a cross-platform application, with downloads available for Win
 
 On RHEL We need to install all packages required by SCAP Workbench to function properly, including the scap-workbench package that provides the utility itself. Note that required dependencies, such as the qt and openssh packages, are automatically updated to the newest available version if the packages are already installed on our system.
 
-SCAP Workbench needs a security content to operate. Red Hat recommends to use the SCAP Security Guide (SSG) thet we have installed already.
+SCAP Workbench needs a security content to operate. Red Hat recommends using the SCAP Security Guide (SSG) that we have installed already.
 
 [source, bash]
 -----------------------
 # sudo yum -y install scap-workbench
 -----------------------
 
-We can download a installer for Windows or MAC if you feel more confortable for running this application in your native operating system. No matter where we executes the workbench, we can scan servers remotely.
+We can download an installer for Windows or MAC if you feel more comfortable running this application in your native operating system. No matter where we executes the workbench, we can scan servers remotely.
 
-Afrter the execution of scap-workbench the first thing we have to select are the profiles for the specific operating system of the server we are suposed to scan.
+After the execution of scap-workbench the first thing we have to select are the profiles for the specific operating system of the server we are supposed to scan.
 
 image::loadSecurityGuide.png[]
 
 In case we don't find the operating system or version needed for the server to be scanned, we can download the latest security guide, as described in a previous section, and select other *Other SCAP content*, then load content to select the appropriate file.
 
-We must select a profile the scanning process. In our example we are going to select the *StandardSystem Security Profile for Red Hat Enterprise Linux 8*.
+We must select a profile for the scanning process. In our example we are going to select the *Standard System Security Profile for Red Hat Enterprise Linux 8*.
 
 image::workbenchChooseProfile.png[]
 
-We can scan all the rules proposed, but also we can customize what best fit our requirements. Select *Customize* for modify what rules are going to be scanned.
+We can scan all the rules proposed, but also we can customize what best fits our requirements. Select *Customize* to modify what rules are going to be scanned.
 
 image::workbenchCustomize.png[]
 
-We can desellect all rules for selecting just what we need to apply to our server.
+We can deselect all rules for selecting just what we need to apply to our server.
 
 image::workbenchSelectRules.png[]
 
 After selecting the rules that apply to our organization we can initiate a *remediation* for the server we need to set in compliance the customized (or full) security guide.
 
-Select the *Remediation* button for execute all the fixes needed for set the server compliance.
+Select the *Remediation* button for executing all the fixes needed for set the server compliance.
 
-The tool, as in command line, execute a scanning first.
+The tool, as in command line, executes a scanning first.
 
 image::workbenchRemediationScanning.png[]
 
@@ -621,7 +621,7 @@ image::workbenchRemediationScanning-2.png[]
 
 After the remediation all the fixes are shown.
 
-Also, we van select the *Report* button to see in a browser the rport just created.
+Also, we can select the *Report* button to see in a browser the report just created.
 
 image::workbenchReport.png[]
 
@@ -631,7 +631,7 @@ image::workbenchReportDetails.png[]
 
 == Integrating reports to RHEL Insights
 
-We can integrate the reports result of periodic scanning or remediations with Ansible, using the command line.
+We can integrate the reports, resulting from periodic scanning or remediations with Ansible, using the command line.
 
 [source, bash]
 -------------------------
@@ -654,5 +654,10 @@ After this upload procedure we can access the report from the tab *Compliance* a
 
 * Select tab *Compliance*
 
-image::insights-2.png[]
+Image::insights-2.png[]
 
+=== References
+
+* link:https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/pdf/security_hardening/Red_Hat_Enterprise_Linux-8-Security_hardening-en-US.pdf[Red Hat Enterprise Linux 8 Security hardening]
+
+* link:https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/index[RHEL Security Guide]
