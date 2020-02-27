@@ -131,7 +131,11 @@ ssg-jre-cpe-dictionary.xml      ssg-rhel6-ds-1.2.xml          ssg-rhel7-ocil.xml
 ssg-jre-cpe-oval.xml            ssg-rhel6-ds.xml              ssg-rhel7-oval.xml
 --------------------------
 
-== Getting info from using oscap
+If we want to get the most recent security guides, we can go download them from link:://www.open-scap.org/security-policies/scap-security-guide/[scap security guide].
+
+
+
+== Getting info for using oscap
 
 The oscap utility can process files conforming to many of the formats used by the utility. In order to process the given file with SCAP content, we need to understand how to use oscap with the given file type. We can open and read the file, or use the info module of oscap which parses the file and extracts relevant information in human-readable format.
 
@@ -540,7 +544,11 @@ fi
 
 === Scanning the RHEL infrastructure with OpenSCAP Workbench
 
-We need to install all packages required by SCAP Workbench to function properly, including the scap-workbench package that provides the utility itself. Note that required dependencies, such as the qt and openssh packages, are automatically updated to the newest available version if the packages are already installed on our system.
+SCAP Workbench is a graphical user interface for the SCAP toolset that was designed to provide users with an intuitive GUI for performing scanning and remediation tasks. The SCAP Workbench is a graphical tool and in many environments where Linux servers are running headless without the graphical X environment installed we need to forward X11.
+
+SCAP Workbench is a cross-platform application, with downloads available for Windows, macOS, and most common Linux platforms, therefore, the easiest path for most users will be to run it in their native operating system. If, for consistency, you wish to run SCAP Workbench on Linux, you would either need to set up a remote X11 session or set up a dedicated scanning host that includes the graphical desktop environment.
+
+On RHEL We need to install all packages required by SCAP Workbench to function properly, including the scap-workbench package that provides the utility itself. Note that required dependencies, such as the qt and openssh packages, are automatically updated to the newest available version if the packages are already installed on our system.
 
 SCAP Workbench needs a security content to operate. Red Hat recommends to use the SCAP Security Guide (SSG) thet we have installed already.
 
@@ -549,8 +557,8 @@ SCAP Workbench needs a security content to operate. Red Hat recommends to use th
 # sudo yum -y install scap-workbench
 -----------------------
 
-[NOTE]
-If we don't have a X display running we need to forward X11.
+We can download a installer for Windows or MAC if you feel more confortable for running this application in your native operating system. No matter where we executes the workbench, we can scan servers remotely.
+
 
 
 
