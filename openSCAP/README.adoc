@@ -589,6 +589,21 @@ Afrter the execution of scap-workbench the first thing we have to select are the
 
 image::loadSecurityGuide.png[]
 
+In case we don't find the operating system or version needed for the server to be scanned, we can download the latest security guide, as described in a previous section, and select other *Other SCAP content*, then load content to select the appropriate file.
+
+We must select a profile the scanning process. In our example we are going to select the *StandardSystem Security Profile for Red Hat Enterprise Linux 8*.
+
+image::workbenchChooseProfile.png[]
+
+We can scan all the rules proposed, but also we can customize what best fit our requirements. Select *Customize* for modify what rules are going to be scanned.
+
+image::workbenchCustomize.png[]
+
+We can desellect all rules for selecting just what we need to apply to our server.
+
+image::workbenchSelectRules.png[]
+
+
 
 === Automating OpenSCAP installation with Ansible
 
