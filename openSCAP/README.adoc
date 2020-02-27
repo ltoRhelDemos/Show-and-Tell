@@ -14,9 +14,13 @@ Audience: IT Managers, Architects, IT security specialists and technical staff w
 
 == Introduction
 
-== Need for Audting Security Poilicies
+This Show & Tell is intended to give to system administrators a brief introduction to openSCAP. We will describe the tools, how to install it on a Linux environment as RHEL, how to interact with the tool from scanning to remediation. Also we will discussing the integrarion with the RHEL predictive tool called Insights.
+
+Let's start!
 
 == What is OpenSCAP?
+
+OpenSCAP is a group of security tools, standards and policies for performing security compliance checks against the systems by following SCAP, which is the U.S. standard maintained by NIST. The SCAP scanner, which is an engine, reads a security policy and checks whether the system is compliant with it. It goes through out all of the rules defined in the policy, one by one, and reports whether each rule is fulfilled. If all checks pass, the system is compliant with the security policy. If not, the system isn't complaint and need a remediation, that can be executed through scripts or ansible playbooks or letting the tool to remediate each non compliant rule.
 
 == Using OpenSCAP
 
