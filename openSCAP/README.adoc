@@ -650,5 +650,5 @@ After this upload procedure we can access the report from the tab *Compliance* a
 
 * Select tab *Compliance*
 
-image::insights-2.png
+image::insights-2.png[]
 
