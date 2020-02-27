@@ -118,7 +118,7 @@ After the installation SSG security content will be available in the following d
 
 [source, bash]
 --------------------------
- ls /usr/share/xml/scap/ssg/content/
+# ls /usr/share/xml/scap/ssg/content/
 
 ssg-firefox-cpe-dictionary.xml  ssg-jre-ds-1.2.xml            ssg-rhel6-ocil.xml            ssg-rhel7-xccdf.xml
 ssg-firefox-cpe-oval.xml        ssg-jre-ds.xml                ssg-rhel6-oval.xml            ssg-rhel8-cpe-dictionary.xml
@@ -133,98 +133,86 @@ ssg-jre-cpe-oval.xml            ssg-rhel6-ds.xml              ssg-rhel7-oval.xml
 
 If we want to get the most recent security guides, we can go download them from link:https://www.open-scap.org/security-policies/scap-security-guide/[scap security guide].
 
+[source, bash]
+--------------------------
+# wget https://github.com/ComplianceAsCode/content/releases/download/v0.1.48/scap-security-guide-0.1.48.zip
 
+Resolving github.com (github.com)... 192.30.253.112
+Connecting to github.com (github.com)|192.30.253.112|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://github-production-release-asset-2e65be.s3.amazonaws.com/19279458/3cc08380-37d6-11ea-8d32-ccfae2c7184d?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200227%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200227T122113Z&X-Amz-Expires=300&X-Amz-Signature=8759e4c609f3b36b5eb315281cf053c7c4a1b4d088e00718a26386bee7ca2a2a&X-Amz-SignedHeaders=host&actor_id=0&response-content-disposition=attachment%3B%20filename%3Dscap-security-guide-0.1.48.zip&response-content-type=application%2Foctet-stream [following]
+--2020-02-27 07:21:13--  https://github-production-release-asset-2e65be.s3.amazonaws.com/19279458/3cc08380-37d6-11ea-8d32-ccfae2c7184d?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200227%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200227T122113Z&X-Amz-Expires=300&X-Amz-Signature=8759e4c609f3b36b5eb315281cf053c7c4a1b4d088e00718a26386bee7ca2a2a&X-Amz-SignedHeaders=host&actor_id=0&response-content-disposition=attachment%3B%20filename%3Dscap-security-guide-0.1.48.zip&response-content-type=application%2Foctet-stream
+Resolving github-production-release-asset-2e65be.s3.amazonaws.com (github-production-release-asset-2e65be.s3.amazonaws.com)... 52.216.136.180
+Connecting to github-production-release-asset-2e65be.s3.amazonaws.com (github-production-release-asset-2e65be.s3.amazonaws.com)|52.216.136.180|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 62094730 (59M) [application/octet-stream]
+Saving to: ‘scap-security-guide-0.1.48.zip’
+
+scap-security-guide-0.1.48.zip      100%[==================================================================>]  59.22M  8.17MB/s    in 8.3s
+
+2020-02-27 07:21:21 (7.16 MB/s) - ‘scap-security-guide-0.1.48.zip’ saved [62094730/62094730]
+
+# unzip scap-security-guide-0.1.48.zip
+
+output ommited.
+
+# cd scap-security-guide-0.1.48
+
+# cp ssg-rhel8-ds-1.2.xml /usr/share/xml/scap/ssg/content/ssg-rhel8-ds-1.2-20200115.xml
+# cp ssg-rhel8-ds.xml /usr/share/xml/scap/ssg/content/ssg-rhel8-ds-20200115.xml
+--------------------------
+
+After copy the security guides updated in /usr/share/xml/scap/ssg/content/ directory, we can get info from these guides to see if profiles are changed. This is done using the 'info' dirc eof oscap described in the next section.
 
 == Getting info for using oscap
 
 The oscap utility can process files conforming to many of the formats used by the utility. In order to process the given file with SCAP content, we need to understand how to use oscap with the given file type. We can open and read the file, or use the info module of oscap which parses the file and extracts relevant information in human-readable format.
 
-for example, let´s see the content of ssg-rhel7-ds-1.2.xml and ssg-rhel8-ds-1.2.xml
+for example, let´s see the content of ssg-rhel8-ds.xml and ssg-rhel8-ds.xml
 
 [source, bash]
 -------------------------
-#  oscap info /usr/share/xml/scap/ssg/content/ssg-rhel7-ds-1.2.xml
+# oscap info /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml
 
 Document type: Source Data Stream
-Imported: 2019-09-02T06:09:15
+Imported: 2019-09-02T06:09:10
 
-Stream: scap_org.open-scap_datastream_from_xccdf_ssg-rhel7-xccdf-1.2.xml
+Stream: scap_org.open-scap_datastream_from_xccdf_ssg-rhel8-xccdf-1.2.xml
 Generated: (null)
-Version: 1.2
+Version: 1.3
 Checklists:
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-xccdf-1.2.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-xccdf-1.2.xml
+WARNING: Datastream component 'scap_org.open-scap_cref_security-data-oval-com.redhat.rhsa-RHEL8.xml' points out to the remote 'https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL8.xml'. Use '--fetch-remote-resources' option to download it.
+WARNING: Skipping 'https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL8.xml' file which is referenced from datastream
                 Status: draft
                 Generated: 2019-09-02
                 Resolved: true
                 Profiles:
-                        Title: OSPP - Protection Profile for General Purpose Operating Systems v4.2.1
+                        Title: Protection Profile for General Purpose Operating Systems
                                 Id: xccdf_org.ssgproject.content_profile_ospp
-                        Title: NIST National Checklist Program Security Guide
-                                Id: xccdf_org.ssgproject.content_profile_ncp
-                        Title: DRAFT - ANSSI DAT-NT28 (minimal)
-                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_minimal
-                        Title: DRAFT - ANSSI DAT-NT28 (enhanced)
-                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_enhanced
-                        Title: DRAFT - ANSSI DAT-NT28 (intermediary)
-                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_intermediary
-                        Title: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 7
+                        Title: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8
                                 Id: xccdf_org.ssgproject.content_profile_pci-dss
-                        Title: Health Insurance Portability and Accountability Act (HIPAA)
-                                Id: xccdf_org.ssgproject.content_profile_hipaa
-                        Title: DRAFT - ANSSI DAT-NT28 (high)
-                                Id: xccdf_org.ssgproject.content_profile_anssi_nt28_high
-                        Title: Standard System Security Profile for Red Hat Enterprise Linux 7
-                                Id: xccdf_org.ssgproject.content_profile_standard
-                        Title: [DRAFT] DISA STIG for Red Hat Enterprise Linux Virtualization Host (RHELH)
-                                Id: xccdf_org.ssgproject.content_profile_rhelh-stig
-                        Title: VPP - Protection Profile for Virtualization v. 1.0 for Red Hat Enterprise Linux Hypervisor (RHELH)
-                                Id: xccdf_org.ssgproject.content_profile_rhelh-vpp
-                        Title: DISA STIG for Red Hat Enterprise Linux 7
-                                Id: xccdf_org.ssgproject.content_profile_stig
-                        Title: Criminal Justice Information Services (CJIS) Security Policy
-                                Id: xccdf_org.ssgproject.content_profile_cjis
-                        Title: Unclassified Information in Non-federal Information Systems and Organizations (NIST 800-171)
-                                Id: xccdf_org.ssgproject.content_profile_cui
-                        Title: C2S for Red Hat Enterprise Linux 7
-                                Id: xccdf_org.ssgproject.content_profile_C2S
-                        Title: Red Hat Corporate Profile for Certified Cloud Providers (RH CCP)
-                                Id: xccdf_org.ssgproject.content_profile_rht-ccp
                 Referenced check files:
-                        ssg-rhel7-oval.xml
+                        ssg-rhel8-oval.xml
                                 system: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                        ssg-rhel7-ocil.xml
+                        ssg-rhel8-ocil.xml
                                 system: http://scap.nist.gov/schema/ocil/2
-                        https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL7.xml
-                                system: http://oval.mitre.org/XMLSchema/oval-definitions-5
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-pcidss-xccdf-1.2.xml
-                Status: draft
-                Generated: 2019-09-02
-                Resolved: true
-                Profiles:
-                        Title: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 7
-                                Id: xccdf_org.ssgproject.content_profile_pci-dss_centric
-                Referenced check files:
-                        ssg-rhel7-oval.xml
-                                system: http://oval.mitre.org/XMLSchema/oval-definitions-5
-                        ssg-rhel7-ocil.xml
-                                system: http://scap.nist.gov/schema/ocil/2
-                        https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL7.xml
+                        security-data-oval-com.redhat.rhsa-RHEL8.xml
                                 system: http://oval.mitre.org/XMLSchema/oval-definitions-5
 Checks:
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-oval.xml
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-ocil.xml
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-cpe-oval.xml
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-oval.xml000
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-ocil.xml000
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-oval.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-ocil.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-oval.xml
+        Ref-Id: scap_org.open-scap_cref_security-data-oval-com.redhat.rhsa-RHEL8.xml
 Dictionaries:
-        Ref-Id: scap_org.open-scap_cref_ssg-rhel7-cpe-dictionary.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-dictionary.xml
 -------------------------
 
 We can filter for Title keyword to list only the name of profiles using the following.
 
 [source, bash]
 ------------------------
-# oscap info /usr/share/xml/scap/ssg/content/ssg-rhel8-ds-1.2.xml | egrep '(Title|Id)'
+# oscap info /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml | egrep '(Title|Id)'
 
         Ref-Id: scap_org.open-scap_cref_ssg-rhel8-xccdf-1.2.xml
                         Title: Protection Profile for General Purpose Operating Systems
@@ -237,7 +225,45 @@ We can filter for Title keyword to list only the name of profiles using the foll
         Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-dictionary.xml
 ------------------------
 
-In the case of RHEL 8 the number of profiles is far less than RHEL 7, just because longevity of each product in the market.
+Now let's get the info to the new security guide downloaded in the previous section.
+
+[source, bash]
+------------------------
+# oscap info /usr/share/xml/scap/ssg/content/ssg-rhel8-ds.xml | egrep '(Title|Id)'
+
+WARNING: Datastream component 'scap_org.open-scap_cref_security-data-oval-com.redhat.rhsa-RHEL8.xml' points out to the remote 'https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL8.xml'. Use '--fetch-remote-resources' option to download it.
+WARNING: Skipping 'https://www.redhat.com/security/data/oval/com.redhat.rhsa-RHEL8.xml' file which is referenced from datastream
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-xccdf-1.2.xml
+                        Title: Criminal Justice Information Services (CJIS) Security Policy
+                                Id: xccdf_org.ssgproject.content_profile_cjis
+                        Title: Unclassified Information in Non-federal Information Systems and Organizations (NIST 800-171)
+                                Id: xccdf_org.ssgproject.content_profile_cui
+                        Title: Health Insurance Portability and Accountability Act (HIPAA)
+                                Id: xccdf_org.ssgproject.content_profile_hipaa
+                        Title: PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8
+                                Id: xccdf_org.ssgproject.content_profile_pci-dss
+                        Title: Red Hat Corporate Profile for Certified Cloud Providers (RH CCP)
+                                Id: xccdf_org.ssgproject.content_profile_rht-ccp
+                        Title: Standard System Security Profile for Red Hat Enterprise Linux 8
+                                Id: xccdf_org.ssgproject.content_profile_standard
+                        Title: [DRAFT] DISA STIG for Red Hat Enterprise Linux 8
+                                Id: xccdf_org.ssgproject.content_profile_stig
+                        Title: [DRAFT] DISA STIG for Red Hat Enterprise Linux Virtualization Host (RHELH)
+                                Id: xccdf_org.ssgproject.content_profile_rhelh-stig
+                        Title: VPP - Protection Profile for Virtualization v. 1.0 for Red Hat Enterprise Linux Hypervisor (RHELH)
+                                Id: xccdf_org.ssgproject.content_profile_rhelh-vpp
+                        Title: Protection Profile for General Purpose Operating Systems
+                                Id: xccdf_org.ssgproject.content_profile_ospp
+                        Title: Australian Cyber Security Centre (ACSC) Essential Eight
+                                Id: xccdf_org.ssgproject.content_profile_e8
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-oval.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-ocil.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-oval.xml
+        Ref-Id: scap_org.open-scap_cref_security-data-oval-com.redhat.rhsa-RHEL8.xml
+        Ref-Id: scap_org.open-scap_cref_ssg-rhel8-cpe-dictionary.xml
+------------------------
+
+Now we can see a lot more guides for our RHEL 8 instance.
 
 === Scanning a host
 
