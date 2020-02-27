@@ -603,7 +603,27 @@ We can desellect all rules for selecting just what we need to apply to our serve
 
 image::workbenchSelectRules.png[]
 
+After selecting the rules that apply to our organization we can initiate a *remediation* for the server we need to set in compliance the customized (or full) security guide.
 
+Select the *Remediation* button for execute all the fixes needed for set the server compliance.
+
+The tool, as in command line, execute a scanning first.
+
+image::workbenchRemediationScanning.png[]
+
+Then, select all failed candidates to execute a fix on each rule.
+
+image::workbenchRemediationScanning-1.png[]
+
+After the remediation all the fixes are shown.
+
+Also, we van select the *Report* button to see in a browser the rport just created.
+
+image::workbenchReport.png[]
+
+In this report we can also see the details of each rule.
+
+image::workbenchReportDetails.png[]
 
 === Automating OpenSCAP installation with Ansible
 
