@@ -625,6 +625,30 @@ In this report we can also see the details of each rule.
 
 image::workbenchReportDetails.png[]
 
-=== Automating OpenSCAP installation with Ansible
-
 == Integrating report to Insights
+
+We can integrate the reports result of periodic scanning or remediations with Ansible, using the command line.
+
+[source, bash]
+-------------------------
+# insights-client --verbose --payload scan-xccdf-results.xml --content-type application/vnd.redhat.compliance.something+tgz
+
+2020-02-27 08:51:19,124    DEBUG insights.client.client Logging initialized
+2020-02-27 08:51:19,125    DEBUG root Loaded initial egg: /etc/insights-client/rpm.egg/insights
+2020-02-27 08:51:19,126    DEBUG insights.client /usr/bin/gpg --verify --keyring /etc/insights-client/redhattools.pub.gpg /var/lib/insights/newest.egg.asc /var/lib/insights/newest.egg
+2020-02-27 08:51:19,140    DEBUG insights.client GPG return code: 0
+2020-02-27 08:51:20,053    DEBUG insights.client.client Logging initialized
+2020-02-27 08:51:20,053    DEBUG insights.client.auto_config Trying to autoconfigure...
+...
+-------------------------
+
+The xml file to be uploaded is the result of executing the eval or remediation options of oscap with the --results directive. This was described in previous sections.
+
+After this upload procedure we can access the report from the tab *Compliance* accessed from the insights inventory window.
+
+* Access link:https://cloud.redhat.com/insights/inventory/[Insights Inventory]
+
+* Select tab *Compliance*
+
+image::insights-2.png
+
