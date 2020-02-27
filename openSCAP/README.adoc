@@ -585,7 +585,9 @@ SCAP Workbench needs a security content to operate. Red Hat recommends to use th
 
 We can download a installer for Windows or MAC if you feel more confortable for running this application in your native operating system. No matter where we executes the workbench, we can scan servers remotely.
 
+Afrter the execution of scap-workbench the first thing we have to select are the profiles for the specific operating system of the server we are suposed to scan.
 
+image::loadSecurityGuide.png
 
 
 === Automating OpenSCAP installation with Ansible
