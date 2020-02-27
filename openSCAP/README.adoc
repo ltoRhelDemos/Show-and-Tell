@@ -168,7 +168,7 @@ output ommited.
 
 After copy the security guides updated in /usr/share/xml/scap/ssg/content/ directory, we can get info from these guides to see if profiles are changed. This is done using the 'info' dirc eof oscap described in the next section.
 
-== Getting info for using oscap
+=== Getting info for using oscap
 
 The oscap utility can process files conforming to many of the formats used by the utility. In order to process the given file with SCAP content, we need to understand how to use oscap with the given file type. We can open and read the file, or use the info module of oscap which parses the file and extracts relevant information in human-readable format.
 
