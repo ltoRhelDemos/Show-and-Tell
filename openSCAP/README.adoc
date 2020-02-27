@@ -629,7 +629,7 @@ In this report we can also see the details of each rule.
 
 image::workbenchReportDetails.png[]
 
-== Integrating report to Insights
+== Integrating reports to RHEL Insights
 
 We can integrate the reports result of periodic scanning or remediations with Ansible, using the command line.
 
