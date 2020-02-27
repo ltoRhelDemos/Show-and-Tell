@@ -613,7 +613,7 @@ image::workbenchRemediationScanning.png[]
 
 Then, select all failed candidates to execute a fix on each rule.
 
-image::workbenchRemediationScanning-1.png[]
+image::workbenchRemediationScanning-2.png[]
 
 After the remediation all the fixes are shown.
 
