@@ -131,7 +131,7 @@ ssg-jre-cpe-dictionary.xml      ssg-rhel6-ds-1.2.xml          ssg-rhel7-ocil.xml
 ssg-jre-cpe-oval.xml            ssg-rhel6-ds.xml              ssg-rhel7-oval.xml
 --------------------------
 
-If we want to get the most recent security guides, we can go download them from link:://www.open-scap.org/security-policies/scap-security-guide/[scap security guide].
+If we want to get the most recent security guides, we can go download them from link:https://www.open-scap.org/security-policies/scap-security-guide/[scap security guide].
 
 
 
