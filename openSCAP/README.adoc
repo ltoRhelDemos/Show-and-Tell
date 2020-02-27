@@ -587,7 +587,7 @@ We can download a installer for Windows or MAC if you feel more confortable for 
 
 Afrter the execution of scap-workbench the first thing we have to select are the profiles for the specific operating system of the server we are suposed to scan.
 
-image::loadSecurityGuide.png
+image::loadSecurityGuide.png[]
 
 
 === Automating OpenSCAP installation with Ansible
