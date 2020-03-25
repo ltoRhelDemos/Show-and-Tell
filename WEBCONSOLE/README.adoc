@@ -137,11 +137,55 @@ image::subscriptions.png[Subscriptions]
 
 image::terminal.png[Console]
 
-
-
 == How to install a plugin for adding functionality to webconsole
 
+For webconsole to extend its functionality it is need to install plugins. These plugins on RHEL are easy to find trought the bash auto completation feature that can be used when we use the the yum command.
+
+[source, bash]
+--------------------------
+yum install cockpi- [tab]
+
+cockpit-composer.noarch           cockpit-doc.noarch                cockpit-pcp.x86_64                cockpit-session-recording.noarch
+cockpit-dashboard.noarch          cockpit-machines.noarch           cockpit-podman.noarch             cockpit-storaged.noarch
+--------------------------
+
+In the next section we will install a plugin for manage more than one server from the web console.
+
 == How to manage several servers from one console
+
+For manage several servers from one console we need to install cockpit-dashborad plugin.
+
+[source, bash]
+---------------------------
+yum install cockpit-dashboard
+---------------------------
+
+Every plugin we install needs a restart of the cockpit.socket service to be recognized.
+
+[source, bash]
+---------------------------
+systemctl restart cockpit.socket
+---------------------------
+
+After login in again on the browser you will see the left part of the screen divided with two options. The server icon holds the original screen from web console but now with the information of the active server.
+
+The gauge icon is the new functionality added which is the dashboard. The dashboard able us to add as much as servers are needed.
+
+Clicking the "plu" button we are going to add a server
+
+image::addingServer.png[]
+
+Giving the credentials we can add the server.
+
+image::credentials.png[]
+
+Then, in this exmaple, zeus is added to the list.
+
+image::zeus.png[]
+
+So, selecting now zeus we can go to screen where zeus will be shown to make management actios on.
+
+image::zeusDetails.png[]
 
 == How to record sessions using the session recording plugin
 
