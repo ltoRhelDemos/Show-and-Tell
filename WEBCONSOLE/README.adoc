@@ -81,6 +81,7 @@ systemctl start cockpit.socket
 
 To access the web console we need to type https://ip-address:9090 on a browser (Chrome is good). After entering we need to approve the certificate then the first screen is going to appear for authentication.
 
+image::login.png[]
 
 We can a
 
