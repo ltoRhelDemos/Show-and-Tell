@@ -1,0 +1,1263 @@
+:scrollbar:
+:data-uri:
+:toc2:
+:imagesdir: images
+
+= RHEL 8 New Container tools - LTO Show & Tell Series
+
+== Description
+This Show&Tell is aimed to share some of the most important concepts and features of the new technology adopted by RHEL 8 to manage and implement containers, using podman, buildah and skopeo.
+
+Audience: IT Managers, Architects and technical staff who operates Linux
+
+:numbered:
+
+== New Container Technology
+In RHEL 8 the docker package is replaced by the Container Tools module, which consists of Podman, Buildah, Skopeo and several other tidbits. These tools are compatible with the OCI specifications which means they can find, run, build and share containers with other tools that target the OCI standards including Docker CE, Docker EE, Kata Containers, CRI-O, and other container engines, registries, and tools. You can build with Buildah, and run with CRI-O. You can copy images from an AWS container registry to a local Podman instance. The OCI standards offer greater flexibility and choice.
+
+== Open Container Initiative
+The Open Container Initiative (OCI) is a lightweight, open governance structure (project), formed under the auspices of the Linux Foundation, for the express purpose of creating open industry standards around container formats and runtime.
+
+The OCI currently contains two specifications: the Runtime Specification (runtime-spec) and the Image Specification (image-spec). The Runtime Specification outlines how to run a “filesystem bundle” that is unpacked on disk. At a high-level an OCI implementation would download an OCI Image then unpack that image into an OCI Runtime filesystem bundle. At this point the OCI Runtime Bundle would be run by an OCI Runtime.
+
+== What is a Container
+A container is a standard unit of software that packages up code and all its dependencies so the application runs quickly and reliably from one computing environment to another. A Docker container image is a lightweight, standalone, executable package of software that includes everything needed to run an application: code, runtime, system tools, system libraries and settings.
+
+Container images become containers at runtime and in the case of Docker containers - images become containers when they run on Docker Engine. Available for both Linux and Windows-based applications, containerized software will always run the same, regardless of the infrastructure. Containers isolate software from its environment and ensure that it works uniformly despite differences for instance between development and staging. ^(1)^
+
+^(1)^ source: https://www.docker.com/resources/what-container
+
+== Some Terminology
+
+=== Container Image
+An image is a file that can be pulled down form a repository server, then used locally as a mount point for a starting container.
+
+=== Container Image Format
+Is the format every container technology provider has defined to the image file. Nevertheless nowadays is more common to see this format pledged to to the format defined by the Open Container Initiative (OCI). Basically this format define the layers and the metadata inside the container image.
+
+This OCI image format propose a container image comprised of tar files for each layer and a manifest in json format.
+
+=== The Container Engine
+Users usually emits requests such as pulling images, running containers, etc. This requests are accepted by a software called the container engine. The container engine, in RHEL 8, run the container from an image using runc, which is a, OCI compliant runtime.
+
+=== Image layer
+
+An image is made of one or several layers. Layers are connected together in a parent-child relationship, so each layer states the change between itself and the parent layer.
+
+=== Tag
+
+When an image builder creates a new repository, they will label the best image layer to use, and this label is called a tag. These tags can refer to versions of software in a repository. One of these tags, which is a special one, is "latest" that point outs to the latest version in a repository.
+
+=== Repository
+
+Repositories are made of layers and metadata that defines an image. Usually we refer to a repository as a container image.
+
+When we specify a repository on the command line, the Container Engine is doing a search on the registry servers that are configured in its configuration files.
+
+=== Container runtime
+
+A container runtime is a software which is in charge of several actions and responsibilities:
+
+* User input management
+* Input over an API typically used by others
+* Handling the metadata which will be passed to the container Container Runtime
+* Using user input for overriding defaults
+* Using defaults specified by the container image
+* Getting the Container Images from the Registry Server
+* Managing the container image for decompressing and expanding it on disk
+* Preparing a mount point for the container
+* Calling the Container Runtime
+
+runc is the OCI compliant runtime most used by users and developers nowadays.
+
+=== Namespace
+
+Namespaces separate groups of repositories. The namespace is typically the username of the person sharing the image, but can also be a group name, or a logical name. For example, Red Hat uses the namespace to separate groups of repositories based on products listed on the Red Hat Federated Registry server.
+
+=== Kernel Namespace
+
+A kernel namespace is different from a namespace in which the former enables each container to have it’s own mount points, network interfaces, user identifiers, process identifiers, etc.
+
+Typically, a regular Linux process is created using a version of exec() system call. When a container is created, the container engine makes the request to the kernel with a special system call called clone(), which in consequence creates the process ith its own virtual mount points, process ids, user ids, network interfaces, hostname, etc, benefiting the process isolation from the regular processes.
+
+=== Container
+
+A container is an instance of a container image comprised of standard Linux processes which are ussually created using clone() system call.
+
+Red Hat Enterprise Linux implements Linux Containers using core technologies such as Control Groups (Cgroups) for Resource Management, Namespaces for Process Isolation, SELinux for Security, enabling secure multi-tenancy and reducing the potential for security exploits. All this is meant to provide you with an environment to producing and running enterprise-quality containers.
+
+=== Container Host
+
+A container host is an Operating System Instance in charge of running the processes that compose a container. This host could be a physical, an on premise virtual machine or a cloud virtual instance.
+
+=== Registry Server
+
+It is a server which stores repositories. Usually when the repository is not locally cached, it can be pulled from different registries. For example Red Hat Enterprise Linux is configured to pull repositories from registry.access.redhat.com first, then it will try docker.io (Docker Hub) and quay.io.
+
+=== Orchestration
+
+The orchestration comes into the scene when scalability and control is necessary in a consistent way. What a container orchestration does is:
+
+* Schedules container workloads into a cluster dynamically.
+* Defines standard file formats for maintaining all metadata.
+
+The capabilities that are obtained by an orchestration system could be the following.
+
+* Consistency
+* Automation
+* Assistance on flowcharts otherwise manual
+
+Red Hat Openshift is a good example of a container orchestration.
+
+== New Tools for this era
+
+=== What is Podman?
+
+Podman is an open-source project that is available on most Linux platforms and resides on GitHub. It is a daemonless container engine for developing, managing, and running Open Container Initiative (OCI) containers and container images on your Linux System. Podman provides a Docker-compatible command line front end that can simply alias the Docker cli, `alias docker=podman`.
+
+In Red Hat Enterprise Linux exists a way to mimic the docker cli installing podman-docker package, which gives Docker's administrators the look and feel of Docker command line.
+
+Containers under the control of Podman can either be run by root or by a non-privileged user. Podman manages the entire container ecosystem which includes pods, containers, container images, and container volumes using the libpod library. Podman specializes in all of the commands and functions that help you to maintain and modify OCI container images, such as pulling and tagging. It allows you to create, run, and maintain those containers created from those images in a production environment.
+
+source: https://podman.io/whatis.html
+
+=== What is Buildah?
+
+Buildah is a command-line tool for building Open Container Initiative-compatible images quickly and easily. It can act as a drop-in replacement for the Docker daemon’s docker build command but is flexible enough to allow you to build images with whatever tools you prefer to use. Buildah is easy to incorporate into scripts and build pipelines, and best of all, it doesn’t require a running container daemon to build its image.
+
+Podman can be used to build containers, so what is the difference wirth Buildah?.
+
+Podman uses Buildah’s build functionality under the covers to create a container image, but the two projects have differences. The most important difference between Podman and Buildah is their concept of a container. Podman allows users to create traditional containers and the intent of these containers is to be controlled through the entirety of a container life cycle. Buildah containers, on the other hand, are really created to allow content to be added to the container image. Each project has a separate internal representation of a container that is not shared. Because of this you cannot see Podman containers from within Buildah or vice versa. However the internal representation of a container image is the same between Buildah and Podman. In consequence, any container image that has been created, pulled or modified by one can be seen and used by the other.
+
+source: https://opensource.com/article/18/6/getting-started-buildah
+
+=== What is Skopeo?
+
+Skopeo is a command line utility that performs various operations on container images and image repositories. it Can work with OCI images as well as the original Docker v2 images.
+
+Skopeo works with API V2 registries such as Docker registries, the Atomic registry, private registries, local directories and local OCI-layout directories. Skopeo does not require a daemon to be running to perform these operations which consist of:
+
+* Copying an image from and to various storage mechanisms. For example you can copy images from one registry to another, without requiring privilege.
+
+* Inspecting a remote image showing its properties including its layers, without requiring you to pull the image to the host.
+
+* Deleting an image from an image repository.
+
+* When required by the repository, skopeo can pass the appropriate credentials and certificates for authentication.
+
+source: https://github.com/containers/skopeo
+
+== Let's get hands dirty
+
+In this session we are going to do several activities related to the following workflow:
+
+=== Going with the basics
+
+* Understand how Podman works in general
+
+*Install RHEL 8 container tools module*
+
+[source,bash]
+-----------------
+# yum module install container-tools -y
+-----------------
+
+* Playing around with containers
+
+*Configure Registries*
+
+You can configure which and the order of the rgistries to be consulted in a search procedure with podman.
+
+[source,bash]
+-----------------
+# more /etc/containers/registries.conf
+
+# This is a system-wide configuration file used to
+# keep track of registries for various container backends.
+# It adheres to TOML format and does not support recursive
+# lists of registries.
+
+# The default location for this configuration file is /etc/containers/registries.conf.
+
+# The only valid categories are: 'registries.search', 'registries.insecure',
+# and 'registries.block'.
+
+[registries.search]
+registries = ['registry.redhat.io', 'registry.access.redhat.com', 'quay.io', 'docker.io']
+
+...
+-----------------
+
+[NOTE] 
+registries.conf, by default, has configured redhat, quay and then docker, which also is the order fo searching.
+
+*Install podman-docker package*
+
+podman-docker is a package for letting Docker users to use docker command as they where working on a docker server. Installin the package is very easy and give docker administrator a comman ground for their admin stuff.
+
+[source,bash]
+-----------------
+# yum install podman-docker -y
+
+# docker info
+Emulate Docker CLI using podman. Create /etc/containers/nodocker to quiet msg.
+host:
+  BuildahVersion: 1.9.0
+  Conmon:
+    package: podman-1.4.2-6.module+el8.1.0+4830+f49150d7.x86_64
+    path: /usr/libexec/podman/conmon
+    version: 'conmon version 2.0.1-dev, commit: unknown'
+  Distribution:
+    distribution: '"rhel"'
+    version: "8.1"
+  MemFree: 137306112
+  MemTotal: 1028866048
+  OCIRuntime:
+    package: runc-1.0.0-61.rc8.module+el8.1.0+4873+4a24e241.x86_64
+    path: /usr/bin/runc
+    version: 'runc version spec: 1.0.1-dev'
+  SwapFree: 1681203200
+  SwapTotal: 1719660544
+  arch: amd64
+  cpus: 2
+  hostname: showtellrhel
+  kernel: 4.18.0-147.3.1.el8_1.x86_64
+  os: linux
+  rootless: false
+  uptime: 1h 51m 40.29s (Approximately 0.04 days)
+registries:
+  blocked: null
+  insecure: null
+  search:
+  - registry.redhat.io
+  - registry.access.redhat.com
+  - quay.io
+  - docker.io
+store:
+  ConfigFile: /etc/containers/storage.conf
+  ContainerStore:
+    number: 7
+  GraphDriverName: overlay
+  GraphOptions: null
+  GraphRoot: /var/lib/containers/storage
+  GraphStatus:
+    Backing Filesystem: xfs
+    Native Overlay Diff: "true"
+    Supports d_type: "true"
+    Using metacopy: "false"
+  ImageStore:
+    number: 5
+  RunRoot: /var/run/containers/storage
+  VolumePath: /var/lib/containers/storage/volumes
+
+-----------------
+
+We have executed a "docker info" command to inspect our containers environment installation. The output shows several pieces of important information such as versions, storage facilities, images stored, registries, etc.
+
+*Search for registries*
+
+The info parameter of podman command give us come useful information including the registries where, by default, the enginde look for images.
+
+  search:
+  - registry.redhat.io
+  - registry.access.redhat.com
+  - quay.io
+  - docker.io
+  
+
+Let's search for the ubi image of RHEL 8.
+
+[source,bash]
+-----------------
+# podman search ubi8 | grep  registry.access.redhat.com
+
+redhat.com   registry.access.redhat.com/ubi8                       The Universal Base Image is designed and eng...   0
+redhat.com   registry.access.redhat.com/openjdk/openjdk-11-rhel8   OpenJDK S2I image for Java Applications on U...   0
+redhat.com   registry.access.redhat.com/openjdk/openjdk-8-rhel8    OpenJDK 1.8 Image for Java Applications base...   0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-21             .NET Core 2.1 SDK and Runtime on RHEL 8           0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-30             .NET Core 3.0 SDK and Runtime on RHEL 8           0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-30-runtime     .NET Core 3.0 runtime only on RHEL 8              0
+redhat.com   registry.access.redhat.com/ubi8/go-toolset            Platform for building and running Go 1.11.5 ...   0
+redhat.com   registry.access.redhat.com/ubi8/perl-526              Platform for building and running Perl 5.26 ...   0
+redhat.com   registry.access.redhat.com/ubi8/python-36             Platform for building and running Python 3.6...   0
+redhat.com   registry.access.redhat.com/ubi8/ruby-25               Platform for building and running Ruby 2.5 a...   0
+redhat.com   registry.access.redhat.com/ubi8/nodejs-10             Platform for building and running Node.js 10...   0
+redhat.com   registry.access.redhat.com/ubi8/nodejs-12             Platform for building and running Node.js 12...   0
+redhat.com   registry.access.redhat.com/ubi8/php-72                Platform for building and running PHP 7.2 ap...   0
+redhat.com   registry.access.redhat.com/ubi8/php-73                Platform for building and running PHP 7.3 ap...   0
+redhat.com   registry.access.redhat.com/ubi8/python-27             Platform for building and running Python 2.7...   0
+redhat.com   registry.access.redhat.com/ubi8/ruby-26               Platform for building and running Ruby 2.6 a...   0
+redhat.com   registry.access.redhat.com/ubi8/s2i-core              Base image which allows using of source-to-i...   0
+redhat.com   registry.access.redhat.com/ubi8/ubi                   Provides the latest release of the Red Hat U...   0
+redhat.com   registry.access.redhat.com/ubi8/dotnet-21-runtime     Provides the latest release of Red Hat Enter...   0
+redhat.com   registry.access.redhat.com/ubi8/s2i-base              Base image with essential libraries and tool...   0
+redhat.com   registry.access.redhat.com/ubi8/ubi-init              Provides the latest release of the Red Hat U...   0
+redhat.com   registry.access.redhat.com/ubi8/ubi-minimal           Provides the latest release of the Minimal R...   0
+redhat.com   registry.access.redhat.com/ubi8-minimal               The Universal Base Image Minimal is a stripp...   0
+redhat.com   registry.access.redhat.com/ubi8-init                  The Universal Base Image Init is designed to...   0
+-----------------
+
+*Pull the RHEL 8 ubi image for use it
+
+[source,bash]
+-----------------
+# podman pull registry.access.redhat.com/ubi8/ubi
+Trying to pull registry.access.redhat.com/ubi8/ubi...Getting image source signatures
+Copying blob fd8daf2668d1 done
+Copying blob cb3c77f9bdd8 done
+Copying config 096cae65a2 done
+Writing manifest to image destination
+Storing signatures
+096cae65a2078ff26b3a2f82b28685b6091e4e2823809d45aef68aa2316300c7
+
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED       SIZE
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago   239 MB
+-----------------
+
+With this image we will going to build our own container with a chatbot application.
+
+*Pull an image with an application installed ready to be used*
+
+The final goal of a container is to service to people or other applications to compose a more robust or elaborated service.
+
+For example, nextcloud is a nice Dropbox clone that can be used right out the box.
+
+Let's search for nextcloud image on any of the registries defined in the configuration file.
+
+[source,bash]
+-----------------
+# podman search nextcloud
+
+INDEX       NAME                                                   DESCRIPTION                                       STARS   OFFICIAL   AUTOMATED
+quay.io     quay.io/rootlogin/nextcloud                            # Nextcloud  Blazing fast image containing N...   0
+quay.io     quay.io/crazymax/nextcloud                             **Moved to [DockerHub](https://hub.docker.co...   0
+...
+docker.io   docker.io/library/nextcloud                            A safe home for all your data                     1232    [OK]
+docker.io   docker.io/linuxserver/nextcloud                        A Nextcloud container, brought to you by Lin...   193
+docker.io   docker.io/wonderfall/nextcloud                         All-in-one alpine-based Nextcloud image.          79         
+...
+-----------------
+
+[NOTE] 
+The output has been truncated for simplicity. The nextcloud container was found on quay and docker registries. Let's pull the official docker image.
+
+[source,bash]
+-----------------
+#podman pull docker.io/library/nextcloud
+Trying to pull docker.io/library/nextcloud...Getting image source signatures
+Copying blob 83d8859e9744 done
+Copying blob 85cf4fc86478 done
+Copying blob 8ec398bc0356 done
+Copying blob 970dadf4ccb6 done
+Copying blob d6b7434b63a2 done
+Copying blob 8c04561117a4 done
+Copying blob 814ae7711d3c done
+Copying blob 4896fed78b6b done
+Copying blob 9c3d824d0ad5 done
+Copying blob 9e316fd5b3b3 done
+Copying blob 578b40496c37 done
+Copying blob 280386098458 done
+Copying blob 11a7c8596b56 done
+Copying blob 46017765526c done
+Copying blob e74d71e9611d done
+Copying blob 8d04e75769f6 done
+Copying blob d71822075f1a done
+Copying blob b5b721156f26 done
+Copying blob c749306a7cbf done
+Copying blob d41cc464d579 done
+Copying blob 6561bcc8c65b done
+Copying config 3cd599c50a done
+Writing manifest to image destination
+Storing signatures
+3cd599c50aec3e6612bfea1fc91e32912a17ecdfb33780f7ceed096b8627c573
+-----------------
+
+*Inspect images installed on the host*
+
+podman can assit you to inspect an image.
+
+[source,bash]
+-----------------
+# podman inspect registry.access.redhat.com/ubi8/ubi
+[
+    {
+        "Id": "096cae65a2078ff26b3a2f82b28685b6091e4e2823809d45aef68aa2316300c7",
+        "Digest": "sha256:9e3ba956fab8788c71645d85a7ad21023a6ebc2b7e48eb2940e91b0904d47a94",
+        "RepoTags": [
+            "registry.access.redhat.com/ubi8/ubi:latest"
+        ],
+        "RepoDigests": [
+            "registry.access.redhat.com/ubi8/ubi@sha256:9e3ba956fab8788c71645d85a7ad21023a6ebc2b7e48eb2940e91b0904d47a94"
+        ],
+        "Parent": "",
+        "Comment": "",
+        "Created": "2019-12-10T17:54:10.824568Z",
+        "Config": {
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "container=oci"
+            ],
+            "Cmd": [
+                "/bin/bash"
+            ],
+            "Labels": {
+                "architecture": "x86_64",
+                "authoritative-source-url": "registry.access.redhat.com",
+                "build-date": "2019-12-10T17:53:44.032126",
+                "com.redhat.build-host": "cpt-1004.osbs.prod.upshift.rdu2.redhat.com",
+                "com.redhat.component": "ubi8-container",
+                "com.redhat.license_terms": "https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI",
+                "description": "The Universal Base Image is designed and engineered to be the base layer for all of your containerized applications, middleware and utilities. This base image is freely redistributable, but Red Hat only supports Red Hat technologies through subscriptions for Red Hat products. This image is maintained by Red Hat and updated regularly.",
+                "distribution-scope": "public",
+                "io.k8s.description": "The Universal Base Image is designed and engineered to be the base layer for all of your containerized applications, middleware and utilities. This base image is freely redistributable, but Red Hat only supports Red Hat technologies through subscriptions for Red Hat products. This image is maintained by Red Hat and updated regularly.",
+                "io.k8s.display-name": "Red Hat Universal Base Image 8",
+                "io.openshift.expose-services": "",
+                "io.openshift.tags": "base rhel8",
+                "maintainer": "Red Hat, Inc.",
+                "name": "ubi8",
+                "release": "328",
+                "summary": "Provides the latest release of Red Hat Universal Base Image 8.",
+                "url": "https://access.redhat.com/containers/#/registry.access.redhat.com/ubi8/images/8.1-328",
+                "vcs-ref": "c42933bcdbf9f1c232e981a5e40de257c3534c8e",
+                "vcs-type": "git",
+                "vendor": "Red Hat, Inc.",
+                "version": "8.1"
+            }
+        },...
+]
+-----------------
+
+[NOTE] 
+We can see a lot of info useful for admin purposes. This image is for RHEL 8.1 and was created on 2019-12-10
+
+*Run a container from that image*
+
+Let's start the nextcloud container. In this case, this a container with an application giving a service. Our container will be run starting all the modules and software required for service nextcloud, so we need to run this container in backgound.
+
+[source,bash]
+-----------------
+# podman run --rm --name=nextcloud -d -p 8080:80 docker.io/library/nextcloud
+a26221d2aba4338206a7a7d5b51ccdd76f9eb9e51e6332e7667e127d908071a4
+
+#podman ps
+CONTAINER ID  IMAGE                               COMMAND               CREATED         STATUS             PORTS                 NAMES
+a26221d2aba4  docker.io/library/nextcloud:latest  /entrypoint.sh ap...  20 seconds ago  Up 19 seconds ago  0.0.0.0:8080->80/tcp  nextcloud
+-----------------
+
+Let's see if the service is up and running?
+
+[source,bash]
+-----------------
+# curl http://192.168.56.116:8080
+<!DOCTYPE html>
+<html class="ng-csp" data-placeholder-focus="false" lang="en" data-locale="en" >
+        <head
+ data-requesttoken="O5MhATiYUvPIj5vuTFzrXcfnBKrWIuYTHAABMzIMwAk=:DcFrOXDLCpyb/9SXdWWCDPSqceLuaqxJT3JAAQZbmEA=">
+                <meta charset="utf-8">
+                <title>
+                Nextcloud               </title>
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+                                <meta name="apple-itunes-app" content="app-id=1125420102">
+                                <meta name="theme-color" content="#0082c9">
+                <link rel="icon" href="/core/img/favicon.ico">
+                <link rel="apple-touch-icon" href="/core/img/favicon-touch.png">
+                <link rel="mask-icon" sizes="any" href="/core/img/favicon-mask.svg" color="#0082c9">
+                <link rel="manifest" href="/core/img/manifest.json">
+                <link rel="stylesheet" href="/core/css/guest.css?v=ba222ded25d957b900c03bef914333cd">
+                <script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/dist/main.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/mimetype.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/mimetypelist.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/select2-toggleselect.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/search/js/search.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/setup.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/search/js/searchprovider.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/files/fileinfo.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/files/client.js?v=ba222ded25d957b900c03bef914333cd"></script>
+<script nonce="TzVNaEFUaVlVdlBJajV2dVRGenJYY2ZuQktyV0l1WVRIQUFCTXpJTXdBaz06RGNGck9YRExDcHliLzlTWGRXV0NEUFNxY2VMdWFxeEpUM0pBQVFaYm1FQT0=" defer src="/core/js/installation.js?v=ba222ded25d957b900c03bef914333cd"></script>
+                        </head>
+        <body id="body-login">
+                <noscript>
+        <div id="nojavascript">
+                <div>
+                        This application requires JavaScript for correct operation. Please <a href="https://www.enable-javascript.com/" target="_blank" rel="noreferrer noopener">enable JavaScript</a> and reload the page.          </div>
+        </div>
+</noscript>
+                                <div class="wrapper">
+...
+        <p class="info">
+                <span class="icon-info-white"></span>
+                Need help?              <a target="_blank" rel="noreferrer noopener" href="https://docs.nextcloud.com/server/17/go.php?to=admin-install">See the documentation ↗</a>
+        </p>
+</form>
+                                </main>
+                        </div>
+                </div>
+                <footer role="contentinfo">
+                        <p class="info">
+                                <a href="https://nextcloud.com" target="_blank" rel="noreferrer noopener">Nextcloud</a> – a safe home for all your data      </p>
+                </footer>
+        </body>
+</html>
+-----------------
+
+To access the nextcloud service simply open a brower and type http://192.168-56.x:8080
+
+[NOTE] 
+In this case, the service is a web service. In case you have other king of protocol you must need to undersdtanding first to access such service. This is going to be covered later.
+
+Let's run the RHE 8 ubi container.
+
+[source,bash]
+-----------------
+# podman run -ti registry.access.redhat.com/ubi8/ubi:latest /bin/bash
+
+[root@8295cb3cba6b /]# yum update
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)                                                                      2.6 MB/s |  14 MB     00:05
+Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)                                                                         3.1 MB/s |  13 MB     00:04
+Red Hat Universal Base Image 8 (RPMs) - BaseOS                                                                                419 kB/s | 760 kB     00:01
+Red Hat Universal Base Image 8 (RPMs) - AppStream                                                                             829 kB/s | 3.1 MB     00:03
+Red Hat Universal Base Image 8 (RPMs) - CodeReady Builder                                                                     8.3 kB/s | 9.1 kB     00:01
+Last metadata expiration check: 0:00:01 ago on Thu Jan  9 21:00:31 2020.
+Dependencies resolved.
+==============================================================================================================================================================
+ Package                           Architecture               Version                              Repository                                            Size
+==============================================================================================================================================================
+Upgrading:
+ gdb-gdbserver                     x86_64                     8.2-6.el8_0                          rhel-8-for-x86_64-appstream-rpms                     435 k
+ setup                             noarch                     2.12.2-2.el8_1.1                     rhel-8-for-x86_64-baseos-rpms                        180 k
+
+Transaction Summary
+==============================================================================================================================================================
+Upgrade  2 Packages
+
+Total download size: 615 k
+Is this ok [y/N]: y
+Downloading Packages:
+(1/2): gdb-gdbserver-8.2-6.el8_0.x86_64.rpm                                                                                   519 kB/s | 435 kB     00:00
+(2/2): setup-2.12.2-2.el8_1.1.noarch.rpm                                                                                      210 kB/s | 180 kB     00:00
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                                         715 kB/s | 615 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                                                                                                      1/1
+  Upgrading        : setup-2.12.2-2.el8_1.1.noarch                                                                                                        1/4
+warning: /etc/shadow created as /etc/shadow.rpmnew
+
+  Running scriptlet: setup-2.12.2-2.el8_1.1.noarch                                                                                                        1/4
+  Upgrading        : gdb-gdbserver-8.2-6.el8_0.x86_64                                                                                                     2/4
+  Cleanup          : setup-2.12.2-2.el8_0.1.noarch                                                                                                        3/4
+  Cleanup          : gdb-gdbserver-8.2-6.el8.x86_64                                                                                                       4/4
+  Running scriptlet: gdb-gdbserver-8.2-6.el8.x86_64                                                                                                       4/4
+  Verifying        : gdb-gdbserver-8.2-6.el8_0.x86_64                                                                                                     1/4
+  Verifying        : gdb-gdbserver-8.2-6.el8.x86_64                                                                                                       2/4
+  Verifying        : setup-2.12.2-2.el8_1.1.noarch                                                                                                        3/4
+  Verifying        : setup-2.12.2-2.el8_0.1.noarch                                                                                                        4/4
+Installed products updated.
+
+Upgraded:
+  gdb-gdbserver-8.2-6.el8_0.x86_64                                                setup-2.12.2-2.el8_1.1.noarch
+
+Complete!
+-----------------
+
+[NOTE] 
+"podman run" executes the bash shell and with -ti set an interactive session where we can interact with the operating system as if we were on the host itself. In this case we executed a yum update.
+
+*Running rootless* 
+
+Running the container tools a superuser is an excelent way to ensure that the containers have full access to all features available on the system. Nevertheless, with the feature called *"Rootless Containers," generally available as of RHEL 8.1*, you can work with containers as a user with no superuser privileges.
+
+Being logged in as root you need to make sure you are in an RHEL instance version 8.1, otherwise update it with yum.
+
+Also make sure the packecge *slirp4netns* is intalled, otherwise install it with yum.
+
+[source,bash]
+-----------------
+# yum install slirp4netns -y
+-----------------
+
+Increase user namespaces in the kernel.
+
+[source,bash]
+-----------------
+# echo "user.max_user_namespaces=28633" > /etc/sysctl.d/userns.conf
+# sysctl -p /etc/sysctl.d/userns.conf
+-----------------
+
+Create a new user account and add a password for that account.
+
+[source,bash]
+-----------------
+# useradd -c "rootless" joe
+# passwd rootless
+-----------------
+
+Log in directly as the user rootless (don’t use su or su - to become that user because that doesn’t set the correct environment variables) and try to pull and run an image.
+
+[source,bash]
+-----------------
+$ podman pull registry.access.redhat.com/ubi8/ubi
+$ podman run registry.access.redhat.com/ubi8/ubi cat /etc/os-release
+NAME="Red Hat Enterprise Linux"
+VERSION="8.1 (Ootpa)"
+-----------------
+
+=== Container building
+
+This, in practice, is what any platform administrator needs to do in the everyday work, when the size makes it manageable, otherwise needs to think in a container orchestration system as Red Hat openshift.
+
+In our exmaple we are going to deploy a simple chatbot which corpus data is related to ansible, extracted from the Ansible Glossary found on the net. The scripts for deployment are located here.
+
+The chatbot is comprised of to main part:
+
+* The Engine
+- This is a python service provider application that expose a chat interface vía Linux sockets trhough the port 9095.
+* The Web Interface
+- The web interface is a simple python flask program in charge of expose a web interface for the chatbot and a restful api. the Web Chat Bot stablish a communicatio nwith the engine to respond to users requests.
+
+*Create a Dockerfile file"
+
+First things first. We need to create a directory tree to get things with some structure. The following procedures has been tested in a RHEL 8.1 environment.
+
+[source,bash]
+-----------------
+# cd /root
+# mkdir containers
+# cd containers
+# mkdir -p engine/chatbotApp webchat/chatbotApp
+# git clone https://github.com/ltoRhelDemos/python-ansible-chatbot.git
+# cp python-ansible-chatbot/* webchat/chatbotApp/.
+# cp python-ansible-chatbot/* engine/chatbotApp/.
+-----------------
+
+Let's build the web chat container.
+
+[source,bash]
+-----------------
+# cd /root/containers/webchat
+# vim Dockerfile
+
+*Dockerfile content*
+FROM registry.access.redhat.com/ubi8/ubi
+
+RUN yum update -y
+RUN yum install python36 -y
+
+RUN pip3 install flask
+
+CMD ["mkdir","/root/chatbot"]
+
+COPY /chatbotApp/* /root/chatbot/
+
+WORKDIR /root/chatbot
+
+CMD ["/usr/bin/python3","webChat.py","title=Ansible_Chatter","subtitle=Latam_Techonology_Office","comment=Mantained by adirgan@redhat.com","questionSentence=What_you_need_to_Know?","buttonText=Ask", "botName=Ansible_Expert", "botName=Ansible_Expert"]
+-----------------
+
+Now, we need to build the container. 
+
+[NOTE] YOU MUST LOG-IN IN registry.access.redhat.com with your Red Hat credentials or a developer account which is free.
+
+[source,bash]
+-----------------
+# podman login registry.access.redhat.com
+username:
+password:
+-----------------
+
+[source,bash]
+-----------------
+# podman build -t ansiblewebchat_0.1 .
+
+STEP 1: FROM registry.access.redhat.com/ubi8/ubi
+STEP 2: RUN yum update -y
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Red Hat Enterprise Linux 8 for x86_64 - BaseOS  3.8 MB/s |  13 MB     00:03
+Red Hat Enterprise Linux 8 for x86_64 - AppStre 3.3 MB/s |  14 MB     00:04
+Red Hat Universal Base Image 8 (RPMs) - BaseOS  223 kB/s | 760 kB     00:03
+Red Hat Universal Base Image 8 (RPMs) - AppStre 1.2 MB/s | 3.1 MB     00:02
+Red Hat Universal Base Image 8 (RPMs) - CodeRea 6.2 kB/s | 9.1 kB     00:01
+Dependencies resolved.
+ Package       Arch   Version            Repository                        Size
+Upgrading:
+ setup         noarch 2.12.2-2.el8_1.1   rhel-8-for-x86_64-baseos-rpms    180 k
+ gdb-gdbserver x86_64 8.2-6.el8_0        rhel-8-for-x86_64-appstream-rpms 435 k
+
+Transaction Summary
+Upgrade  2 Packages
+
+Total download size: 615 k
+Downloading Packages:
+(1/2): setup-2.12.2-2.el8_1.1.noarch.rpm        548 kB/s | 180 kB     00:00
+(2/2): gdb-gdbserver-8.2-6.el8_0.x86_64.rpm     1.3 MB/s | 435 kB     00:00
+Total                                           1.8 MB/s | 615 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Upgrading        : gdb-gdbserver-8.2-6.el8_0.x86_64                       1/4
+  Upgrading        : setup-2.12.2-2.el8_1.1.noarch                          2/4
+warning: /etc/shadow created as /etc/shadow.rpmnew
+
+  Running scriptlet: setup-2.12.2-2.el8_1.1.noarch                          2/4
+  Cleanup          : setup-2.12.2-2.el8_0.1.noarch                          3/4
+  Cleanup          : gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+  Running scriptlet: gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+  Verifying        : setup-2.12.2-2.el8_1.1.noarch                          1/4
+  Verifying        : setup-2.12.2-2.el8_0.1.noarch                          2/4
+  Verifying        : gdb-gdbserver-8.2-6.el8_0.x86_64                       3/4
+  Verifying        : gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+Installed products updated.
+
+Upgraded:
+  setup-2.12.2-2.el8_1.1.noarch         gdb-gdbserver-8.2-6.el8_0.x86_64
+
+Complete!
+7e01ddcaa846a0d2907ae970b38c495e76af95b37f53acfaed6083c9fb776564
+STEP 3: RUN yum install python36 -y
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Last metadata expiration check: 0:00:17 ago on Fri Jan 10 11:45:03 2020.
+Dependencies resolved.
+ Package              ArchVersion                              Repository                       Size
+Installing:
+ python36             x86_643.6.8-2.module+el8.1.0+3334+5cb623d7 rhel-8-for-x86_64-appstream-rpms 19 k
+Installing dependencies:
+ python3-setuptools   noarch39.2.0-5.el8                         rhel-8-for-x86_64-baseos-rpms    163 k
+ python3-pip          noarch9.0.3-15.el8                         rhel-8-for-x86_64-appstream-rpms 19 k
+Enabling module streams:
+ python36             3.6
+
+Transaction Summary
+Install  3 Packages
+
+Total download size: 201 k
+Installed size: 466 k
+Downloading Packages:
+(1/3): python3-setuptools-39.2.0-5.el8.noarch.r 745 kB/s | 163 kB     00:00
+(2/3): python36-3.6.8-2.module+el8.1.0+3334+5cb  77 kB/s |  19 kB     00:00
+(3/3): python3-pip-9.0.3-15.el8.noarch.rpm       75 kB/s |  19 kB     00:00
+
+Total                                           760 kB/s | 201 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Installing       : python3-setuptools-39.2.0-5.el8.noarch                 1/3
+  Installing       : python3-pip-9.0.3-15.el8.noarch                        2/3
+  Installing       : python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   3/3
+  Running scriptlet: python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   3/3
+  Verifying        : python3-setuptools-39.2.0-5.el8.noarch                 1/3
+  Verifying        : python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   2/3
+  Verifying        : python3-pip-9.0.3-15.el8.noarch                        3/3
+Installed products updated.
+
+Installed:
+  python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64
+  python3-setuptools-39.2.0-5.el8.noarch
+  python3-pip-9.0.3-15.el8.noarch
+
+Complete!
+125564775c7fbfe3adad166ad95c8c3749fb9a3bf4c5320ff2baacae0af73cdb
+STEP 4: RUN pip3 install flask
+WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
+Collecting flask
+  Downloading https://files.pythonhosted.org/packages/9b/93/628509b8d5dc749656a9641f4caf13540e2cdec85276964ff8f43bbb1d3b/Flask-1.1.1-py2.py3-none-any.whl (94kB)
+Collecting Werkzeug>=0.15 (from flask)
+  Downloading https://files.pythonhosted.org/packages/ce/42/3aeda98f96e85fd26180534d36570e4d18108d62ae36f87694b476b83d6f/Werkzeug-0.16.0-py2.py3-none-any.whl (327kB)
+Collecting Jinja2>=2.10.1 (from flask)
+  Downloading https://files.pythonhosted.org/packages/65/e0/eb35e762802015cab1ccee04e8a277b03f1d8e53da3ec3106882ec42558b/Jinja2-2.10.3-py2.py3-none-any.whl (125kB)
+Collecting click>=5.1 (from flask)
+  Downloading https://files.pythonhosted.org/packages/fa/37/45185cb5abbc30d7257104c434fe0b07e5a195a6847506c074527aa599ec/Click-7.0-py2.py3-none-any.whl (81kB)
+Collecting itsdangerous>=0.24 (from flask)
+  Downloading https://files.pythonhosted.org/packages/76/ae/44b03b253d6fade317f32c24d100b3b35c2239807046a4c953c7b89fa49e/itsdangerous-1.1.0-py2.py3-none-any.whl
+Collecting MarkupSafe>=0.23 (from Jinja2>=2.10.1->flask)
+  Downloading https://files.pythonhosted.org/packages/b2/5f/23e0023be6bb885d00ffbefad2942bc51a620328ee910f64abe5a8d18dd1/MarkupSafe-1.1.1-cp36-cp36m-manylinux1_x86_64.whl
+Installing collected packages: Werkzeug, MarkupSafe, Jinja2, click, itsdangerous, flask
+Successfully installed Jinja2-2.10.3 MarkupSafe-1.1.1 Werkzeug-0.16.0 click-7.0 flask-1.1.1 itsdangerous-1.1.0
+4169f6f9047002ac92a0c74e4141c9f950a04269ea1f5753f1850f7df69db162
+STEP 5: CMD ["mkdir","/root/chatbot"]
+2c974cf0c23321b1bbc910cadc389838d517028cc7787eb476f383e5dc0e9a37
+STEP 6: COPY /chatbotApp/* /root/chatbot/
+77ce9f864d4fb14759cf2a20b01339aab7e87293f67a139c2f1b293d77bfebe7
+STEP 7: WORKDIR /root/chatbot
+e198ac4b38dcbb1705988125d44c846e97305027d45bb5f985ab86d28953cbd2
+STEP 8: CMD ["/usr/bin/python3","webChat.py","title=Ansible_Chatter","subtitle=Latam_Techonology_Office","comment=Mantained by adirgan@redhat.com","questionSentence=What_you_need_to_Know?","buttonText=Ask", "botName=Ansible_Expert", "botName=Ansible_Expert"]
+STEP 9: COMMIT ansiblewebchat_0.1
+4ce07810a2228c3c1b871eb5cf004d6e183f2c6c7c672deab9ad044a92a745e6
+-----------------
+
+Let's continue with the chatbot engine.
+
+[source,bash]
+-----------------
+# cd /root/containers/engine
+# vim Dockerfile
+
+*Dockerfile content*
+FROM registry.access.redhat.com/ubi8/ubi
+
+RUN yum update -y
+RUN yum install python36 -y
+
+RUN pip3 install nltk
+RUN pip3 install numpy
+RUN pip3 install tflearn
+RUN pip3 install tensorflow
+
+CMD ["mkdir","/root/chatbot"]
+
+COPY /chatbotApp/* /root/chatbot/
+
+WORKDIR /root/chatbot
+
+CMD ["/usr/bin/python3","serviceProvider.py"]
+-----------------
+
+Now, we build the container. 
+
+[source,bash]
+-----------------
+# podman build -t ansiblechatbotengine_0.1 .
+
+STEP 1: FROM registry.access.redhat.com/ubi8/ubi
+STEP 2: RUN yum update -y
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Red Hat Enterprise Linux 8 for x86_64 - BaseOS  3.8 MB/s |  13 MB     00:03
+Red Hat Enterprise Linux 8 for x86_64 - AppStre 3.5 MB/s |  14 MB     00:03
+Red Hat Universal Base Image 8 (RPMs) - BaseOS  186 kB/s | 760 kB     00:04
+Red Hat Universal Base Image 8 (RPMs) - AppStre 1.2 MB/s | 3.1 MB     00:02
+Red Hat Universal Base Image 8 (RPMs) - CodeRea 7.2 kB/s | 9.1 kB     00:01
+Dependencies resolved.
+ Package       Arch   Version            Repository                        Size
+Upgrading:
+ setup         noarch 2.12.2-2.el8_1.1   rhel-8-for-x86_64-baseos-rpms    180 k
+ gdb-gdbserver x86_64 8.2-6.el8_0        rhel-8-for-x86_64-appstream-rpms 435 k
+
+Transaction Summary
+Upgrade  2 Packages
+
+Total download size: 615 k
+Downloading Packages:
+(1/2): setup-2.12.2-2.el8_1.1.noarch.rpm        574 kB/s | 180 kB     00:00
+(2/2): gdb-gdbserver-8.2-6.el8_0.x86_64.rpm     1.1 MB/s | 435 kB     00:00
+
+Total                                           1.6 MB/s | 615 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Upgrading        : gdb-gdbserver-8.2-6.el8_0.x86_64                       1/4
+  Upgrading        : setup-2.12.2-2.el8_1.1.noarch                          2/4
+warning: /etc/shadow created as /etc/shadow.rpmnew
+
+  Running scriptlet: setup-2.12.2-2.el8_1.1.noarch                          2/4
+  Cleanup          : setup-2.12.2-2.el8_0.1.noarch                          3/4
+  Cleanup          : gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+  Running scriptlet: gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+  Verifying        : setup-2.12.2-2.el8_1.1.noarch                          1/4
+  Verifying        : setup-2.12.2-2.el8_0.1.noarch                          2/4
+  Verifying        : gdb-gdbserver-8.2-6.el8_0.x86_64                       3/4
+  Verifying        : gdb-gdbserver-8.2-6.el8.x86_64                         4/4
+Installed products updated.
+
+Upgraded:
+  setup-2.12.2-2.el8_1.1.noarch         gdb-gdbserver-8.2-6.el8_0.x86_64
+
+Complete!
+b11c1b1313c3cabc507012cfca2f1393edbe5eaa6038bc004597430e4e813088
+STEP 3: RUN yum install python36 -y
+Updating Subscription Management repositories.
+Unable to read consumer identity
+Subscription Manager is operating in container mode.
+Last metadata expiration check: 0:00:18 ago on Fri Jan 10 11:17:07 2020.
+Dependencies resolved.
+ Package              ArchVersion                              Repository                       Size
+Installing:
+ python36             x86_643.6.8-2.module+el8.1.0+3334+5cb623d7 rhel-8-for-x86_64-appstream-rpms 19 k
+Installing dependencies:
+ python3-setuptools   noarch39.2.0-5.el8                         rhel-8-for-x86_64-baseos-rpms    163 k
+ python3-pip          noarch9.0.3-15.el8                         rhel-8-for-x86_64-appstream-rpms 19 k
+Enabling module streams:
+ python36             3.6
+
+Transaction Summary
+Install  3 Packages
+
+Total download size: 201 k
+Installed size: 466 k
+Downloading Packages:
+(1/3): python3-pip-9.0.3-15.el8.noarch.rpm       65 kB/s |  19 kB     00:00
+(2/3): python36-3.6.8-2.module+el8.1.0+3334+5cb  59 kB/s |  19 kB     00:00
+(3/3): python3-setuptools-39.2.0-5.el8.noarch.r 491 kB/s | 163 kB     00:00
+Total                                           599 kB/s | 201 kB     00:00
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+  Installing       : python3-setuptools-39.2.0-5.el8.noarch                 1/3
+  Installing       : python3-pip-9.0.3-15.el8.noarch                        2/3
+  Installing       : python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   3/3
+  Running scriptlet: python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   3/3
+  Verifying        : python3-setuptools-39.2.0-5.el8.noarch                 1/3
+  Verifying        : python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64   2/3
+  Verifying        : python3-pip-9.0.3-15.el8.noarch                        3/3
+Installed products updated.
+
+Installed:
+  python36-3.6.8-2.module+el8.1.0+3334+5cb623d7.x86_64
+  python3-setuptools-39.2.0-5.el8.noarch
+  python3-pip-9.0.3-15.el8.noarch
+
+Complete!
+055ca687bf112be1559b9440d204a15d910921ecfe44fd74dd12002a5801d105
+STEP 4: RUN pip3 install nltk
+WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
+Collecting nltk
+  Downloading https://files.pythonhosted.org/packages/f6/1d/d925cfb4f324ede997f6d47bea4d9babba51b49e87a767c170b77005889d/nltk-3.4.5.zip (1.5MB)
+Requirement already satisfied: six in /usr/lib/python3.6/site-packages (from nltk)
+Installing collected packages: nltk
+  Running setup.py install for nltk ... done
+Successfully installed nltk-3.4.5
+088ef98d8f95d294e72663573ce0be77e9542f43018d74cc9bcaf3239f20d400
+STEP 5: RUN pip3 install numpy
+WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
+Collecting numpy
+  Downloading https://files.pythonhosted.org/packages/62/20/4d43e141b5bc426ba38274933ef8e76e85c7adea2c321ecf9ebf7421cedf/numpy-1.18.1-cp36-cp36m-manylinux1_x86_64.whl (20.1MB)
+Installing collected packages: numpy
+Successfully installed numpy-1.18.1
+23895d7e4e9d5113d54aa5a1a08692e504cb9c3184fc728e79ad8f3e65076737
+STEP 6: RUN pip3 install tflearn
+WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
+Collecting tflearn
+  Downloading https://files.pythonhosted.org/packages/16/ec/e9ce1b52e71f6dff3bd944f020cef7140779e783ab27512ea7c7275ddee5/tflearn-0.3.2.tar.gz (98kB)
+Requirement already satisfied: numpy in /usr/local/lib64/python3.6/site-packages (from tflearn)
+Requirement already satisfied: six in /usr/lib/python3.6/site-packages (from tflearn)
+Collecting Pillow (from tflearn)
+  Downloading https://files.pythonhosted.org/packages/19/5e/23dcc0ce3cc2abe92efd3cd61d764bee6ccdf1b667a1fb566f45dc249953/Pillow-7.0.0-cp36-cp36m-manylinux1_x86_64.whl (2.1MB)
+Installing collected packages: Pillow, tflearn
+  Running setup.py install for tflearn ... done
+Successfully installed Pillow-7.0.0 tflearn-0.3.2
+084de56f5f7c1238c3ac27696194f67798d186dc2fd65e674257f4f372e05454
+STEP 7: RUN pip3 install tensorflow
+WARNING: Running pip install with root privileges is generally not a good idea. Try `pip3 install --user` instead.
+Collecting tensorflow
+  Downloading https://files.pythonhosted.org/packages/de/f0/96fb2e0412ae9692dbf400e5b04432885f677ad6241c088ccc5fe7724d69/tensorflow-1.14.0-cp36-cp36m-manylinux1_x86_64.whl (109.2MB)
+Collecting astor>=0.6.0 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/c3/88/97eef84f48fa04fbd6750e62dcceafba6c63c81b7ac1420856c8dcc0a3f9/astor-0.8.1-py2.py3-none-any.whl
+Collecting tensorflow-estimator<1.15.0rc0,>=1.14.0rc0 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/3c/d5/21860a5b11caf0678fbc8319341b0ae21a07156911132e0e71bffed0510d/tensorflow_estimator-1.14.0-py2.py3-none-any.whl (488kB)
+Collecting wrapt>=1.11.1 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/23/84/323c2415280bc4fc880ac5050dddfb3c8062c2552b34c2e512eb4aa68f79/wrapt-1.11.2.tar.gz
+Collecting wheel>=0.26 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/00/83/b4a77d044e78ad1a45610eb88f745be2fd2c6d658f9798a15e384b7d57c9/wheel-0.33.6-py2.py3-none-any.whl
+Collecting protobuf>=3.6.1 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/ca/ac/838c8c8a5f33a58132dd2ad2a30329f6ae1614a9f56ffb79eaaf71a9d156/protobuf-3.11.2-cp36-cp36m-manylinux1_x86_64.whl (1.3MB)
+Requirement already satisfied: six>=1.10.0 in /usr/lib/python3.6/site-packages (from tensorflow)
+Collecting absl-py>=0.7.0 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/1a/53/9243c600e047bd4c3df9e69cfabc1e8004a82cac2e0c484580a78a94ba2a/absl-py-0.9.0.tar.gz (104kB)
+Collecting google-pasta>=0.1.6 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/c3/fd/1e86bc4837cc9a3a5faf3db9b1854aa04ad35b5f381f9648fbe81a6f94e4/google_pasta-0.1.8-py3-none-any.whl (57kB)
+Collecting gast>=0.2.0 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/1f/04/4e36c33f8eb5c5b6c622a1f4859352a6acca7ab387257d4b3c191d23ec1d/gast-0.3.2.tar.gz
+Requirement already satisfied: numpy<2.0,>=1.14.5 in /usr/local/lib64/python3.6/site-packages (from tensorflow)
+Collecting tensorboard<1.15.0,>=1.14.0 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/91/2d/2ed263449a078cd9c8a9ba50ebd50123adf1f8cfbea1492f9084169b89d9/tensorboard-1.14.0-py3-none-any.whl (3.1MB)
+Collecting grpcio>=1.8.6 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/8b/9b/ba5d094f979325fdba696bafa9ee23cc50b8fc60481e3d2a9e13d76817dc/grpcio-1.26.0-cp36-cp36m-manylinux1_x86_64.whl (2.5MB)
+Collecting termcolor>=1.1.0 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/8a/48/a76be51647d0eb9f10e2a4511bf3ffb8cc1e6b14e9e4fab46173aa79f981/termcolor-1.1.0.tar.gz
+Collecting keras-applications>=1.0.6 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/71/e3/19762fdfc62877ae9102edf6342d71b28fbfd9dea3d2f96a882ce099b03f/Keras_Applications-1.0.8-py3-none-any.whl (50kB)
+Collecting keras-preprocessing>=1.0.5 (from tensorflow)
+  Downloading https://files.pythonhosted.org/packages/28/6a/8c1f62c37212d9fc441a7e26736df51ce6f0e38455816445471f10da4f0a/Keras_Preprocessing-1.1.0-py2.py3-none-any.whl (41kB)
+Requirement already satisfied: setuptools in /usr/lib/python3.6/site-packages (from protobuf>=3.6.1->tensorflow)
+Collecting markdown>=2.6.8 (from tensorboard<1.15.0,>=1.14.0->tensorflow)
+  Downloading https://files.pythonhosted.org/packages/c0/4e/fd492e91abdc2d2fcb70ef453064d980688762079397f779758e055f6575/Markdown-3.1.1-py2.py3-none-any.whl (87kB)
+Collecting werkzeug>=0.11.15 (from tensorboard<1.15.0,>=1.14.0->tensorflow)
+  Downloading https://files.pythonhosted.org/packages/ce/42/3aeda98f96e85fd26180534d36570e4d18108d62ae36f87694b476b83d6f/Werkzeug-0.16.0-py2.py3-none-any.whl (327kB)
+Collecting h5py (from keras-applications>=1.0.6->tensorflow)
+  Downloading https://files.pythonhosted.org/packages/60/06/cafdd44889200e5438b897388f3075b52a8ef01f28a17366d91de0fa2d05/h5py-2.10.0-cp36-cp36m-manylinux1_x86_64.whl (2.9MB)
+Installing collected packages: astor, tensorflow-estimator, wrapt, wheel, protobuf, absl-py, google-pasta, gast, markdown, grpcio, werkzeug, tensorboard, termcolor, h5py, keras-applications, keras-preprocessing, tensorflow
+  Running setup.py install for wrapt ... done
+  Running setup.py install for absl-py ... done
+  Running setup.py install for gast ... done
+  Running setup.py install for termcolor ... done
+Successfully installed absl-py-0.9.0 astor-0.8.1 gast-0.3.2 google-pasta-0.1.8 grpcio-1.26.0 h5py-2.10.0 keras-applications-1.0.8 keras-preprocessing-1.1.0 markdown-3.1.1 protobuf-3.11.2 tensorboard-1.14.0 tensorflow-1.14.0 tensorflow-estimator-1.14.0 termcolor-1.1.0 werkzeug-0.16.0 wheel-0.33.6 wrapt-1.11.2
+0461a7b9e7c00b2c53ce8fcbc09e4320198cd3b30336231f404e733628918d6c
+STEP 8: CMD ["mkdir","/root/chatbot"]
+e0267d47ca03de85f27b467685753e322c12a1e22391fbaec5a9bfd0925d741b
+STEP 9: COPY /chatbotApp/* /root/chatbot/
+d283c38e29eade030a73ec80c38ea180d3b0507f3a5fef017380d5c533211685
+STEP 10: WORKDIR /root/chatbot
+b89e969d82ac4035d17f6160a881c78111a122c8bf2ad74c71588b235339d3f2
+STEP 11: CMD ["/usr/bin/python3","serviceProvider.py"]
+STEP 12: COMMIT chatbotengine_0.1
+70a8e5aa0055644404bc4a24eca27a3692b1296894f9a8c625e3c7cc2eba1b48
+-----------------
+
+Our engine container has been created successfully.
+
+=== Running and testing our service
+
+*List the local images*
+[source,bash]
+-----------------
+# podman images
+
+REPOSITORY                            TAG      IMAGE ID       CREATED          SIZE
+localhost/ansiblewebchat_0.1          latest   5ae1eced8c19   13 seconds ago   368 MB
+localhost/ansiblechatbotengine_0.1    latest   f73ae2090435   4 minutes ago    1.13 GB
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago      239 MB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago      239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago     645 MB
+-----------------
+
+*The need of a POD*
+
+The webchat service needs to communicate with the engine layer and both services are exposing different ports and protocols. We only need to expose the webchat port which is 8080 through http.- The engine only needs to communicate with the webchat and they need to be in the same network namespace so the webchat service only needs to communicate with localhost:9095. For the two containers to be in the same network namespace we need to create a common pod in which each container lives.
+
+For this purpose we are going to create the pod when we start the webchat container, as we´ll see in the next seccion.
+
+*Run the WEBCHAT container*
+
+[source,bash]
+-----------------
+# podman run -ti --rm --pod=new:webchatpod --name=webchat -d -p 8080:8080 ansiblewebchat_0.1
+
+# podman ps
+CONTAINER ID  IMAGE                                COMMAND               CREATED             STATUS                 PORTS                   NAMES
+621c9968b211  localhost/ansiblewebchat_0.1:latest  /usr/bin/python3 ...  About a minute ago  Up About a minute ago  0.0.0.0:8080->8080/tcp  webchat
+-----------------
+
+*Run the engine container*
+
+[source,bash]
+-----------------
+# podman run -ti --rm --pod=webchatpod --name=ensibleenginet -d ansiblechatbotengine_0.1
+
+# podman ps
+CONTAINER ID  IMAGE                                      COMMAND               CREATED        STATUS            PORTS                   NAMES
+978f3eff94bc  localhost/ansiblechatbotengine_0.1:latest  /usr/bin/python3 ...  3 seconds ago  Up 3 seconds ago  0.0.0.0:8080->8080/tcp  ensibleenginet
+621c9968b211  localhost/ansiblewebchat_0.1:latest        /usr/bin/python3 ...  2 minutes ago  Up 2 minutes ago  0.0.0.0:8080->8080/tcp  webchat
+-----------------
+
+*Test the service*
+
+Now we can test our service is up & running accessing http://192.168.56.116:8080/chat in a web browser to expose a web interface.
+
+Other way to access the service is through the api that this service expose.
+
+http://192.168.56.116:8080/api?command=chat&question=what_is_ansible?
+
+The output should be like this:
+
+[source,bash]
+-----------------
+{
+"response": {
+"answer": "Ansible is a radically simple IT automation engine that automates cloud provisioning, configuration management, application deployment, intra-service orchestration, and many other IT needs.",
+"tag": "ansible"
+},
+"status": "(OK)"
+}
+-----------------
+
+A third way could be using curl.
+
+[source,bash]
+-----------------
+# curl http://192.168.56.116:8080/chat
+
+<html>
+
+<head>
+<title>Ansible Chatter</title>
+</head>
+
+<body>
+<h1 style="color:#a10000;line-height:20px">Ansible Chatter</h1>
+<h2 style="color:#a10000;line-height:5px">Latam Techonology Office</h2>
+<h6 style="color:#a10000;line-height:3px">Mantained by adirgan@redhat.com</h6>
+<hr     >
+
+<form method="POST">
+    What you need to Know? <input type="text" name="question">
+    <input type="submit" value="Ask">
+</form>
+<hr>
+
+<h4 style="color:#05157a;line-height:5px">Ansible Expert Response</h4>
+<h4 style="border:1px solid #05157a;color:#05157a">###    </h4>
+
+</body>
+</html>
+-----------------
+
+*Saving the images*
+
+Podman can be usedto save images to an archive file or directory and restore it later to another container environment. 
+
+[source,bash]
+-----------------
+# podman save -o ansiblewebchat_0.1 localhost/ansiblewebchat_0.1
+# podman save -o ansiblechatbotengine_0.1 localhost/ansiblechatbotengine_0.1
+
+# ls -lh
+total 1.4G
+-rw-r--r--. 1 root root 1.1G Jan 10 07:48 ansiblechatbotengine_0.1.tar
+-rw-r--r--. 1 root root 351M Jan 10 07:48 ansiblewebchat_0.1.tar
+drwxr-xr-x. 3 root root   42 Jan 10 06:57 engine
+drwxr-xr-x. 4 root root   29 Jan 10 06:56 python-ansible-chatbot
+drwxr-xr-x. 3 root root   42 Jan 10 07:04 webchat
+-----------------
+
+we can remove our images recently created to emulate a fresh installation and load (restore) our containers.
+
+[source,bash]
+-----------------
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED          SIZE
+localhost/ansiblewebchat_0.1          latest   5ae1eced8c19   40 minutes ago   368 MB
+localhost/ansiblechatbotengine_0.1    latest   f73ae2090435   45 minutes ago   1.13 GB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago      239 MB
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago      239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago     645 MB
+k8s.gcr.io/pause                      3.1      da86e6ba6ca1   2 years ago      747 kB
+
+# podman rmi 5ae1eced8c19
+0c5389a12c04b161bc79a0a357ddbb1b298d6aba9adb2214653e23e614d725d8
+07de6a13f349b98d880d0b93f3e96f957ab3f46366dfbe34e610624f39f01faa
+f96188da434271eb13b58d2786e2f504581d1e345c68b802ad36a44d20ae6251
+6b88ef84d9c7174483ffda4fe8a18a0e6923bf4b1e9f66446e87934beb28ebc5
+5ae1eced8c198e1525e2b5736b085dca4489f60fe3263315086820f39fa8bdd9
+
+# podman rmi f73ae2090435
+1c16f704450d66f3b0d4e1c8c88be4538a798a486ddbbeb83e235eafefd55a24
+9fd00ef6c888c33c2d4b948e2a112f65fa55f2cda22b9372a2663b5537994cc1
+953bc94ab55f5d411b3cd4b7e4039961f157542c3ce604ecc184e91631d3125c
+1db973aeea4b99268ecf977f037c9fd0edbe1d55db1349e62801ad3d4536d5b5
+c516f6ab9eb2189ba2c3bbe60f2f28d6f5faceaabac353ca6596ff3dd8f33e38
+6844d76fee817aa9cf649c5c9be5484bca91274332479dfe2891840cc9b97888
+1ba47472b0f2d7dc31f33b6d023aeaa9a069ec44583c13bcb71dbd5ceedff869
+488ab17965a112348899711dd58e9b4c20a1b9fbfde0ec5be788f925f1cc87fc
+7e3a65cd5e25d06b598c548d6c99631663a542282e7e73301fca2ef5095fdf7c
+f73ae2090435c43deaff4a4749cd2283b66be34e4e67f35e388b9d1c41c79646
+
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED        SIZE
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago    239 MB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago    239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago   645 MB
+k8s.gcr.io/pause                      3.1      da86e6ba6ca1   2 years ago    747 kB
+-----------------
+
+Now, restore the containers and run again to re-instantiate the service.
+
+[source,bash]
+-----------------
+# podman load -i ansiblewebchat_0.1.tar
+
+Getting image source signatures
+Copying blob aaef544432d3 done
+Copying blob 9f06c28ef392 done
+Copying blob e956ae04a50a done
+Copying blob 3cc03d64532c done
+Copying blob c630f5c3e169 skipped: already exists
+Copying blob 4bd7408cc1c8 skipped: already exists
+Copying config 5ae1eced8c done
+Writing manifest to image destination
+Storing signatures
+Loaded image(s): localhost/ansiblewebchat_0.1:latest
+
+# podman load -i ansiblechatbotengine_0.1.tar
+
+Getting image source signatures
+Copying blob d273dfdee6be done
+Copying blob 4bd7408cc1c8 skipped: already exists
+Copying blob 9f06c28ef392 skipped: already exists
+Copying blob e956ae04a50a skipped: already exists
+Copying blob 8dd71635abb5 done
+Copying blob c630f5c3e169 skipped: already exists
+Copying blob 34bc8b9f1a4f done
+Copying blob 7c69c6565a87 done
+Copying blob 8210a781aca6 done
+Copying config f73ae20904 done
+Writing manifest to image destination
+Storing signatures
+Loaded image(s): localhost/ansiblechatbotengine_0.1:latest
+
+# podman images
+REPOSITORY                            TAG      IMAGE ID       CREATED             SIZE
+localhost/ansiblewebchat_0.1          latest   5ae1eced8c19   About an hour ago   368 MB
+localhost/ansiblechatbotengine_0.1    latest   f73ae2090435   About an hour ago   1.13 GB
+registry.redhat.io/ubi8/ubi           latest   096cae65a207   4 weeks ago         239 MB
+registry.access.redhat.com/ubi8/ubi   latest   096cae65a207   4 weeks ago         239 MB
+docker.io/library/nextcloud           latest   9f69908039fd   6 months ago        645 MB
+k8s.gcr.io/pause                      3.1      da86e6ba6ca1   2 years ago         747 kB
+-----------------
+
+Let's run again environment.
+
+[source,bash]
+-----------------
+#  podman run -ti --rm --pod=new:webchatpod --name=ansiblewebchat -d -p 8080:8080 localhost/ansiblewebchat_0.1
+0b5f2841bd0e7bcdb85c3526519605c562dcc32e2f06543f9def31bbc493cb78
+
+#  podman run -ti --rm --pod=webchatpod --name=ensibleengine -d ansiblechatbotengine_0.1
+0937c466416f35f9612a53717d7efed17e9b18b249e943f6a25fdd13e67ca55a
+
+# podman ps
+CONTAINER ID  IMAGE                                      COMMAND               CREATED         STATUS             PORTS  NAMES
+0937c466416f  localhost/ansiblechatbotengine_0.1:latest  /usr/bin/python3 ...  14 seconds ago  Up 14 seconds ago         ensibleengine
+0b5f2841bd0e  localhost/ansiblewebchat_0.1:latest        /usr/bin/python3 ...  42 seconds ago  Up 41 seconds ago         ansiblewebchat
+-----------------
+
+=== WebConsole to manage containers with Podman
+
+* Installing the cockpit-podman plugin
+
+[source,bash]
+-----------------
+#  yum install cockpit-podman
+-----------------
+
+Thant's it, you can now from webconsole manage the lifecycle of images and containers.
+
+== Resources and beyond
+
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/building_running_and_managing_containers/index/[BUILDING, RUNNING, AND MANAGING CONTAINERS^]  
+
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/container-command-line-reference_building-running-and-managing-containers[ CONTAINER COMMAND-LINE REFERENCE^]  
+
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/getting_started_with_containers/using_red_hat_universal_base_images_standard_minimal_and_runtimes[USING RED HAT UNIVERSAL BASE IMAGES (STANDARD, MINIMAL, AND RUNTIMES)^]  
+
+* https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/building_running_and_managing_containers/working-with-container-images_building-running-and-managing-containers[WORKING WITH CONTAINER IMAGES)^]  
+
+
+
+
+
+
+
