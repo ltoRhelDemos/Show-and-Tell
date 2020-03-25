@@ -55,27 +55,27 @@ The installation is as simple as install the cockpit package and open the ports 
 For RHEL 7 we must enable some repositories.
 
 [source, bash]
---------------------------
+--------------------------------
 subscription-manager repos --enable=rhel-7-server-extras-rpms
 subscription-manager repos --enable=rhel-7-server-optional-rpms
--------------------------
+--------------------------------
 
 Installing the cockpit package.
 
 [source, bash]
---------------------------
+--------------------------------
 yum install cockpit
---------------------------
+--------------------------------
 
 Open ports and enable the service.
 
 [source, bash]
---------------------------
+--------------------------------
 firewall-cmd --add-port=9090/tcp
 firewall-cmd --add-port=9090/tcp --permanent
 systemctl enable cockpit.socket
 systemctl start cockpit.socket
---------------------------
+--------------------------------
 
 == A naive tour of the web interface
 
