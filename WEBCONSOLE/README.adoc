@@ -14,11 +14,68 @@ Audience: IT Managers, Architects and technical staff who operates Linux
 
 == The new challenges of the OS Management
 
+With the proliferation of virtual machines and containers as an operating system standard features in conjunction with all the OS management related activities that a system administrator has to do in his every day life, sometimes a day could be horrific, not mentioning the error prone activities that repetitive tasks could mean.
+
+The command line has been for decades the norm for administering Linux environments. Nevertheless, the command line could be daunting as far as labor is concerned, but also could lead to errors related to excesive confidence in combination with root priviledges.
+
+This reality makes us think about better ways to execute the daily management work. A good practice a lot of system administrators are adopting is to combine command line activities with gui assited tools to handle the 80/20 paretto of management burden the operating systems demands.
+
+This is where Webconsole comes to this picture.
+
 == What is Webconsole
+
+The Red Hat Enterprise Linux web console is an open source project called Cockpit that provides a user-friendly web interface allowing for the remote administration of servers. Being a web console, this also means that it is equally easy to use on mobile devices as well.
+
+From https://cockpit-project.org[Cockpit Project] we can reference this:
+
+"Discoverable: Cockpit makes GNU/Linux discoverable. See your server in a web browser and perform system tasks with a mouse. It’s easy to start containers, administer storage, configure networks, and inspect logs.
+
+Designed & tested: Cockpit is designed with your goals in mind. We also routinely test Cockpit with usability studies to make it work the way you’d expect. As a result, Cockpit gets easier to use all the time.
+
+Team-friendly: Cockpit is friendly enough for those new to Linux and useful for seasoned admins too.
+
+Packages included: Installing and running Cockpit is simple. It’s already included in most of the major distributions."
 
 == The extensible nature of WebConsole
 
+Another great feature of Cockpit is that it is pluggable, which means functionality can be extended by additional plugins. Red Hat develops several pluggings that are official and supported.
+
+cockpit-composer
+cockpit-pcp.x86_64                
+cockpit-session-recording
+cockpit-dashboard
+cockpit-machines
+cockpit-podman
+cockpit-storaged (Installed by default in RHEL 8)
+
 == How to install Webconsole
+
+The installation is as simple as install the cockpit package and open the ports needed to access the web application.
+
+For RHEL 7 we must enable some repositories.
+
+[source,bash]
+--------------------------
+subscription-manager repos --enable=rhel-7-server-extras-rpms
+subscription-manager repos --enable=rhel-7-server-optional-rpms
+-------------------------
+
+Installing the cockpit package.
+
+[source,bash]
+--------------------------
+yum install cockpit
+--------------------------
+
+Open ports and enable the service.
+
+[source,bash]
+--------------------------
+firewall-cmd --add-port=9090/tcp
+firewall-cmd --add-port=9090/tcp --permanent
+systemctl enable cockpit.socket
+systemctl start cockpit.socket
+--------------------------
 
 == A naive tour of the web interface
 
