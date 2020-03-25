@@ -101,19 +101,39 @@ So, in this very first screen you can do a lot of things.
 
 At the left menu there are several options.
 
+* Logs
+
 image::logs.png[Logs]
+
+* Networking 
 
 image::networking.png[Networking]
 
+* Firewall
+
+image::firewall.png[Firewall]
+
+* Accounts
+
 image::accounts.png[Accounts]
+
+* Services
 
 image::services.png[Services]
 
+*  Diagnostic Report
+
 image::sos.png[Diagnostic Report]
+
+* Software updates
 
 image::updates.png[Software Updates]
 
+* Subscriptions
+
 image::subscriptions.png[Subscriptions]
+
+* Terminal 
 
 image::terminal.png[Console]
 
