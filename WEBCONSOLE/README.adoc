@@ -83,7 +83,41 @@ To access the web console we need to type https://ip-address:9090 on a browser (
 
 image::login.png[]
 
-We can a
+Accessing the tool with a regular user should be done if that user is not expected to change nothing on the server. If changes are needed to complete actions then root or proviledged users should login.
+
+Let´s enter with root user.
+
+The system dashboard is the first screen you can see when accessing for the first time webconconsole. Here some performance metrics are shown, but you can also do some interesting stuff:
+
+* Change the hostname 
+* Join to a domain 
+* Change the time or date or configure the connection to a ntp server
+* Change the the server profile
+* Power off or reboot the server
+
+image::system.png[]
+
+So, in this very first screen you can do a lot of things.
+
+At the left menu there are several options.
+
+image::logs.png[Logs]
+
+image::networking.png[Networking]
+
+image::accounts.png[Accounts]
+
+image::services.png[Services]
+
+image::sos.png[Diagnostic Report]
+
+image::updates.png[Software Updates]
+
+image::subscriptions.png[Subscriptions]
+
+image::terminal.png[Console]
+
+
 
 == How to install a plugin for adding functionality to webconsole
 
