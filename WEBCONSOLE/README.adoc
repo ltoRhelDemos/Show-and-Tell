@@ -207,12 +207,11 @@ image::sessionRecording.png[]
 
 To activate the recording we need to click on the gear icon located at the right-up corner of the screen, then in the sssd configuration section select "All" in the scope dropdown menu, followed by clicking the save button.
 
-image::sessionRecordingConfig.png
+image::sessionRecordingConfig.png[]
 
 After this configuration takes effect, all users that login to the server are going to be recorded when a ssh session is oppened. Then these sessions could be played-back.
 
-image:sessionRecordingPlay.png
-
+image:sessionRecordingPlay.png[]
 
 == Managing the Networking from Webconsole
 
