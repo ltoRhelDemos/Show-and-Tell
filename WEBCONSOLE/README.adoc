@@ -171,7 +171,7 @@ After login in again on the browser you will see the left part of the screen div
 
 The gauge icon is the new functionality added which is the dashboard. The dashboard able us to add as much as servers are needed.
 
-Clicking the "plu" button we are going to add a server
+Clicking the "plus" button we are going to add a server
 
 image::addingServer.png[]
 
@@ -188,6 +188,31 @@ So, selecting now zeus we can go to screen where zeus will be shown to make mana
 image::zeusDetails.png[]
 
 == How to record sessions using the session recording plugin
+
+Another nice pluggin is the session recording one, which enable us to configure and magane all the sessions recorded on the server.
+
+[source, bash]
+---------------------------
+yum install cockpit-session-recording
+---------------------------
+
+[source, bash]
+---------------------------
+systemctl restart cockpit.socket
+---------------------------
+
+After restarting the cockpit.socket service we will notice a "session recording menu entry at the left of the screen"
+
+image::sessionRecording.png[]
+
+To activate the recording we need to click on the gear icon located at the right-up corner of the screen, then in the sssd configuration section select "All" in the scope dropdown menu, followed by clicking the save button.
+
+image::sessionRecordingConfig.png
+
+After this configuration takes effect, all users that login to the server are going to be recorded when a ssh session is oppened. Then these sessions could be played-back.
+
+image:sessionRecordingPlay.png
+
 
 == Managing the Networking from Webconsole
 
