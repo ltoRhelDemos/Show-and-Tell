@@ -229,7 +229,7 @@ After applying the changes you will see the list of the configured interfaces wh
 
 image::bondingCreated.png[]
 
-There is the possibility to change the configuration of the bonding interface as shown in the following picture.
+We can change the configuration of the bonding interface by selecting it from the list as shown in the following picture.
 
 image::bondingModification.png[]
 
@@ -238,6 +238,22 @@ From command line we can see the newly created interface bond o using "ip route"
 image::bondingFromCommandLine.png[]
 
 === Creating a Teaming Interface
+
+We can also create a teaming interface, much in the same way as a bonding interface as depicted in the following pictures.
+
+*Creating a Teaming interface*
+image:teamingSettings.png[]
+
+*team0 Teaming interface listed after creation*
+image:teamingCreated.png[]
+
+*Modifying a Teaming interface*
+image:teamingModification.png[]
+
+*List Teaming interface from command line*
+image:teamingFromCommandLine.png[]
+
+
 
 == Managing disks and VDO using the console
 
