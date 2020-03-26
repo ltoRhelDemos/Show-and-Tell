@@ -269,7 +269,39 @@ Creating a vlan is very simple too using webconsole.
 
 image::vlan.png[]
 
+=== Managing the Firewall
+
+Managing firewall services and ports are daily tasks that we ussually do trhough firewall-cmd command. Although we are very used to it thare are easier ways to interact with the firewall.
+
+In the networking section of webconsole we can can click on firewall to see the services and ports configured.
+
+image::firewallMain.png[]
+
+After click on firewall we'll see the following table or ports and services enabled.
+
+image::firewallClicked.png[]
+
+In the firewall screen we can manipulate zones which can be created for each part of the network that required different access/traffic control policies. The most common configuration of these is to have private (inside), public (outside), and DMZ (“demilitarized” or neutral) zones.
+
+Also (and the most common activity with firewall) we can enable services or ports that are needed for the correct functioning of an appplication. RHEL 8.1 now allow from webconsole enable ports in a custom way.
+
+*Adding preset services*
+
+image::firewallAddService.png[]
+
+*Adding a customized port*
+
+image::firewallAddPort.png[]
+
+After adding a customized port the list of services will be updated.
+
+image::firewallPort9094.png[]
+
+In the main firewall screen we can enable or disable the firewalld as well.
+
+
 == Managing disks and VDO using the console
+
 
 
 
