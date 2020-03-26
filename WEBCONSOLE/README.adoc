@@ -299,9 +299,29 @@ image::firewallPort9094.png[]
 
 In the main firewall screen we can enable or disable the firewalld as well.
 
-
 == Managing disks and VDO using the console
 
+The storage pluggin is an excelent example of what we can optimizse our admin work with a gui interface. For enabling the storage module we need to install the appropriate pluggin.
+
+[source, bash]
+---------------------------
+yum install cockpit-storaged
+---------------------------
+
+[source, bash]
+---------------------------
+systemctl restart cockpit.socket
+---------------------------
+
+Re-authenticate on webconsole to have take all the changes. Now at the left you can see the storage item at the menu which we are going to click to access the panel.
+
+image::storageMain.png[]
+
+From the storage panel we can see the configured disks, the usage in terms if writings and readings, but also we can configure raid groups, disk groups and logical volumes, VDO devices, NFS mounts and isci targets. A very complete tool for helping to the laboriously tasks of configuring the disk subsystem. 
+
+Lest's start!
+
+=== Configuring a RAID device
 
 
 
