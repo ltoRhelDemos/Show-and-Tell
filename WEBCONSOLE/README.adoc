@@ -263,8 +263,16 @@ The procedure for creating a bridge in the same as bonding & teaming. The bridge
 
 image::bridgeTypical.png[]
 
+=== creating a VLAN
+
+Creating a vlan is very simple too using webconsole. 
+
+image::vlan.png
 
 == Managing disks and VDO using the console
+
+
+
 
 == Managing Virtual Machines
 
