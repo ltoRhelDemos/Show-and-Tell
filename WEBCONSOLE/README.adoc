@@ -267,7 +267,7 @@ image::bridgeTypical.png[]
 
 Creating a vlan is very simple too using webconsole. 
 
-image::vlan.png
+image::vlan.png[]
 
 == Managing disks and VDO using the console
 
