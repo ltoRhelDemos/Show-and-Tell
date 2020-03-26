@@ -242,17 +242,26 @@ image::bondingFromCommandLine.png[]
 We can also create a teaming interface, much in the same way as a bonding interface as depicted in the following pictures.
 
 *Creating a Teaming interface*
+
 image:teamingSettings.png[]
 
 *team0 Teaming interface listed after creation*
+
 image:teamingCreated.png[]
 
 *Modifying a Teaming interface*
+
 image:teamingModification.png[]
 
 *List Teaming interface from command line*
+
 image:teamingFromCommandLine.png[]
 
+=== creating a Link Layer Bridge
+
+The procedure for creating a bridge in the same as bonding & teaming. The bridge can be configured over a team or a bond interface previously created. This is used tipically for helping with the communication among virtual machines and a kypervisor.
+
+image::bridgeTypical.png[]
 
 
 == Managing disks and VDO using the console
