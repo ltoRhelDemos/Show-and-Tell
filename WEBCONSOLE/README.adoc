@@ -319,11 +319,61 @@ image::storageMain.png[]
 
 From the storage panel we can see the configured disks, the usage in terms if writings and readings, but also we can configure raid groups, disk groups and logical volumes, VDO devices, NFS mounts and isci targets. A very complete tool for helping to the laboriously tasks of configuring the disk subsystem. 
 
+We are going to create the disk architecture of the left in which we are going to define an optimized disk volume which is going to be mounted on /data.
+
+image::storageArchitecture.png[]
+
 Lest's start!
 
 === Configuring a RAID device
 
+Configurin the RAID 1 volume is straightforward because we only need to define the name, type of RAID ans select the disks. In this case two 16GB disks presented to to the server.
 
+image::storageRaid1.png[]
+
+=== Configuring a volume group
+
+After the RAID volume is created we are going to create a volume group on top of that and then we are going to create a logical volume with the 50% of the total space.
+
+*Creating the volume group*
+
+image::storageVgroup.png[]
+
+*After creating the VG we select it*
+
+image::storageLVM1.png[]
+
+*Now we create the logical volume with 8GB*
+
+image::storageLV2.png[]
+
+For using VDO we need to install the packages needed. We can do it using webconsole as well.
+
+image::storageVDOInstallSupport.png[]
+
+Configuring a VDO volume on top of the Logincal Volume is a very simple task. Click on the "+" button at the VDO section and select the logical volume recently created, then define it as a 32GB volume and 512GB of index memory leaving the rest of parameters by default.
+
+image::storageVDOCreation.png[]
+
+Now we need to format the VDO volume so we are able to mmount it. First select the VDO volume then format it with XFS as the picture denotes.
+
+image::storageVDOFormat.png[]
+
+Now we can mount the volume...
+
+image::storageVDOMount.png[]
+
+After the mounting task is done...
+
+image::storageVDOMounted.png[]
+
+From command line we can see the just mounted vdo volume.
+
+image::storageVDOMountedCommandLine.png[]
+
+And al we can see the volume on webconsole.
+
+image::storageVDOWebconsole.png[]
 
 
 == Managing Virtual Machines
