@@ -279,7 +279,7 @@ image::vlan.png
 == Managing containers
 
 == Why is so important to have tools assisting the management
-
+ 
 == Wrap-up
 
 
