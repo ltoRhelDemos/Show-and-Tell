@@ -375,10 +375,22 @@ And al we can see the volume on webconsole.
 
 image::storageVDOWebconsole.png[]
 
-
-== Managing Virtual Machines
-
 == Managing containers
+
+On RHEL 8.1 and above Red Hat proposes to system administrators a new pluggin for managing containers based on padman. This is not a replacement for any other tool for orchestrating containers like Openshift, nevertheless it can achieve several machanical tasks that any system admisnitrator needs to execute when the container plataform is small.
+
+*Installaing the pluggin*
+
+[source, bash]
+-----------------------------
+yum install cockpit-podman -y
+
+systemctl restart cockpit.socket
+-----------------------------
+
+Then authenticate yourself again in the webconsole gui.
+
+
 
 == Why is so important to have tools assisting the management
  
