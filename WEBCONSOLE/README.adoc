@@ -390,6 +390,23 @@ systemctl restart cockpit.socket
 
 Then authenticate yourself again in the webconsole gui.
 
+Select "Podman Containers" in the left menu of webconsole.
+
+image::podmanMain.png[]
+
+Let's pull a RHEL 8 ubi for an inytereseting exercise of creating and running a container with a web chat.
+
+Click on "Get New Image" link on the right side of the screen. Write "ubi8" on Download as field.
+
+image::podmanPull.png[]
+
+... and click download. After Downloding the image it will appear in the main podman containters screen.
+
+image::podmanUbi8Downloaded.png[]
+
+Now we are going to build a container using the instructions of https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/CONTAINERS#62-container-building[6.2 container building].
+
+
 
 
 == Why is so important to have tools assisting the management
