@@ -6,7 +6,7 @@
 = RED HAT INSIGHTS: UNDERSTANDING WHAT'S INSIDE - LTO Show & Tell Series
 
 == Description
-This Show&Tell is aimed to share some of the most important concepts and features of Insights and hiow it can help to customer looking for stability, availability, security and performance in their Operating System Grid.
+This Show&Tell is aimed to share some of the most important concepts and features of Insights and how it can help to customer looking for stability, availability, security and performance in their Operating System Grid.
 
 Audience: IT Managers, Architects and technical staff who operates Linux
 
