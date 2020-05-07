@@ -818,7 +818,7 @@ RUN yum install python36 -y
 RUN pip3 install nltk
 RUN pip3 install numpy
 RUN pip3 install tflearn
-RUN pip3 install tensorflow
+RUN pip3 install tensorflow==1.5
 
 CMD ["mkdir","/root/chatbot"]
 
