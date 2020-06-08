@@ -284,7 +284,7 @@ Each server send their information to the insights server for real-time analysis
 
 image::insights-fig1.png[]
 
-The second way is through a proxy server. In this mode the server is not exposed directly to the internet, which is a good security practice. In this connection model the server send the it’s information to the proxy and this forward it to insights servers.
+The second way is through a https://access.redhat.com/solutions/1606693[proxy server]. In this mode the server is not exposed directly to the internet, which is a good security practice. In this connection model the server send the it’s information to the proxy and this forward it to insights servers.
 
 image::insights-fig2.png[]
 
