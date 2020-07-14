@@ -26,6 +26,7 @@ In the management equation not only exists the identification phase, but the rem
 Insights is capable to propose playbooks for each remediation and fix proposed, that can be gathered and composed into more complex and rich playbooks to address several issues and servers at the same time, gaining more control over what needs to be acomplished to bring the platform from a current state to a needed one, without the intervention of the command line, which is prone to errors that in consequence raise the risks.
 
 This Show & Tell is aimed to show you how we can, with the help of Insights and Ansible, remediate issues or fix states using the proposed playbooks by Insights. We will be visiting some procedures for addressing recommendations, vulnerabilities and compliance, so we can have the peace of mind that our platform is treated with proved automated procedures.
+
 == How to install the client
 
 The client for RHEL 8 is installed by default. In case other version (version>=6.4) the installation is pretty straightforward.
