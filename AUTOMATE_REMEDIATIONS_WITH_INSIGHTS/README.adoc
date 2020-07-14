@@ -146,5 +146,43 @@ PLAY RECAP *********************************************************************
 
 This is all we need to do for installing and registering Insights in a bunch of servers. It is very simple right?. 
 
-As we are going to see, the remediation and fixes that Insights recommends are going to be easey too!... and that's the idea, having a tool that smash our issues in a way that the human intervention is minimal.
+As we are going to see, the remediation and fixes that Insights recommends are going to be easy too!... and that's the idea, having a tool that smash our issues in a way that the human intervention is minimal.
+
+== Checking for Vulnerabilities
+
+Insighs has a very useful functionality that takes care of the vulnerabilities found on servers registered to the server. In fact, this functionality itself is a tool that can be used to evaluate vulnerabilities, define statuses on those, create reports for reviewing threads and of course, having playbooks for automating the remediations.
+
+And this is going to be our goal in this section. How to obtain the playbooks related to vulnerabilities and how to use them to remediate using Ansible our platform.
+
+When we access the left panel of Insights, we surely can see an entry named Vulnerabilities. If we click on that item we should view a list of all vulnerabilities found in our registered platform. 
+
+Every vulnerability is listed along with the published day, the impact, the CVSS score, the systems affected by the vulnerability, and also two additional columns that can be modified by us when necesary. IN this case we talk about a column named *Business Risk* and a column named *Status*.
+
+These 2 columns are customizable. The "Business Risk" able us to define and describe the risk to the business if the issue (vulnerability) manifests itself in our server. This is a cool feature because we can determine and describe to others why the vulnerability needs to be address and remediated in terms of the risk to our business and services.
+
+The columns Status complement the previous column because after describe the risks asociated with the vulnerability is good to document in which state is the review of the issue itself. We can choose among some options:
+
+[source,bash]
+------------------------
+Not Reviewed
+In Review
+On Hold
+Scheduled for patch
+Resolved
+No Action - Risk accepted
+Resolved via Mitigation
+------------------------
+
+Using some of the listed options we can document the vulnerability in a complete way, so we can create reports that later can be reviewed for prioritizing and elevating for remediation approval in a change commitee.
+
+Also, we can download an https://www.dropbox.com/s/80pwwdop54hqie8/Vulnerability-Executive-Report--14-Jul-2020-20_52_12-UTC.pdf?dl=0[executive report] that can be used for determining the level of risk at which our pltaform is exposed.
+
+OK, now we need to aim to what matters in terms of automation. We have several ways to generate the playbooks that can help us to remediate the vulnerabilities.
+
+- In the CVEs tab, on the Vulnerabilities item, we can check any vulnerability that we need to address to remediate using ansible. After checking the individual vulnerabilities a "Remediation Buttom" will be enabled so we can generate the playbook with all the plays related to each vulnerability.
+
+- We also can use the selection pull down menu on the upper-left corner of the list to de-select, select a page or all the vulnerabilities in the list. 
+
+In both cases we can automate the remediation to just a simple execution of the playbook genereted from ansible Tower or engine.
+
 
