@@ -3,10 +3,10 @@
 :toc2:
 :imagesdir: images
 
-= RED HAT INSIGHTS: UNDERSTANDING WHAT'S INSIDE - LTO Show & Tell Series
+= RED HAT INSIGHTS: AUTOMATING REMEDIATIONS & FIXES
 
 == Description
-This Show&Tell is aimed to share some of the most important concepts and features of Insights and how it can help to customer looking for stability, availability, security and performance in their Operating System Grid.
+This Show&Tell is aimed to share some of the most important concepts and features of Insights and how we can automate remediations and fixes needed to get the platform to be stable, secure and in compliance.
 
 Audience: IT Managers, Architects and technical staff who operates Linux
 
