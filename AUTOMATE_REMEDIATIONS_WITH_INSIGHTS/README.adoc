@@ -76,6 +76,75 @@ In this case, it is ease to automate the installation and registration of the se
 
 What we need to have, and this is going to be a common requirement for all this Show & Tell, a RHEl server, which ideally can be RHEL 8 with Ansible engine installed. See the procedure in workshop called https://github.com/ltoRhelDemos/Workshops/tree/master/RHEL%20Automation%20with%20Ansible[Automating RHEL management with Ansible].
 
+Having the ansible server as a control host it is time to install the RedHatInsights.insights-client role. 
 
+[source,bash]
+-----------------
+ansible-galaxy install RedHatInsights.insights-client
+-----------------
 
+The role will be installed and it will be ready to use after this action.
+
+Let's create a simple playbook that uses this role to install and register servers in an inventory. 
+
+The playbook that follows could be named *install_insights.yml*
+
+[source,bash]
+-----------------
+---
+- name: Install and register Insights
+  hosts: all
+  roles:
+  - role: RedHatInsights.insights-client
+    when: ansible_os_family == 'RedHat'
+-----------------
+
+Let's create am inventory file called *hosts* which is going to following content. In our example we will install and register Insights in ONE server. The idea to use an Ansible role is automate this procedures on several or hundreds of servers at the same time.
+
+[source,bash]
+------------------------
+[insights_servers]
+192.168.56.102
+------------------------
+
+Now the execution part. In the control node, where we have created the playbook and the inventory file we need to execute the playbook.
+
+[source,bash]
+------------------------
+ansible-playbook -i hosts install_insights.yml
+
+PLAY [Install and register Insights] *************************************************
+
+TASK [Gathering Facts] ***************************************************************
+ok: [192.168.56.102]
+
+TASK [RedHatInsights.insights-client : Install 'insights-client'] ********************
+changed: [192.168.56.102]
+
+TASK [RedHatInsights.insights-client : Set Insights Configuration Values] ************
+ok: [192.168.56.102]
+
+TASK [RedHatInsights.insights-client : Register Insights Client] *********************
+changed: [192.168.56.102]
+
+TASK [RedHatInsights.insights-client : Change permissions of Insights Config directory so that Insights System ID can be read] ***
+ok: [192.168.56.102]
+
+TASK [RedHatInsights.insights-client : Change permissions of machine_id file so that Insights System ID can be read] ***
+ok: [192.168.56.102]
+
+TASK [RedHatInsights.insights-client : Create directory for ansible custom facts] ****
+changed: [192.168.56.102]
+
+TASK [RedHatInsights.insights-client : Install custom insights fact] *****************
+changed: [192.168.56.102]
+
+PLAY RECAP ***************************************************************************
+192.168.56.102             : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+------------------------
+
+This is all we need to do for installing and registering Insights in a bunch of servers. It is very simple right?. 
+
+As we are going to see, the remediation and fixes that Insights recommends are going to be easey too!... and that's the idea, having a tool that smash our issues in a way that the human intervention is minimal.
 
