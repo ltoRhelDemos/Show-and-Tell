@@ -68,34 +68,13 @@ The automated versions can be located at ansible or puppet links.
 
 Is good practice to configure the servers you want to subscribe to insights through a https://access.redhat.com/solutions/1606693[proxy], so the server aren't exposed directly to a public connection. 
 
-== What does insights client when it is registering the server?
+== Automating the Insights Installation
 
-The client starts a protocol to get the server registered looking at the subscription validity. If the subscription is valid and up to date, the server is registered.
+One of the very first thinks an administrator can automate with Insights is the installation and registration itself. As we saw in the previous section, we need to install the insights-client packacge and then register the server to the service. This procedure although ease means you hav to do the same towo actions on all the servers needed to be in the insights realm.
 
-The client try to register the instance through port 443 on
+In this case, it is ease to automate the installation and registration of the service on any number of RHEL instances, and in this way we can also hide the differences of this procedure depending on the RHEL version we are dealing with.
 
-[source,bash]
----------------------
-https://cert-api.access.redhat.com/r/insights/uploads
----------------------
-
-After a successful registration, the client creates an autonomous task for uploading data daily. 
-
-In RHEL versions 7.4 and below versions, it uses cron and creates an entry in /etc/cron.daily.
-
-I RHEL versions 7.5 and above, it uses a timer in systemd that can be changed using
-
-[source,bash]
----------------------
-[root@server ~]# systemctl edit insights-client.timer
-The file can be found at /usr/lib/systemd/system/.
----------------------
-
-In big environments is desirable not to make all servers upload data at the same time. For this reason there is a random delay time variable called RandomizedDelaySec that can be changed in the timer file to resolve the bulk uploads that can impact the network.
-
-After the configuration of a scheduled task, insights client start the first data collection which is sent to insights service right away.
-
-After this, the registration process finish. The next upload will happen automatically daily and the service is set permanently. The data uploaded can be seen at the service portal.
+What we need to have, and this is going to be a common requirement for all this Show & Tell, a RHEl server, which ideally can be RHEL 8 with Ansible engine installed. See the procedure in workshop called "https://github.com/ltoRhelDemos/Workshops/tree/master/RHEL%20Automation%20with%20Ansible[Automating RHEL management with Ansible]".
 
 
 
