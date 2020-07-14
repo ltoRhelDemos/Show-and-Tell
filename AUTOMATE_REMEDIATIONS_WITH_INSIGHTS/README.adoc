@@ -74,7 +74,7 @@ One of the very first thinks an administrator can automate with Insights is the 
 
 In this case, it is ease to automate the installation and registration of the service on any number of RHEL instances, and in this way we can also hide the differences of this procedure depending on the RHEL version we are dealing with.
 
-What we need to have, and this is going to be a common requirement for all this Show & Tell, a RHEl server, which ideally can be RHEL 8 with Ansible engine installed. See the procedure in workshop called "https://github.com/ltoRhelDemos/Workshops/tree/master/RHEL%20Automation%20with%20Ansible[Automating RHEL management with Ansible]".
+What we need to have, and this is going to be a common requirement for all this Show & Tell, a RHEl server, which ideally can be RHEL 8 with Ansible engine installed. See the procedure in workshop called https://github.com/ltoRhelDemos/Workshops/tree/master/RHEL%20Automation%20with%20Ansible[Automating RHEL management with Ansible].
 
 
 
