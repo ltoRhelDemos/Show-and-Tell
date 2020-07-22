@@ -181,9 +181,33 @@ Also, we can download an https://www.dropbox.com/s/80pwwdop54hqie8/Vulnerability
 
 OK, now we need to aim to what matters in terms of automation. We have several ways to generate the playbooks that can help us to remediate the vulnerabilities.
 
-- In the CVEs tab, on the Vulnerabilities item, we can check any vulnerability that we need to address to remediate using ansible. After checking the individual vulnerabilities a "Remediation Buttom" will be enabled so we can generate the playbook with all the plays related to each vulnerability.
+- In the CVEs tab, on the Vulnerabilities item, we can select any vulnerability that we need to address to remediate using ansible. After selecting the individual vulnerabilities we travel to the CVE's details where the systems affected will be listed. If we choose one are more systems the "Remediation Buttom" will be enabled so we can generate the playbook.
 
-- We also can use the selection pull down menu on the upper-left corner of the list to de-select, select a page or all the vulnerabilities in the list. 
+image::vulnerabilities_2.png
+
+- We also can go to the systems tab and select the server we want to inspect, then check the vulnerabilities we wnat to address. In this case, the Remediation button will be enabled.
+
+For generating the playbook, click on the "Remediation Button". 
+
+image::vulnerabilities_3.png
+
+We can select to create a new playbook or choose from already created one. In our case we will be creating a new one named "CVE".
+
+image::Remediation_Screen_1.png
+
+In the next screen will be listed all the vulnerabilities we are addressing. Click on "Create" button to create the playbook which is going to be applied to the server selected previously.
+
+image::Remediation_Screen_2.png
+
+We can access the playbook just at the notification window or in the Remediations menu item at the left of the screen.
+
+image::Remediation_Screen_3.png
+
+Going to the "Remediation" item at the left menu, we can see the recently created playbook named "CVE"
+
+image::Remediation_Screen_4.png
+
+
 
 In both cases we can automate the remediation to just a simple execution of the playbook genereted from ansible Tower or engine.
 
