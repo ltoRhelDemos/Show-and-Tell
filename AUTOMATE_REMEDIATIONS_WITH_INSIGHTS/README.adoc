@@ -185,35 +185,132 @@ OK, now we need to aim to what matters in terms of automation. We have several w
 
 image::vulnerabilities_2.png[]
 
-- We also can go to the systems tab and select the server we want to inspect, then check the vulnerabilities we wnat to address. In this case, the Remediation button will be enabled.
+
+We also can go to the systems tab and select the server we want to inspect, then check the vulnerabilities we wnat to address. In this case, the Remediation button will be enabled.
+
 
 For generating the playbook, click on the "Remediation Button". 
 
 image::vulnerabilities_3.png[]
 
+
 We can select to create a new playbook or choose from already created one. In our case we will be creating a new one named "CVE".
+
 
 image::Remediation_Screen_1.png[]
 
+
 In the next screen will be listed all the vulnerabilities we are addressing. Click on "Create" button to create the playbook which is going to be applied to the server selected previously.
+
 
 image::Remediation_Screen_2.png[]
 
+
 We can access the playbook just at the notification window or in the Remediations menu item at the left of the screen.
+
 
 image::Remediation_Screen_3.png[]
 
+
 Going to the "Remediation" item at the left menu, we can see the recently created playbook named "CVE". Selecting the playbook we can go to the details and download the playbook  for executing it from Tower or Ansible Engine.
+
 
 image::Remediation_Screen_4.png[]
 
+
 At this stage we can see the details and download the playbook clicking the "Downlod" button. The file downloaded will me in the YAML format.
+
 
 image::Remediation_Screen_5.png[]
 
+
 Also, if we have installed the cloud connector for Satellite, we can eexecute the remediation directly from Satellite or from the portal.
 
+
 image::Remediation_Screen_6.png[]
+
+
+=== En example of Remediation 
+
+
+Just for showing you how simple is to remediate a vulnerability with an Ansible Playbook, we are going to choose a critical *CVE-2018-3169*. 
+
+
+image::cve.png[]
+
+
+Let's check the system affected, which in our case is turing. Then create the playbook using the "Remediate" button. After creation, select it from the notification window and downloaded it.
+
+After Download the playbook, let's take a look on the yaml...
+
+[source,bash]
+-------------------------------
+---
+#
+# CVE-2018-3169
+
+# Upgrade packages affected by CVE-2018-3169
+# Identifier: (vulnerabilities:CVE-2018-3169,fix)
+# Version: 552ffa63dc334ccf3400dda2a8d7d267d8528ef9
+
+- name: update vulnerable packages
+  hosts: "turing"
+  become: true
+  tasks:
+    - name: check for update
+      shell: "{{ ansible_facts['pkg_mgr'] }} check-update -q --cve CVE-2018-3169"
+      check_mode: no
+      register: check_out
+      failed_when: check_out.rc != 0 and check_out.rc != 100
+      args:
+        warn: false
+
+    - when: check_out.rc == 100
+      name: upgrade package
+      shell: "{{ ansible_facts['pkg_mgr'] }} upgrade -v -y --cve CVE-2018-3169"
+      args:
+        warn: false
+
+    - when: check_out.rc == 100
+      name: set reboot fact
+      set_fact:
+        insights_needs_reboot: True
+
+- name: Reboot system (if applicable)
+  hosts: "turing"
+  become: True
+  gather_facts: False
+  tasks:
+    - when:
+        - insights_needs_reboot is defined
+        - insights_needs_reboot
+      block:
+        - name: Reboot system
+          shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+          async: 1
+          poll: 0
+          ignore_errors: true
+
+        - name: Wait for system to boot up
+          local_action:
+            module: wait_for
+            host: "{{ hostvars[inventory_hostname]['ansible_host'] | default(hostvars[inventory_hostname]['ansible_ssh_host'], true) | default(inventory_hostname, true) }}"
+            port: "{{ hostvars[inventory_hostname]['ansible_port'] | default(hostvars[inventory_hostname]['ansible_ssh_port'], true) | default('22', true) }}"
+            delay: 15
+            search_regex: OpenSSH
+            timeout: 300
+          become: false
+
+- name: run insights
+  hosts: "turing"
+  become: True
+  gather_facts: False
+  tasks:
+    - name: run insights
+      command: insights-client
+      changed_when: false
+-------------------------------
+
 
 
 
