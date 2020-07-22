@@ -343,11 +343,42 @@ OK, now let's remediate the CVE.
 [source,bash]
 -------------------------------
 ansible-playbook -i hosts CVE-2018-3169.yml
+
+PLAY [update vulnerable packages] *******************************************************************************
+
+TASK [Gathering Facts] ******************************************************************************************
+ok: [192.168.56.113]
+
+TASK [check for update] *****************************************************************************************
+changed: [192.168.56.113]
+
+TASK [upgrade package] ******************************************************************************************
+changed: [192.168.56.113]
+
+TASK [set reboot fact] ******************************************************************************************
+ok: [192.168.56.113]
+
+PLAY [Reboot system (if applicable)] ****************************************************************************
+
+TASK [Reboot system] ********************************************************************************************
+changed: [192.168.56.113]
+
+TASK [Wait for system to boot up] *******************************************************************************
+ok: [192.168.56.113 -> localhost]
+
+PLAY [run insights] *********************************************************************************************
+
+TASK [run insights] *********************************************************************************************
+ok: [192.168.56.113]
+
+PLAY RECAP ******************************************************************************************************
+192.168.56.113             : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
 -------------------------------
 
 After the execution we see there is no need to human intervention for executing remediations in one or more servers.
 
-== Compliance conform
+== Compliance
 
 Another new aspect of Insights is the possibility of integrating it with openSCAP. This integration is very straightforward and can be used for creating or modifying Security Guides which are applicable with openSCAP, but using Insights as intermediary for executing the scanning and maintaining the compliance reports accessible from the portal. How nice is it?.
 
