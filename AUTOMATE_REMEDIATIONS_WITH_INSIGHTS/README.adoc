@@ -203,14 +203,17 @@ We can access the playbook just at the notification window or in the Remediation
 
 image::Remediation_Screen_3.png[]
 
-Going to the "Remediation" item at the left menu, we can see the recently created playbook named "CVE"
+Going to the "Remediation" item at the left menu, we can see the recently created playbook named "CVE". Selecting the playbook we can go to the details and download the playbook  for executing it from Tower or Ansible Engine.
 
 image::Remediation_Screen_4.png[]
+
+At this stage we can see the details and download the playbook clicking the "Downlod" button. The file downloaded will me in the YAML format.
+
 image::Remediation_Screen_5.png[]
+
+Also, if we have installed the cloud connector for Satellite, we can eexecute the remediation directly from Satellite or from the portal.
+
 image::Remediation_Screen_6.png[]
 
-
-
-In both cases we can automate the remediation to just a simple execution of the playbook genereted from ansible Tower or engine.
 
 
