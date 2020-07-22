@@ -311,6 +311,94 @@ After Download the playbook, let's take a look on the yaml...
       changed_when: false
 -------------------------------
 
+In this playbook we have three plays to execute.
+
+- update vulnerable packages
+- Reboot system (if applicable)
+- run insights
+
+== Executing our first remediation
+
+We will be addressing the remediation of CVE-2018-3169 on the turing server. This first time, we are going to remediate from an Ansible Control Node. We need to create the playbook in the control node. Just copy & paste the playbook on a file called CVE-2018-3169.yml.
+
+[source,bash]
+-------------------------------
+mkdir ~/remediations
+cd ~/remediations
+vim CVE-2018-3169.yml
+-------------------------------
+
+Copy and paste the playbook on this file, and save it. Now let's create an inventory file called hosts
+
+[source,bash]
+-------------------------------
+vim hosts
+
+[turing]
+192.168.56.113
+-------------------------------
+
+OK, now let's remediate the CVE. 
+
+[source,bash]
+-------------------------------
+ansible-playbook -i hosts CVE-2018-3169.yml
+-------------------------------
+
+After the execution we see there is no need to human intervention for executing remediations in one or more servers.
+
+== Compliance conform
+
+Another new aspect of Insights is the possibility of integrating it with openSCAP. This integration is very straightforward and can be used for creating or modifying Security Guides which are applicable with openSCAP, but using Insights as intermediary for executing the scanning and maintaining the compliance reports accessible from the portal. How nice is it?.
+
+Let's first install openSCAP scanner on the turing server.
+
+[source,bash]
+-------------------------------
+Install the scanner
+-------------------------------
+
+Now we are able to integrate Insights with openSCAP in to ways. We can upload the result of the SCAP scanning or we can use a very nice option from the command line.
+
+[source,bash]
+-------------------------------
+insights-client --compliance
+
+output
+-------------------------------
+
+This command could be executed recurrently adding a crontab entry for executing the scanning every day, every week or every month.
+
+After the scanning is done and the data is sent to Insights service, the report will be available for being accessed from the portal, as shown in the next picture.
+
+image::complianceReport_1.png
+
+As we can see, there is a list of the rules that was passed and the rules that was not passed. We que sort the list to see all the rules that the server was not in compliance. In this way we can start to plan how to remediate this. 
+
+For each rule we can generate a playbook, which is the prefered procedure in this exercise. We can choose to generate a playbook to remediate all the non compliance rules for each of the servers. For this exercise, we will choose a non compliance rule and create de playbook, then, download it for executing it from our Ansible control node, in a similar way of what we did in the previous section.
+
+Description of the rule
+
+[source,bash]
+-------------------------------
+playbook
+------------------------------- 
+
+[source,bash]
+-------------------------------
+Execution
+------------------------------- 
+
+== Automating the patching process
+
+Insights now give us the opportunity to review what patches needs to be applied to a server. What is interesting of looking at this from insights is that we can sort, review, plan and automate the patching of a server.
+
+In the following exercise we will show you how to navigate in the Patch section and how to select patches to generate a playbook for actually patch the server, which in this case is turing.
+
+
+
+
+
 
 
 
