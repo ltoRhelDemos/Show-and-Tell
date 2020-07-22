@@ -206,6 +206,8 @@ image::Remediation_Screen_3.png[]
 Going to the "Remediation" item at the left menu, we can see the recently created playbook named "CVE"
 
 image::Remediation_Screen_4.png[]
+image::Remediation_Screen_5.png[]
+image::Remediation_Screen_6.png[]
 
 
 
