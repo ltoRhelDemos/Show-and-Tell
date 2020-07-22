@@ -158,6 +158,8 @@ When we access the left panel of Insights, we surely can see an entry named Vuln
 
 Every vulnerability is listed along with the published day, the impact, the CVSS score, the systems affected by the vulnerability, and also two additional columns that can be modified by us when necesary. IN this case we talk about a column named *Business Risk* and a column named *Status*.
 
+image::images/vulnerabilities_1.jpg[]
+
 These 2 columns are customizable. The "Business Risk" able us to define and describe the risk to the business if the issue (vulnerability) manifests itself in our server. This is a cool feature because we can determine and describe to others why the vulnerability needs to be address and remediated in terms of the risk to our business and services.
 
 The columns Status complement the previous column because after describe the risks asociated with the vulnerability is good to document in which state is the review of the issue itself. We can choose among some options:
