@@ -792,5 +792,27 @@ PLAY RECAP *********************************************************************
 
 == Insights Recommendations
 
+One of the killer features of Insights is what recommends for each server registered, not related to patches, compliance, or vulnerabilities. What we mean is: Insights is smart enough to identify if the server have issues related to configurations that are not conformed to a best practice. In this case, these recommendations are proactively proposing remediations for issues that could impact the availability, stability, performance or security of our servers.
+
+This is very cool, because not only Insights can recommend about the operating system, but about applications installed as SAP, SQL Server. openShift, RHEV, openStack, postgreSQL, among others.
+
+The advisor menu item in the left of the screen shows you three options.
+
+
+image::advisor_1.png[]
+
+
+"Recommendations, systems and topics". The first one tells us what Insights has identified are relevant issues. Here, in the same way as we did in the previous sections, we just need to select the issues we want to address and create the playbooks. Not all the issues identied by Insights are going to have Playbooks recommended. In case we don't have a Playbook, Insights always will propose a manual remediation. So we need to adapt ourselves to this behavoir, in order to choose the better way to implement the fixes that the tool propose proactively.
+
+
+image::advisor_2.png[]
+
+
+The "Systems" menu item is intended to show all the servers so you can choose one of them for reviewing all the recommendations and took decisions for remediations.
+
+The "Topics" menu item will show you a list of all applications that have rules in the Insights tool.
+
+
+image::advisor_3.png[]
 
 
