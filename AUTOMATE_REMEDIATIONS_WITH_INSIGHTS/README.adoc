@@ -810,9 +810,40 @@ image::advisor_2.png[]
 
 The "Systems" menu item is intended to show all the servers so you can choose one of them for reviewing all the recommendations and took decisions for remediations.
 
+image::advisor_3.png[]
+
+
 The "Topics" menu item will show you a list of all applications that have rules in the Insights tool.
 
 
-image::advisor_3.png[]
+image::advisor_4.png[]
+
+
+As you can see, we can even automate the remediation to recommendations related to best practices at the operating system level and at the application layer.
+
+
+== Conslusions
+
+Insights is an tool that can be integrated with Ansible Engine or Ansible Tower for automaing remediations. We can use it in our everyday management job with thhe benefits it implies.
+
+Automating remediations can leverage other areas of reseach and improvement because the time we spend documenting, planning, and executing remediations ussualy takes so long that our job in things that matters is diminished.
+
+If we also integrate Insights with Satellite and Ansible Tower, we can have the holy trinity of the Red Hat management, in which we can handle a big quantity of servers with the ultimate goal of having our services up&running and in compliance with all the security policies that our companies need to implement.
+
+== Other Show & Tell sessions that you could access
+
+
+- https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/INSIGHTS[INSIGHTS]
+- https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/VDO[VDO]
+- https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/CONTAINERS[CONTAINERS]
+- https://github.com/ltoRhelDemos/Show-and-Tell/blob/master/openSCAP/README.adoc[Open SCAP]
+- https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/WEBCONSOLE[WEBCONSOLE]
+
+== Information about this Show&TELL
+
+The RHEL Show & Tell series is part of the Tech Talks initiative from The Red Hat LATAM office of Technology
+
+
+
 
 
