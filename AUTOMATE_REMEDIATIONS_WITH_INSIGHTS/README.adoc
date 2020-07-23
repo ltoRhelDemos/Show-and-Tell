@@ -380,45 +380,246 @@ After the execution we see there is no need to human intervention for executing 
 
 == Compliance
 
-Another new aspect of Insights is the possibility of integrating it with openSCAP. This integration is very straightforward and can be used for creating or modifying Security Guides which are applicable with openSCAP, but using Insights as intermediary for executing the scanning and maintaining the compliance reports accessible from the portal. How nice is it?.
+Another cool aspect of Insights is the possibility of integrating it with openSCAP. This integration is very straightforward and can be used for creating or modifying Security Guides which are applicable with openSCAP, but using Insights as intermediary for executing the scanning and maintaining the compliance reports accessible from the portal. How nice is it?.
 
-Let's first install openSCAP scanner on the turing server.
+Let's first install openSCAP scanner on the turing server. The scanner must be installed in each server that will be subject of a security guide.
 
 [source,bash]
 -------------------------------
-Install the scanner
+yum install -y openscap-scanner
+
+=================================================================================================================
+ Package                      Arch               Version                    Repository                      Size
+=================================================================================================================
+Updating:
+ openscap-scanner             x86_64             1.2.17-9.el7               rhel-7-server-rpms              62 k
+Updating for dependencies:
+ openscap                     x86_64             1.2.17-9.el7               rhel-7-server-rpms             3.8 M
+
+Transaction Summary
+=================================================================================================================
+Upgrade  1 Package (+1 Dependent package)
+
+Total download size: 3.9 M
+
 -------------------------------
 
 Now we are able to integrate Insights with openSCAP in to ways. We can upload the result of the SCAP scanning or we can use a very nice option from the command line.
+
+But first, we need to create a security policy for this server from the Insights Portal. Select the compliance in the left menu, then click on SCAP Policy. If we don't have policies created the following screen might be shown.
+
+Create a new policy by clicking "Create new policy".
+
+image::scapPolicy_1.png[]
+
+Select in which RHEL version you will create the policy. This is needed because depending on the version some policies applies and some not.
+
+For example. Selecting RHEL 8 we can select from several predefined policies:
+
+- Protection Profile for General Purpose Operating Systems
+- PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8
+- Australian Cyber Security Centre (ACSC) Essential Eight
+- Standard System Security Profile for Red Hat Enterprise Linux 8
+- Criminal Justice Information Services (CJIS) Security Policy
+- Unclassified Information in Non-federal Information Systems and Organizations (NIST 800-171)
+- Health Insurance Portability and Accountability Act (HIPAA)
+- Red Hat Corporate Profile for Certified Cloud Providers (RH CCP)
+- [DRAFT] DISA STIG for Red Hat Enterprise Linux 8
+- [DRAFT] DISA STIG for Red Hat Enterprise Linux Virtualization Host (RHELH)
+- VPP - Protection Profile for Virtualization v. 1.0 for Red Hat Enterprise Linux Hypervisor (RHELH)
+- xccdf_org.ssgproject.content_profile_ospp_customized
+
+In our example we are going to select the "Protection profile for General Purpose Operating Systems".
+
+image::scapPolicy_2.png[]
+
+Then we can describe in detail the policy we have chosen. In this we can define a compliance threshold that is intended to define a percentage from 0% to 100%. 
+
+image::scapPolicy_3.png[]
+
+The next screen will list all the rules that are included in the policy. We can de-select all the rules that we could consider are no applicable to our server or project, in a more general sense.
+
+image::scapPolicy_4.png[]
+
+If we have several servers in which these policy will be enforced, the next screen give us the opportunity to select these servers. In our case we will be choosing the turing server.
+
+image::scapPolicy_5.png[]
+
+Review and click on the finish button.
+
+image::scapPolicy_6.png[]
+
+image::scapPolicy_7.png[]
+
+Now we are ready to trigger the scanning on the server. For this we can login to the server and execute the following command.
 
 [source,bash]
 -------------------------------
 insights-client --compliance
 
-output
+Running scan for xccdf_org.ssgproject.content_profile_ospp... this may take a while
+Uploading Insights data.
+Successfully uploaded report for turing.
+
 -------------------------------
 
 This command could be executed recurrently adding a crontab entry for executing the scanning every day, every week or every month.
 
 After the scanning is done and the data is sent to Insights service, the report will be available for being accessed from the portal, as shown in the next picture.
 
-image::complianceReport_1.png
+image::scapPolicy_8.png[]
 
-As we can see, there is a list of the rules that was passed and the rules that was not passed. We que sort the list to see all the rules that the server was not in compliance. In this way we can start to plan how to remediate this. 
+As we can see, there is a list of rules that passed and others that not. We can sort the list to see all the rules that need attention. In this way we can start to plan how to remediate them. 
+
+image::scapPolicy_9.png[]
+
+image::scapPolicy_10.png[]
 
 For each rule we can generate a playbook, which is the prefered procedure in this exercise. We can choose to generate a playbook to remediate all the non compliance rules for each of the servers. For this exercise, we will choose a non compliance rule and create de playbook, then, download it for executing it from our Ansible control node, in a similar way of what we did in the previous section.
 
-Description of the rule
+image::scapPolicy_11.png[]
+
+As we did in the previos section, we select the rule, i.e. "Disable SSH Access via Empty Passwords", then click on the "Remediate" button. After the playbook creation, download it.
+
+image::scapPolicy_12.png[]
+
+The Playbook might looks like this. create a file in the "remediations" directory created before named *"disableSSHAccessViaEmptyPasswords.yml"*
 
 [source,bash]
 -------------------------------
-playbook
+# Disable SSH Access via Empty Passwords
+# Identifier: (ssg:rhel7|content_profile_ospp|xccdf_org.ssgproject.content_rule_sshd_disable_empty_passwords,fix)
+# Version: 48db51056597f5613713a8068ac1b4e9bee869d8
+- name: Disable SSH Access via Empty Passwords
+  hosts: 'turing'
+  become: true
+  tags:
+    - CCE-27471-2
+    - CJIS-5.5.6
+    - DISA-STIG-RHEL-07-010300
+    - NIST-800-171-3.1.1
+    - NIST-800-171-3.1.5
+    - NIST-800-53-AC-17(a)
+    - NIST-800-53-AC-17(b)
+    - NIST-800-53-AC-3
+    - NIST-800-53-AC-6
+    - NIST-800-53-CM-6(b)
+    - high_severity
+    - low_complexity
+    - low_disruption
+    - no_reboot_needed
+    - restrict_strategy
+    - sshd_disable_empty_passwords
+  tasks:
+    - name: Disable SSH Access via Empty Passwords
+      block:
+        - name: Deduplicate values from /etc/ssh/sshd_config
+          lineinfile:
+            path: /etc/ssh/sshd_config
+            create: false
+            regexp: (?i)^\s*PermitEmptyPasswords\s+
+            state: absent
+          notify: insights_reboot_handler
+        - name: Insert correct line to /etc/ssh/sshd_config
+          lineinfile:
+            path: /etc/ssh/sshd_config
+            create: true
+            line: PermitEmptyPasswords no
+            state: present
+            insertbefore: '^[#\s]*Match'
+            validate: /usr/sbin/sshd -t -f %s
+          notify: insights_reboot_handler
+      when: >-
+        ansible_virtualization_role != "guest" or ansible_virtualization_type !=
+        "docker"
+  handlers:
+    - name: insights_reboot_handler
+      set_fact:
+        insights_needs_reboot: true
+
+
+# Reboots a system if any of the preceeding plays sets the 'insights_needs_reboot' variable to true.
+# The variable can be overridden to suppress this behavior.
+- name: Reboot system (if applicable)
+  hosts: "turing"
+  become: True
+  gather_facts: False
+  tasks:
+    - when:
+        - insights_needs_reboot is defined
+        - insights_needs_reboot
+      block:
+        - name: Reboot system
+          shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+          async: 1
+          poll: 0
+          ignore_errors: true
+
+        - name: Wait for system to boot up
+          local_action:
+            module: wait_for
+            host: "{{ hostvars[inventory_hostname]['ansible_host'] | default(hostvars[inventory_hostname]['ansible_ssh_host'], true) | default(inventory_hostname, true) }}"
+            port: "{{ hostvars[inventory_hostname]['ansible_port'] | default(hostvars[inventory_hostname]['ansible_ssh_port'], true) | default('22', true) }}"
+            delay: 15
+            search_regex: OpenSSH
+            timeout: 300
+          become: false
+
+- name: run insights
+  hosts: "turing"
+  become: True
+  gather_facts: False
+  tasks:
+    - name: run insights
+      command: insights-client
+      changed_when: false
 ------------------------------- 
 
+The playbook execute 3 activities.
+
+- Change the configuration
+- Reboot the system and waits for it to returning back
+- Execute Insights again
+
+Let's execute the playbbok to make this server in compliance with the rule.
+
 [source,bash]
--------------------------------
-Execution
-------------------------------- 
+------------------------------------
+ansible-playbook -i hosts disableSSHAccessViaEmptyPasswords.yml
+
+PLAY [Disable SSH Access via Empty Passwords] *******************************************************************
+
+TASK [Gathering Facts] ******************************************************************************************
+ok: [192.168.56.113]
+
+TASK [Deduplicate values from /etc/ssh/sshd_config] *************************************************************
+ok: [192.168.56.113]
+
+TASK [Insert correct line to /etc/ssh/sshd_config] **************************************************************
+changed: [192.168.56.113]
+
+RUNNING HANDLER [insights_reboot_handler] ***********************************************************************
+ok: [192.168.56.113]
+
+PLAY [Reboot system (if applicable)] ****************************************************************************
+
+TASK [Reboot system] ********************************************************************************************
+changed: [192.168.56.113]
+
+TASK [Wait for system to boot up] *******************************************************************************
+ok: [192.168.56.113 -> localhost]
+
+PLAY [run insights] *********************************************************************************************
+
+TASK [run insights] *********************************************************************************************
+ok: [192.168.56.113]
+
+PLAY RECAP ******************************************************************************************************
+192.168.56.113             : ok=7    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+------------------------------------
+
+The sever is now in compliance with the rule we selected. 
 
 == Automating the patching process
 
