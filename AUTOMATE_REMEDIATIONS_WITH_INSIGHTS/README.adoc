@@ -21,15 +21,15 @@ Delivered as a Software-as-a-Service (SaaS) offering, Red Hat Insights takes adv
 
 Red Hat Insights uses intelligent data to pinpoint technical risks and help IT resolve problems before business is affected. This modern, integrated platform supports operational analytics and automated resolution across physical, virtual, container, and private and public cloud environments.
 
-In the management equation not only exists the identification phase, but the remediation of the identified issues. Insights is intellegint enough to propose manual remediations, including step-by-step cookbooks to revolve a state that is not convenient for our platform. Nevertheless, in what Insights excels is how this tool propose those remediations in the automation realm. 
+In the management equation not only exists the identification phase, but the remediation of the identified issues. Insights is intelligent enough to propose manual remediations, including step-by-step cookbooks to revolve a state that is not convenient for our platform. Nevertheless, what Insights excels is how this tool proposes those remediations in the automation realm. 
 
-Insights is capable to propose playbooks for each remediation and fix proposed, that can be gathered and composed into more complex and rich playbooks to address several issues and servers at the same time, gaining more control over what needs to be acomplished to bring the platform from a current state to a needed one, without the intervention of the command line, which is prone to errors that in consequence raise the risks.
+Insights is capable to propose playbooks for each remediation and fix proposed, that can be gathered and composed into more complex and rich playbooks to address several issues and servers at the same time, gaining more control over what needs to be accomplished to bring the platform from a current state to a needed one, without the intervention of the command line, which is prone to errors that in consequence raise the risks.
 
-This Show & Tell is aimed to show you how we can, with the help of Insights and Ansible, remediate issues or fix states using the proposed playbooks by Insights. We will be visiting some procedures for addressing recommendations, vulnerabilities and compliance, so we can have the peace of mind that our platform is treated with proved automated procedures.
+This Show & Tell is aimed to show you how we can, with the help of Insights and Ansible, remediate issues or fix states using the proposed playbooks by Insights. We will be visiting some procedures for addressing recommendations, vulnerabilities and compliance, so we can have the peace of mind that our platform is treated with proven automated procedures.
 
 == How to install the client
 
-The client for RHEL 8 is installed by default. In case other version (version>=6.4) the installation is pretty straightforward.
+The client for RHEL 8 is installed by default. In case other versions (version>=6.4) the installation is pretty straightforward.
 
 Before any installation you need to register the server with the appropriate subscription, which has to be active.
 
@@ -46,6 +46,7 @@ The installation of the client is as follows . Remember to register the server t
 ---------------------
 [root@server ~]# yum install redhat-access-insights
 [root@server ~]#  redhat-access-insights --register
+
 Automatic scheduling for Insights has been enabled.
 Starting to collect Insights data for archimedes
 Uploading Insights data.
@@ -58,6 +59,7 @@ Successfully uploaded report from archimedes to account xxxxxxxx.
 ---------------------
 [root@server ~]# yum install insights-client
 [root@server ~]#  insights-clients --register
+
 Automatic scheduling for Insights has been enabled.
 Starting to collect Insights data for archimedes
 Uploading Insights data.
@@ -66,15 +68,15 @@ Successfully uploaded report from archimedes to account xxxxxxxx.
 
 The automated versions can be located at ansible or puppet links.
 
-Is good practice to configure the servers you want to subscribe to insights through a https://access.redhat.com/solutions/1606693[proxy], so the server aren't exposed directly to a public connection. 
+Is good practice to configure the servers you want to subscribe to insights through a https://access.redhat.com/solutions/1606693[proxy], so the servers aren't exposed directly to a public connection. 
 
 == Automating the Insights Installation
 
-One of the very first thinks an administrator can automate with Insights is the installation and registration itself. As we saw in the previous section, we need to install the insights-client packacge and then register the server to the service. This procedure although ease means you hav to do the same towo actions on all the servers needed to be in the insights realm.
+One of the very first thinks an administrator can automate with Insights is the installation and registration itself. As we saw in the previous section, we need to install the insights-client package and then register the server to the service. This procedure, although ease, means you have to do the same two actions on all the servers needed to be in the insights realm.
 
-In this case, it is ease to automate the installation and registration of the service on any number of RHEL instances, and in this way we can also hide the differences of this procedure depending on the RHEL version we are dealing with.
+In this case, it is easy to automate the installation and registration of the service on any number of RHEL instances, and in this way we can also hide the differences of this procedure depending on the RHEL version we are dealing with.
 
-What we need to have, and this is going to be a common requirement for all this Show & Tell, a RHEl server, which ideally can be RHEL 8 with Ansible engine installed. See the procedure in workshop called https://github.com/ltoRhelDemos/Workshops/tree/master/RHEL%20Automation%20with%20Ansible[Automating RHEL management with Ansible].
+What we need to have, and this is going to be a common requirement for all this Show & Tell, is a RHEL server, which ideally can be RHEL 8 with Ansible engine installed. See the procedure in the workshop called https://github.com/ltoRhelDemos/Workshops/tree/master/RHEL%20Automation%20with%20Ansible[Automating RHEL management with Ansible].
 
 Having the ansible server as a control host it is time to install the RedHatInsights.insights-client role. 
 
@@ -99,7 +101,7 @@ The playbook that follows could be named *install_insights.yml*
     when: ansible_os_family == 'RedHat'
 -----------------
 
-Let's create am inventory file called *hosts* which is going to following content. In our example we will install and register Insights in ONE server. The idea to use an Ansible role is automate this procedures on several or hundreds of servers at the same time.
+Let's create an inventory file called *hosts* which is going to follow the content. In our example we will install and register Insights in ONE server. The idea to use an Ansible role is to automate these procedures on several or hundreds of servers at the same time.
 
 [source,bash]
 ------------------------
@@ -146,23 +148,23 @@ PLAY RECAP *********************************************************************
 
 This is all we need to do for installing and registering Insights in a bunch of servers. It is very simple right?. 
 
-As we are going to see, the remediation and fixes that Insights recommends are going to be easy too!... and that's the idea, having a tool that smash our issues in a way that the human intervention is minimal.
+As we are going to see, the remediation and fixes that Insights recommends are going to be easy too!... and that's the idea, having a tool that smashes our issues in a way that the human intervention is minimal.
 
 == Checking for Vulnerabilities
 
-Insighs has a very useful functionality that takes care of the vulnerabilities found on servers registered to the server. In fact, this functionality itself is a tool that can be used to evaluate vulnerabilities, define statuses on those, create reports for reviewing threads and of course, having playbooks for automating the remediations.
+Insights has a very useful functionality that takes care of the vulnerabilities found on servers registered to the server. In fact, this functionality itself is a tool that can be used to evaluate vulnerabilities, define statuses on those, create reports for reviewing threads and of course, having playbooks for automating the remediations.
 
 And this is going to be our goal in this section. How to obtain the playbooks related to vulnerabilities and how to use them to remediate using Ansible our platform.
 
 When we access the left panel of Insights, we surely can see an entry named Vulnerabilities. If we click on that item we should view a list of all vulnerabilities found in our registered platform. 
 
-Every vulnerability is listed along with the published day, the impact, the CVSS score, the systems affected by the vulnerability, and also two additional columns that can be modified by us when necesary. IN this case we talk about a column named *Business Risk* and a column named *Status*.
+Every vulnerability is listed along with the published day, the impact, the CVSS score, the systems affected by the vulnerability, and also two additional columns that can be modified by us when necessary. IN this case we talk about a column named *Business Risk* and a column named *Status*.
 
 image::vulnerabilities_1.png[]
 
-These 2 columns are customizable. The "Business Risk" able us to define and describe the risk to the business if the issue (vulnerability) manifests itself in our server. This is a cool feature because we can determine and describe to others why the vulnerability needs to be address and remediated in terms of the risk to our business and services.
+These 2 columns are customizable. The "Business Risk" allows us to define and describe the risk to the business if the issue (vulnerability) manifests itself in our server. This is a cool feature because we can determine and describe to others why the vulnerability needs to be addressed and remediated in terms of the risk to our business and services.
 
-The columns Status complement the previous column because after describe the risks asociated with the vulnerability is good to document in which state is the review of the issue itself. We can choose among some options:
+The columns Status complement the previous column because after describing the risks associated with the vulnerability, it is good to document in which state is the review of the issue itself. We can choose among some options:
 
 [source,bash]
 ------------------------
@@ -175,26 +177,27 @@ No Action - Risk accepted
 Resolved via Mitigation
 ------------------------
 
-Using some of the listed options we can document the vulnerability in a complete way, so we can create reports that later can be reviewed for prioritizing and elevating for remediation approval in a change commitee.
+Using some of the listed options we can document the vulnerability in a complete way, so we can create reports that later can be reviewed for prioritizing and elevating for remediation approval in a change committee.
 
-Also, we can download an https://www.dropbox.com/s/80pwwdop54hqie8/Vulnerability-Executive-Report--14-Jul-2020-20_52_12-UTC.pdf?dl=0[executive report] that can be used for determining the level of risk at which our pltaform is exposed.
+Also, we can download an https://www.dropbox.com/s/80pwwdop54hqie8/Vulnerability-Executive-Report--14-Jul-2020-20_52_12-UTC.pdf?dl=0[executive report] that can be used for determining the level of risk at which our platform is exposed.
 
-OK, now we need to aim to what matters in terms of automation. We have several ways to generate the playbooks that can help us to remediate the vulnerabilities.
+OK, now we need to aim at what matters in terms of automation. We have several ways to generate the playbooks that can help us to remediate the vulnerabilities.
 
-- In the CVEs tab, on the Vulnerabilities item, we can select any vulnerability that we need to address to remediate using ansible. After selecting the individual vulnerabilities we travel to the CVE's details where the systems affected will be listed. If we choose one are more systems the "Remediation Buttom" will be enabled so we can generate the playbook.
+- In the CVEs tab, on the Vulnerabilities item, we can select any vulnerability that we need to address to remediate using ansible. After selecting the individual vulnerabilities we travel to the CVE's details where the systems affected will be listed. If we choose one are more systems the "Remediation” button will be enabled so we can generate the playbook.
+
 
 image::vulnerabilities_2.png[]
 
 
-We also can go to the systems tab and select the server we want to inspect, then check the vulnerabilities we wnat to address. In this case, the Remediation button will be enabled.
-
+We also can go to the systems tab and select the server we want to inspect, then check the vulnerabilities we want to address. In this case, the Remediation button will be enabled.
 
 For generating the playbook, click on the "Remediation Button". 
+
 
 image::vulnerabilities_3.png[]
 
 
-We can select to create a new playbook or choose from already created one. In our case we will be creating a new one named "CVE".
+We can select to create a new playbook or choose from an already created one. In our case we will be creating a new one named "CVE".
 
 
 image::Remediation_Screen_1.png[]
@@ -218,19 +221,19 @@ Going to the "Remediation" item at the left menu, we can see the recently create
 image::Remediation_Screen_4.png[]
 
 
-At this stage we can see the details and download the playbook clicking the "Downlod" button. The file downloaded will me in the YAML format.
+At this stage we can see the details and download the playbook clicking the "Download" button. The file downloaded will me in the YAML format.
 
 
 image::Remediation_Screen_5.png[]
 
 
-Also, if we have installed the cloud connector for Satellite, we can eexecute the remediation directly from Satellite or from the portal.
+Also, if we have installed the cloud connector for Satellite, we can execute the remediation directly from Satellite or from the portal.
 
 
 image::Remediation_Screen_6.png[]
 
 
-=== En example of Remediation 
+=== An example of Remediation 
 
 
 Just for showing you how simple is to remediate a vulnerability with an Ansible Playbook, we are going to choose a critical *CVE-2018-3169*. 
@@ -239,9 +242,9 @@ Just for showing you how simple is to remediate a vulnerability with an Ansible 
 image::cve.png[]
 
 
-Let's check the system affected, which in our case is turing. Then create the playbook using the "Remediate" button. After creation, select it from the notification window and downloaded it.
+Let's check the system affected, which in our case is turing. Then create the playbook using the "Remediate" button. After creation, select it from the notification window and download it.
 
-After Download the playbook, let's take a look on the yaml...
+After downloading the playbook, let's take a look at the yaml...
 
 [source,bash]
 -------------------------------
@@ -376,13 +379,13 @@ PLAY RECAP *********************************************************************
 
 -------------------------------
 
-After the execution we see there is no need to human intervention for executing remediations in one or more servers.
+After the execution we see there is no need for human intervention for executing remediations in one or more servers.
 
 == Compliance
 
 Another cool aspect of Insights is the possibility of integrating it with openSCAP. This integration is very straightforward and can be used for creating or modifying Security Guides which are applicable with openSCAP, but using Insights as intermediary for executing the scanning and maintaining the compliance reports accessible from the portal. How nice is it?.
 
-Let's first install openSCAP scanner on the turing server. The scanner must be installed in each server that will be subject of a security guide.
+Let's first install openSCAP scanner on the turing server. The scanner must be installed in each server that will be subject to a security guide.
 
 [source,bash]
 -------------------------------
@@ -404,7 +407,7 @@ Total download size: 3.9 M
 
 -------------------------------
 
-Now we are able to integrate Insights with openSCAP in to ways. We can upload the result of the SCAP scanning or we can use a very nice option from the command line.
+Now we are able to integrate Insights with openSCAP in two ways. We can upload the result of the SCAP scanning or we can use a very nice option from the command line.
 
 But first, we need to create a security policy for this server from the Insights Portal. Select the compliance in the left menu, then click on SCAP Policy. If we don't have policies created the following screen might be shown.
 
@@ -412,9 +415,9 @@ Create a new policy by clicking "Create new policy".
 
 image::scapPolicy_1.png[]
 
-Select in which RHEL version you will create the policy. This is needed because depending on the version some policies applies and some not.
+Select in which RHEL version you will create the policy. This is needed because depending on the version some policies apply and some not.
 
-For example. Selecting RHEL 8 we can select from several predefined policies:
+For example, selecting RHEL 8 we can select from several predefined policies:
 
 - Protection Profile for General Purpose Operating Systems
 - PCI-DSS v3.2.1 Control Baseline for Red Hat Enterprise Linux 8
@@ -425,8 +428,8 @@ For example. Selecting RHEL 8 we can select from several predefined policies:
 - Health Insurance Portability and Accountability Act (HIPAA)
 - Red Hat Corporate Profile for Certified Cloud Providers (RH CCP)
 - [DRAFT] DISA STIG for Red Hat Enterprise Linux 8
-- [DRAFT] DISA STIG for Red Hat Enterprise Linux Virtualization Host (RHELH)
-- VPP - Protection Profile for Virtualization v. 1.0 for Red Hat Enterprise Linux Hypervisor (RHELH)
+- [DRAFT] DISA STIG for Red Hat Enterprise Linux Virtualization Host (RHEL)
+- VPP - Protection Profile for Virtualization v. 1.0 for Red Hat Enterprise Linux Hypervisor (RHEL)
 - xccdf_org.ssgproject.content_profile_ospp_customized
 
 In our example we are going to select the "Protection profile for General Purpose Operating Systems".
@@ -437,11 +440,11 @@ Then we can describe in detail the policy we have chosen. In this we can define 
 
 image::scapPolicy_3.png[]
 
-The next screen will list all the rules that are included in the policy. We can de-select all the rules that we could consider are no applicable to our server or project, in a more general sense.
+The next screen will list all the rules that are included in the policy. We can deselect all the rules that we could consider are not applicable to our server or project, in a more general sense.
 
 image::scapPolicy_4.png[]
 
-If we have several servers in which these policy will be enforced, the next screen give us the opportunity to select these servers. In our case we will be choosing the turing server.
+If we have several servers in which these policy will be enforced, the next screen gives us the opportunity to select these servers. In our case we will be choosing the turing server.
 
 image::scapPolicy_5.png[]
 
@@ -471,19 +474,25 @@ image::scapPolicy_8.png[]
 
 As we can see, there is a list of rules that passed and others that not. We can sort the list to see all the rules that need attention. In this way we can start to plan how to remediate them. 
 
+
 image::scapPolicy_9.png[]
 
 image::scapPolicy_10.png[]
 
-For each rule we can generate a playbook, which is the prefered procedure in this exercise. We can choose to generate a playbook to remediate all the non compliance rules for each of the servers. For this exercise, we will choose a non compliance rule and create de playbook, then, download it for executing it from our Ansible control node, in a similar way of what we did in the previous section.
+
+For each rule we can generate a playbook, which is the prefered procedure in this exercise. We can choose to generate a playbook to remediate all the non compliance rules for each of the servers. For this exercise, we will choose a non compliance rule and create a playbook, then download it for executing it from our Ansible control node, in a similar way to what we did in the previous section.
+
 
 image::scapPolicy_11.png[]
 
-As we did in the previos section, we select the rule, i.e. "Disable SSH Access via Empty Passwords", then click on the "Remediate" button. After the playbook creation, download it.
+
+As we did in the previous section, we select the rule, i.e. "Disable SSH Access via Empty Passwords", then click on the "Remediate" button. After the playbook creation, download it.
+
 
 image::scapPolicy_12.png[]
 
-The Playbook might looks like this. create a file in the "remediations" directory created before named *"disableSSHAccessViaEmptyPasswords.yml"*
+
+The Playbook might look like this. create a file in the "remediations" directory created before named *"disableSSHAccessViaEmptyPasswords.yml"*
 
 [source,bash]
 -------------------------------
@@ -575,13 +584,13 @@ The Playbook might looks like this. create a file in the "remediations" director
       changed_when: false
 ------------------------------- 
 
-The playbook execute 3 activities.
+The playbook executes 3 activities.
 
 - Change the configuration
 - Reboot the system and waits for it to returning back
 - Execute Insights again
 
-Let's execute the playbbok to make this server in compliance with the rule.
+Let's execute the playbook to make this server in compliance with the rule.
 
 [source,bash]
 ------------------------------------
@@ -619,29 +628,35 @@ PLAY RECAP *********************************************************************
 
 ------------------------------------
 
-The sever is now in compliance with the rule we selected. 
+The server is now in compliance with the rule we selected. 
 
 == Automating the patching process
 
-Insights now give us the opportunity to review what patches needs to be applied to a server. What is interesting of looking at this from insights is that we can sort, review, plan and automate the patching process using Ansible.
+Insights now give us the opportunity to review what patches need to be applied to a server. What is interesting about looking at this from insights is that we can sort, review, plan and automate the patching process using Ansible.
 
-In the following exercise we will show you how to navigate in the Patch section and how to select patches to generate a playbook for actually patch the server, which in this case is turing.
+In the following exercise we will show you how to navigate in the Patch section and how to select patches to generate a playbook for actually patching the server, which in this case is turing.
 
-Go to Patch menu item in the left of the screen, as depicted in the next picture.
+Go to the Patch menu item in the left of the screen, as depicted in the next picture.
+
 
 image::patch_1.png[]
 
-As you can see, there will be a list of all the advisories applicable to all systems. We can review the list, sort by type and determine wich plan to follow.
+
+As you can see, there will be a list of all the advisories applicable to all systems. We can review the list, sort by type and determine which plan to follow.
 
 We can go to the "Systems" tab. In this view is shown the list of systems. If we need to heal turing, applying the advisories, select it from the list.
 
-In the following list you'll see for turing 29 bugs, 395 enhancements and 129 security advisories that need to be applied to this server.
+In the following list you'll see for the turing server there are 29 bugs, 395 enhancements and 129 security advisories identified that need to be applied to this server.
+
 
 image::patch_2.png[]
 
-Selecting turing server the list will be associated to the advisories that are relevant for this system.
+
+Selecting the turing server the list will be associated with the advisories that are relevant for this system.
+
 
 image::patch_3.png[]
+
 
 We sorted the list, so all security advisories will appear first. 
 
@@ -650,11 +665,15 @@ Let´s patch two security issues.
 - sudo security update
 - systemd security update
   
+
 image::patch_4.png[]
 
-As we did earlier, we can click on the "Remediate" button, so we can generate the remediation playbbok. Download it for its execution.
+
+As we did earlier, we can click on the "Remediate" button, so we can generate the remediation playbook. Download it for its execution.
+
 
 image::patch_5.png[]
+
 
 Now, after download the playbook, let's create a file in the #remediations" directory "*named patchSecurityIssues.yml"*
 
@@ -770,5 +789,8 @@ PLAY RECAP *********************************************************************
 192.168.56.113             : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 ------------------------------------
+
+== Insights Recommendations
+
 
 
