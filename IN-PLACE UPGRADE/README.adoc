@@ -1,0 +1,17 @@
+:scrollbar:
+:data-uri:
+:toc2:
+:imagesdir: images
+
+= Securing Linux Servers and auditing security policies with OpenSCAP - LTO Show & Tell Series
+
+== Description
+This Show&Tell is aimed to share some of the most important concepts and features of OpenSCAP as a tool for auditing security policies.
+
+Audience: IT Managers, Architects, IT security specialists and technical staff who operates Linux
+
+:numbered:
+
+== Introduction
+
+This Show & Tell is intended to give to system administrators a brief introduction to openSCAP. We will describe the tools, how to install it on a Linux environment as RHEL, how to interact with the tool from scanning to remediation. Also we will discuss the integration with the RHEL predictive tool called Insights.
