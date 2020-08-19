@@ -3,10 +3,10 @@
 :toc2:
 :imagesdir: images
 
-= Securing Linux Servers and auditing security policies with OpenSCAP - LTO Show & Tell Series
+= Upgrading RHEL 7 to 8 with LEAPP and BOOM - LTO Show & Tell Series
 
 == Description
-This Show&Tell is aimed to share some of the most important concepts and features of OpenSCAP as a tool for auditing security policies.
+This Show&Tell is aimed to share some of the most important concepts and actions needed for upgrading a RHEL 7 to RHEL 8.
 
 Audience: IT Managers, Architects, IT security specialists and technical staff who operates Linux
 
@@ -14,4 +14,16 @@ Audience: IT Managers, Architects, IT security specialists and technical staff w
 
 == Introduction
 
-This Show & Tell is intended to give to system administrators a brief introduction to openSCAP. We will describe the tools, how to install it on a Linux environment as RHEL, how to interact with the tool from scanning to remediation. Also we will discuss the integration with the RHEL predictive tool called Insights.
+This Show & Tell is intended to give system administrators information about leapp as a tool for assiting in the upgrading fromn RHEL 7 to RHEL 8 instances, with the minimal effort but with maximum security and a very short downtime window.
+
+== Understand the environment and evaluate the pre-requisites.
+
+An in-place upgrade is a recommended and supported way for migrating your system to the next major version of RHEL. This applies to RHEL 6 to RHEL 7 or RHEL 7 to RHEL 8 instances.
+
+=== Applications
+
+We need to understand, at first, the environment in terms of the applications installed. This is a very important step, mainly because after the upgrading process some packages and libraries will be depracated or changed in versions. Applications need to be analyzed under the light of what thay use of the operating system to run properly. Leapp pre-upgrade report is a good source of this kind of information, allowing the possibility to match the running application requierements with the possible changes the OS will experiment. In case of changes impacting the application, we need to take actions on this, that could go from modifying the application to install a new version of it.
+
+=== Operating sysrtem and HW considerations.
+
+Take a look of the https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/upgrading_from_rhel_7_to_rhel_8/index#planning-an-upgrade_upgrading-from-rhel-7-to-rhel-8[requierements] 
