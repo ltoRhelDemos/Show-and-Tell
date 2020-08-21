@@ -26,4 +26,35 @@ We need to understand, at first, the environment in terms of the applications in
 
 === Operating sysrtem and HW considerations.
 
-Take a look of the https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/upgrading_from_rhel_7_to_rhel_8/index#planning-an-upgrade_upgrading-from-rhel-7-to-rhel-8[requierements] 
+Take a look of the https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/upgrading_from_rhel_7_to_rhel_8/index#planning-an-upgrade_upgrading-from-rhel-7-to-rhel-8[requierements] needed to be considered for prepare the environment for the upgrading.
+
+== Preparing a RHEL 7 system for the upgrade
+
+Ensure the system is registered, if not you can use subscription-manager to do so.
+
+[source,bash]
+-----------------------------------------
+subscription-manager register --auto-attach
+-----------------------------------------
+
+Chack the current version and release of the running instance.
+
+[source,bash]
+-----------------------------------------
+subscription-manager list installed
++-------------------------------------------+
+    Installed Product Status
++-------------------------------------------+
+Product Name:   Red Hat Enterprise Linux Server
+Product ID:     69
+Version:        7.6
+Arch:           x86_64
+Status:         Subscribed
+Status Details:
+Starts:         06/07/2020
+Ends:           06/07/2021
+-----------------------------------------
+
+Check the pre-requisites for upgrading accordinly to the last proposed minir version. In our case is 7.8
+
+
