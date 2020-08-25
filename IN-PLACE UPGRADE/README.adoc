@@ -203,14 +203,16 @@ There are a lot of inrmation in the report that we will be showing with webconso
 -----------------------------------------
 cat /var/log/leapp/leapp-report.txt
 
-...
+... output omited for space sake!
+
 Risk Factor: high (inhibitor)
 Title: Possible problems with remote login using root account
 Summary: OpenSSH configuration file does not explicitly state the option PermitRootLogin in sshd_config file, whi
 ch will default in RHEL8 to "prohibit-password".
 Remediation: [hint] If you depend on remote root logins using passwords, consider setting up a different user for
  remote administration or adding "PermitRootLogin yes" to sshd_config.
-...
+
+... output omited for space sake!
 -----------------------------------------
 
 As we can see, we need to explicitly permit root login on this instance. Doing it it is very straighforward.
@@ -229,3 +231,105 @@ The report can be accessed using a webconsole plugin called cockpit-leapp with c
 
 image::leapp_webconsole_report.png[]
 
+A color code and some values can give us enough information about leapp findings.
+
+*Risk factor*
+** High - very likely to result in a deteriorated system state
+** Medium - can impact both the system and applications
+** Low - should not impact the system but can have an impact on applications
+
+* Inhibitor - will inhibit (hard stop) the upgrade process, otherwise the system could become unbootable, inaccessible, or dysfunctional
+
+* Remediation - an actionable solution to a reported problem:
+** Remediation command - can be executed directly through the web console
+** Remediation hint - instructions on how to resolve the problem manually
+
+In this report, a remediation hint is proposed for the inhibitor rule, which is uncomment "PermitRootLogin yes", as described above.
+
+This report can be seen as a pre-flight check, where valuable information is listed for taken actions on applications tunning on the system.
+
+In this report, for example, we can see in the first two lines that some packages are not going to be installed on the upgraded instance.We can check which packages are not going to be installed just clicking on the links, as you can see in the next image.
+
+
+
+== Ready for Upgradino RHEL
+
+=== Phase 1
+
+After all pre-requisites are met and all remediation hints are applied, we are ready to execute leapp for upgrading the RHEL instance.
+
+
+[source,bash]
+-----------------------------------------
+leapp upgrade
+
+==> Processing phase `configuration_phase`
+====> * ipu_workflow_config
+        IPU workflow config actor
+==> Processing phase `FactsCollection`
+====> * scan_custom_repofile
+        Scan the custom /etc/leapp/files/leapp_upgrade_repositories.repo repo file.
+====> * network_manager_read_config
+        Provides data about NetworkManager configuration.
+====> * transaction_workarounds
+        Provides additional RPM transaction tasks based on bundled RPM packages.
+====> * tcp_wrappers_config_read
+        Parse tcp_wrappers configuration files /etc/hosts.{allow,deny}.
+====> * system_facts
+        Provides data about many facts from system.
+====> * rpm_scanner
+        Provides data about installed RPM Packages.
+
+... output omited for space sake!
+
+[SKIPPED] dbus-1.12.8-10.el8_2.x86_64.rpm: Already downloaded
+[SKIPPED] grub2-tools-minimal-2.02-87.el8_2.x86_64.rpm: Already downloaded
+[SKIPPED] grub2-tools-2.02-87.el8_2.x86_64.rpm: Already downloaded
+[SKIPPED] grub2-common-2.02-87.el8_2.noarch.rpm: Already downloaded
+[SKIPPED] ca-certificates-2020.2.41-80.0.el8_2.noarch.rpm: Already downloaded
+(193/843): perl-Time-HiRes-1.9758-1.el8.x86_64.  52 kB/s |  61 kB     00:01
+(194/843): udisks2-iscsi-2.8.3-2.el8.x86_64.rpm  32 kB/s |  46 kB     00:01
+(195/843): udisks2-lvm2-2.8.3-2.el8.x86_64.rpm   44 kB/s |  70 kB     00:01
+(196/843): libudisks2-2.8.3-2.el8.x86_64.rpm    104 kB/s | 140 kB     00:01
+(197/843): redhat-support-lib-python-0.11.2-1.e  83 kB/s | 229 kB     00:02
+(198/843): redhat-support-tool-0.11.2-2.el8.noa 120 kB/s | 236 kB     00:01
+
+... output omited for space sake!
+
+--------------------------------------------------------------------------------
+Total                                           409 kB/s | 555 MB     23:08
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1
+Complete!
+The downloaded packages were saved in cache until the next successful transaction.
+You can remove cached packages by executing 'dnf clean packages'.
+==> Processing phase `InterimPreparation`
+====> * initram_disk_generator
+        Creates the upgrade initram disk
+====> * add_upgrade_boot_entry
+        Add new boot entry for Leapp provided initramfs.
+====> * efi_interim_fix
+        Adjust EFI boot entry for first reboot
+A reboot is required to continue. Please reboot your system.
+
+
+Debug output written to /var/log/leapp/leapp-upgrade.log
+
+============================================================
+                           REPORT
+============================================================
+
+A report has been generated at /var/log/leapp/leapp-report.json
+A report has been generated at /var/log/leapp/leapp-report.txt
+
+============================================================
+                       END OF REPORT
+============================================================
+-----------------------------------------
+
+
+== Upgrading process
