@@ -347,3 +347,5 @@ In this phase, the system boots into a RHEL 8-based initial RAM disk image, init
 Alternatively, you can run the leapp upgrade command with the --reboot option and skip this manual step.
 
 image::leapp_phaseII-proceed1.png[]
+
+image::leapp_phaseII-proceed2.png[]
