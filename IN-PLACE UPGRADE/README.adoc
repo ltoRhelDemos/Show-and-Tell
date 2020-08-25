@@ -349,3 +349,46 @@ Alternatively, you can run the leapp upgrade command with the --reboot option an
 image::leapp_phaseII-proceed1.png[]
 
 image::leapp_phaseII-proceed2.png[]
+
+Several reboots are going to happen.
+
+image::leapp_phaseII-proceed2.png[]
+
+After upgrade and configure, a reboot is executed automatically at the end of the process. After this we need to check is everything is ok and the version of the atrget system is as expected.
+
+[source,bash]
+-----------------------------------------
+cat /etc/redhat-release
+Red Hat Enterprise Linux release 8.2 (Ootpa)
+-----------------------------------------
+
+[source,bash]
+-----------------------------------------
+uname -r
+4.18.0-193.el8.x86_64
+-----------------------------------------
+
+[source,bash]
+-----------------------------------------
+uname -r
+4.18.0-193.el8.x86_64
+-----------------------------------------
+
+[source,bash]
+-----------------------------------------
+# subscription-manager list --installed
++-----------------------------------------+
+    	  Installed Product Status
++-----------------------------------------+
+Product Name: Red Hat Enterprise Linux for x86_64
+Product ID:   479
+Version:      8.2
+Arch:         x86_64
+Status:       Subscribed
+-----------------------------------------
+
+[source,bash]
+-----------------------------------------
+subscription-manager release
+Release: 8.2
+-----------------------------------------
