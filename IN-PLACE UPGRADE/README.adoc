@@ -352,9 +352,13 @@ image::leapp_phaseII-proceed2.png[]
 
 Several reboots are going to happen.
 
-image::leapp_phaseII-proceed2.png[]
+image::leapp_phaseII-proceed4.png[]
 
 After upgrade and configure, a reboot is executed automatically at the end of the process. After this we need to check is everything is ok and the version of the atrget system is as expected.
+
+== Checking the upgraded instance
+
+=== Release installed
 
 [source,bash]
 -----------------------------------------
@@ -392,3 +396,44 @@ Status:       Subscribed
 subscription-manager release
 Release: 8.2
 -----------------------------------------
+
+Note that when the release version is set to 8.2, customer will be receiving yum updates only for this specific version of RHEL. If customer wants to unset the release version to be able to consume updates from the latest minor version of RHEL 8, use the following command:
+
+[source,bash]
+-----------------------------------------
+subscription-manager release --unset
+-----------------------------------------
+
+== Restore SELinx enforcing mode
+
+During the in-place upgrade process, certain security policies must remain disabled. Such is the case of SELinux which leapp changes the mode to permissive from the beginning of the process. We need to change it to enforce mode after the upgrading process.
+
+Ensure that there are no SELinux denials, for example, by using the ausearch utility:
+
+[source,bash]
+-----------------------------------------
+ausearch -m AVC,USER_AVC -ts boot
+
+<no matches>
+-----------------------------------------
+
+Now change the SELinux configuration editing /etc/selinux/config
+
+[source,bash]
+-----------------------------------------
+vim /etc/selinux/config
+
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#       enforcing - SELinux security policy is enforced.
+#       permissive - SELinux prints warnings instead of enforcing.
+#       disabled - No SELinux policy is loaded.
+SELINUX=enforcing
+# SELINUXTYPE= can take one of these two values:
+#       targeted - Targeted processes are protected,
+#       mls - Multi Level Security protection.
+SELINUXTYPE=targeted
+-----------------------------------------
+
+
+
