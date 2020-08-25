@@ -121,3 +121,80 @@ Ensure your system does not use more than one Network Interface Card (NIC) with 
 === Backup & Recovery Considerations
 
 Ensure you have a full system backup or a virtual machine snapshot. you can use the https://access.redhat.com/solutions/2115051[Relax-and-Recover (ReaR) utility]. Alternatively, you can use https://www.redhat.com/en/blog/upgrading-rhel-7-rhel-8-leapp-and-boom[LVM snapshots using Boom], or RAID splitting.
+
+== Pre-Upgrade reporting
+
+Customers always can execute a pre-upgrade procedure that will analyze the instance and will create a report that can be visualized on text format. Alternatively customers can install webconsole on the server and the plugin for leapp. This will allow the customer to see a color coded  and easier to read report. Also from Webconsole they can execute the remediations leapp can advice in the pre-upgrade analysis.
+
+[source,bash]
+-----------------------------------------
+yum install cockpit cockpit-leapp
+sysmtemctl enable --now cockpit.socket
+-----------------------------------------
+
+Then access the service using the server's ip and the port 9090 from any browser.
+
+=== Executing the pre-upgrade analysis
+
+After all components are installed and everything is configured correctly we are ready to generate the first report that exposes the analysis of leapp over the instance.
+
+[source,bash]
+-----------------------------------------
+leapp preupgrade --debug
+
+==> Processing phase `configuration_phase`
+====> * ipu_workflow_config
+        IPU workflow config actor
+==> Processing phase `FactsCollection`
+====> * scan_custom_repofile
+        Scan the custom /etc/leapp/files/leapp_upgrade_repositories.repo repo file.
+====> * network_manager_read_config
+        Provides data about NetworkManager configuration.
+====> * tcp_wrappers_config_read
+        Parse tcp_wrappers configuration files /etc/hosts.{allow,deny}.
+====> * system_facts
+        Provides data about many facts from system.
+
+...
+
+==> Processing phase `Reports`
+====> * verify_check_results
+        Check all dialogs and notify that user needs to make some choices.
+====> * verify_check_results
+        Check all generated results messages and notify user about them.
+
+============================================================
+                     UPGRADE INHIBITED
+============================================================
+
+Upgrade has been inhibited due to the following problems:
+    1. Inhibitor: Possible problems with remote login using root account
+Consult the pre-upgrade report for details and possible remediation.
+
+============================================================
+                     UPGRADE INHIBITED
+============================================================
+
+
+Debug output written to /var/log/leapp/leapp-preupgrade.log
+
+============================================================
+                           REPORT
+============================================================
+
+A report has been generated at /var/log/leapp/leapp-report.json
+A report has been generated at /var/log/leapp/leapp-report.txt
+
+============================================================
+                       END OF REPORT
+============================================================
+
+Answerfile has been generated at /var/log/leapp/answerfile
+
+
+
+-----------------------------------------
+
+
+
+
