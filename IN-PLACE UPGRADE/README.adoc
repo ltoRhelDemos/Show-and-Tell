@@ -404,7 +404,7 @@ Note that when the release version is set to 8.2, customer will be receiving yum
 subscription-manager release --unset
 -----------------------------------------
 
-== Restore SELinx enforcing mode
+== Restore SELinux enforcing mode
 
 During the in-place upgrade process, certain security policies must remain disabled. Such is the case of SELinux which leapp changes the mode to permissive from the beginning of the process. We need to change it to enforce mode after the upgrading process.
 
@@ -435,5 +435,111 @@ SELINUX=enforcing
 SELINUXTYPE=targeted
 -----------------------------------------
 
+Then 
 
+[source,bash]
+-----------------------------------------
+reboot
+-----------------------------------------
 
+After the rebooting process let´s check the result.
+
+[source,bash]
+-----------------------------------------
+getenforce
+  Enforcing
+-----------------------------------------
+
+At this point our server is up to date to the lates RHEL 8 minor version.
+
+== Snapshooting an instance to boot aternatively using boom
+
+One way to recover for a failed or not consistent upgrading process is creating a bootable snapshot with the last image just before starting the upgrading process.
+
+== Check logical volumes and disk groups
+
+[source,bash]
+-----------------------------------------
+ lvs
+  LV       VG   Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  root     rhel owi-aos--- <12.50g
+  swap     rhel -wi-ao----   1.50g
+
+vgs
+  VG   #PV #LV #SN Attr   VSize  VFree
+  rhel   2   3   1 wz--n- 28.99g <2.45g
+-----------------------------------------
+
+== Snapshot creation
+
+Create a snapshot called *rollback* with the following command.
+
+[source,bash]
+-----------------------------------------
+lvcreate -s -L 13G -n rollback rhel/root 
+
+ Reducing COW size 12.55 GiB down to maximum usable size <12.55 GiB.
+ Logical volume "rollback" created.
+-----------------------------------------
+
+Now check what we have done.
+
+[source,bash]
+-----------------------------------------
+lvs 
+  
+  LV       VG   Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  rollback rhel swi-a-s--- <12.55g      root   37.21
+  root     rhel owi-aos--- <12.50g
+  swap     rhel -wi-ao----   1.50g
+-----------------------------------------
+
+=== Creating the bootable rollback snapshot with boom
+
+[source,bash]
+-----------------------------------------
+boom create --title "RHEL7.8 Snapshot for rollback" --rootlv rhel/rollback
+
+WARNING - Boom configuration not found in grub.cfg
+WARNING - Run 'grub2-mkconfig > /boot/grub2/grub.cfg' to enable
+Created entry with boot_id 94bb475:
+ title RHEL7.8 Snapshot for rollback
+ machine-id aff60dca5fb14737858604118a273715
+ version 3.10.0-957.el7.x86_64
+ linux /vmlinuz-3.10.0-957.el7.x86_64
+ initrd /initramfs-3.10.0-957.el7.x86_64.img
+ options root=/dev/rhel/rollback ro rd.lvm.lv=rhel/rollback rhgb quiet
+-----------------------------------------
+
+We need to copy the configuration so the grub menu reflects this new entry.
+
+[source,bash]
+-----------------------------------------
+grub2-mkconfig > /boot/grub2/grub.cfg
+
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-3.10.0-957.el7.x86_64
+Found initrd image: /boot/initramfs-3.10.0-957.el7.x86_64.img
+Found linux image: /boot/vmlinuz-0-rescue-aff60dca5fb14737858604118a273715
+Found initrd image: /boot/initramfs-0-rescue-aff60dca5fb14737858604118a273715.img
+done
+-----------------------------------------
+
+Now we can check if we have a new image from booting of.
+
+[source,bash]
+-----------------------------------------
+boom list
+BootID  Version                 Name RootDevice
+cf9fd6d 3.10.0-957.el7.x86_64    Red Hat Enterprise Linux Server /dev/rhel/rollback
+-----------------------------------------
+
+After this simple prcedure we are ready to start the upgrading process as described in previous sections.
+
+Rebooting the system after the upgrading process the GRUB menu will look like the following.
+
+image::leapp_boom1.png[]
+
+We can choose from booting from the upgraded RHEL or from the snapshot taken just before the upgrading process.
+
+== How we can Upgrade from RHEL 6 to 7?
