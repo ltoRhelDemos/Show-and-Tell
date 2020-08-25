@@ -94,4 +94,30 @@ yum install leapp leapp-repository
 
 At this point we need to download additional required data files attached to the Knowledgebase https://access.redhat.com/articles/3664871[article] Data required by the Leapp utility for an in-place upgrade from RHEL 7 to RHEL 8 and place them in the /etc/leapp/files/ directory. This is necessary for a successful upgrade. Note that currently you need data files from the *leapp-data8.tar.gz* archive or later.
 
+*NOTE:* we need to download the file *leapp-data8.tar.gz* using a browser, then uncompress it on  /etc/leapp/files
 
+[source,bash]
+-----------------------------------------
+tar -xzf leapp-data8.tar.gz -C /etc/leapp/files && rm leapp-data8.tar.gz
+-----------------------------------------
+
+=== GRUB Considerations
+
+If GRUB is installed outside of the default location, which is /boot, export the respective environment variable as follows:
+
+[source,bash]
+-----------------------------------------
+export LEAPP_GRUB_DEVICE="/path_to_device"
+-----------------------------------------
+
+=== Automated tools considerations
+
+Ensure you have any configuration management (such as Salt, Chef, Puppet, Ansible) disabled or adequately reconfigured to not attempt to restore the original RHEL 7 system.
+
+=== Network Considerations
+
+Ensure your system does not use more than one Network Interface Card (NIC) with a name based on the prefix used by the kernel *(eth)*.
+
+=== Backup & Recovery Considerations
+
+Ensure you have a full system backup or a virtual machine snapshot. you can use the https://access.redhat.com/solutions/2115051[Relax-and-Recover (ReaR) utility]. Alternatively, you can use https://www.redhat.com/en/blog/upgrading-rhel-7-rhel-8-leapp-and-boom[LVM snapshots using Boom], or RAID splitting.
