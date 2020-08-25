@@ -24,11 +24,13 @@ An in-place upgrade is a recommended and supported way for migrating your system
 
 We need to understand, at first, the environment in terms of the applications installed. This is a very important step, mainly because after the upgrading process some packages and libraries will be depracated or changed in versions. Applications need to be analyzed under the light of what thay use of the operating system to run properly. Leapp pre-upgrade report is a good source of this kind of information, allowing the possibility to match the running application requierements with the possible changes the OS will experiment. In case of changes impacting the application, we need to take actions on this, that could go from modifying the application to install a new version of it.
 
-=== Operating sysrtem and HW considerations.
+=== Operating system and HW considerations.
 
 Take a look of the https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html-single/upgrading_from_rhel_7_to_rhel_8/index#planning-an-upgrade_upgrading-from-rhel-7-to-rhel-8[requierements] needed to be considered for prepare the environment for the upgrading.
 
 == Preparing a RHEL 7 system for the upgrade
+
+=== Check instance is subscribed
 
 Ensure the system is registered, if not you can use subscription-manager to do so.
 
@@ -37,24 +39,39 @@ Ensure the system is registered, if not you can use subscription-manager to do s
 subscription-manager register --auto-attach
 -----------------------------------------
 
-Chack the current version and release of the running instance.
+=== Check the current version and release of the running instance.
 
 [source,bash]
 -----------------------------------------
-subscription-manager list installed
+subscription-manager list --installed
 +-------------------------------------------+
     Installed Product Status
 +-------------------------------------------+
 Product Name:   Red Hat Enterprise Linux Server
 Product ID:     69
-Version:        7.6
+Version:        7.8
 Arch:           x86_64
-Status:         Subscribed
+Status:         Not Subscribed
 Status Details:
-Starts:         06/07/2020
-Ends:           06/07/2021
+Starts:
+Ends:
 -----------------------------------------
 
-Check the pre-requisites for upgrading accordinly to the last proposed minir version. In our case is 7.8
+In this example the version is 7.8 which is the last minor version of RHEL 7, at the moment this article was writen. In case we are not in the last minor version, we need to update the RHEL instance appropiately.
+
+In some cases customers lock the updates to a specific versions. In this case we need to instruct the Subscription Manager to consume the latest content.
+
+[source,bash]
+-----------------------------------------
+subscription-manager release --unset
+yum versionlock clear
+-----------------------------------------
+
+Then, run yum to update the instance to the lasted update.
+
+[source,bash]
+-----------------------------------------
+yum update
+-----------------------------------------
 
 
