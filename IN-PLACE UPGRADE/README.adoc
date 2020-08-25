@@ -233,7 +233,7 @@ image::leapp_webconsole_report.png[]
 
 A color code and some values can give us enough information about leapp findings.
 
-*Risk factor*
+* Risk factor
 ** High - very likely to result in a deteriorated system state
 ** Medium - can impact both the system and applications
 ** Low - should not impact the system but can have an impact on applications
