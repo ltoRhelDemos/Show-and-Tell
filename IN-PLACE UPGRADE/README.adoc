@@ -67,11 +67,31 @@ subscription-manager release --unset
 yum versionlock clear
 -----------------------------------------
 
-Then, run yum to update the instance to the lasted update.
+=== Add the proper repositories
+
+[source,bash]
+-----------------------------------------
+subscription-manager repos --enable rhel-7-server-rpms -enable rhel-7-server-extras-rpms
+-----------------------------------------
+
+=== Update the instance
+
+Run yum to update the instance to the lasted update.
 
 [source,bash]
 -----------------------------------------
 yum update
 -----------------------------------------
+
+=== Install LEAPP utility
+
+Leapp is an OS and application modernization framework. In this case leapp is used for upgrading the OS from RHEL 7 to RHEL 8.
+
+[source,bash]
+-----------------------------------------
+yum install leapp leapp-repository
+-----------------------------------------
+
+At this point we need to download additional required data files attached to the Knowledgebase https://access.redhat.com/articles/3664871[article] Data required by the Leapp utility for an in-place upgrade from RHEL 7 to RHEL 8 and place them in the /etc/leapp/files/ directory. This is necessary for a successful upgrade. Note that currently you need data files from the *leapp-data8.tar.gz* archive or later.
 
 
