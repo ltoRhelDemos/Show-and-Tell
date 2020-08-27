@@ -543,3 +543,8 @@ image::leapp_boom1.png[]
 We can choose from booting from the upgraded RHEL or from the snapshot taken just before the upgrading process.
 
 == How we can Upgrade from RHEL 6 to 7?
+
+Doing this upgrade on RHEL 6 have the same logic and steps but some commands are going to be different. 
+
+=== Prepare the system to be candidate to be upgraded.
+
