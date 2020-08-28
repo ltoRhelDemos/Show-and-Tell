@@ -687,5 +687,5 @@ Then reboot.
 
 === Upgrading to RHEL 8.2
 
-If we plan to upgrade to version 8 (which is the recommendation) it is needed to update to the last RHEL 7 minor version. In this case, the procedure described above just bring us to 7.6 version. We need to update to 7.8 version. From now on, we can do the upgrading process using the same procedure described in this document, used for upgrading from RHEL 7 to RHEL 8.
+If we plan to upgrade to version 8 (which is the recommendation) it is needed to update to the last RHEL 7 minor version. In this case, the procedure described above just bring us to 7.6 version. We need to update to 7.8 version. From now on, we can do the upgrading process using the same https://github.com/ltoRhelDemos/Show-and-Tell/blob/master/IN-PLACE%20UPGRADE/README.adoc#preparing-a-rhel-7-system-for-the-upgrade[procedure described in this document], used for upgrading from RHEL 7 to RHEL 8.
 
