@@ -80,7 +80,8 @@ Run yum to update the instance to the lasted update.
 
 [source,bash]
 -----------------------------------------
-yum update
+yum update -y
+reboot
 -----------------------------------------
 
 === Install LEAPP utility
@@ -129,7 +130,7 @@ Customers always can execute a pre-upgrade procedure that will analyze the insta
 [source,bash]
 -----------------------------------------
 yum install cockpit cockpit-leapp
-sysmtemctl enable --now cockpit.socket
+systemctl enable --now cockpit.socket
 -----------------------------------------
 
 Then access the service using the server's ip and the port 9090 from any browser.
@@ -547,4 +548,144 @@ We can choose from booting from the upgraded RHEL or from the snapshot taken jus
 Doing this upgrade on RHEL 6 have the same logic and steps but some commands are going to be different. 
 
 === Prepare the system to be candidate to be upgraded.
+
+In the same way we did on RHEL 7, we need to bring the instance to the latest minor version, which is 6.10.
+
+[source,bash]
+-----------------------------------------
+yum update -y 
+reboot
+-----------------------------------------
+
+=== Add the proper RHEL 6 repositories
+
+We need to add the repositories and install the software needed.
+
+[source,bash]
+-----------------------------------------
+subscription-manager repos --enable rhel-6-server-extras-rpms
+subscription-manager repos --enable rhel-6-server-optinal-rpms
+-----------------------------------------
+
+=== Installing the software for RHEL 6 upgrade
+
+[source,bash]
+-----------------------------------------
+yum -y install preupgrade-assistant preupgrade-assistant-ui preupgrade-assistant-el6toel7 redhat-upgrade-tool
+-----------------------------------------
+
+=== Assessment
+
+The upgrade tool can be used previous to the upgrade process itself. This could help the customer to understan a little bit better its environment and what things are going to change between versions. This could help to evaluate if the application that runs on the RHEL 6 instance can be moved to RHEL 7 without compromising its stability and quality of service.
+
+Also, in this assessment the customer can evaluate the inhibitors for the upgrading. Those inhibitors can be fixed or remediated to take a step on the upgrading process.
+
+[source,bash]
+-----------------------------------------
+preupg -v
+-----------------------------------------
+
+=== Upgrading process
+
+If the customer addresses all the inhibitors and the applications are candidates for this migration process, the only thing left to execute the upgrade.
+
+It is needed to instruct  the tool where are the repositories needed for the upgrading procedure. In this case, we need to indicate where are all the binaries and sources of RHEL 7.6, which is the version to upgrade.
+
+In this example I have downloaded the RHEL 7.6 DVD image, so we need to mount the DVD on the instance and poit out to the device.
+
+[source,bash]
+-----------------------------------------
+mkdir /media/dvd
+mount /dev/sr0 /media/dvd
+-----------------------------------------
+
+There are other methos that can be used. The following https://access.redhat.com/solutions/637583[article] give details about this.
+
+Now we can proceed with the upgrade itself.
+
+[source,bash]
+-----------------------------------------
+redhat-upgrade-tool --device /dev/sr0 --cleanup-post
+reboot
+-----------------------------------------
+
+=== Check the upgraded instance
+
+Once the upgrade procedure is done we need to check the version. But most importantly, we need to update the instance to the last RHEL 7 minor version if we pretend to upgrade to RHEL 8.2.
+
+[source,bash]
+-----------------------------------------
+more /etc/redhat-release
+-----------------------------------------
+
+Also we can check which repositories are enabled.
+
+[source,bash]
+-----------------------------------------
+yum repolist
+-----------------------------------------
+
+=== Upgrading to GRUB 2
+
+RHEL 6 uses GRUB v1. RHEL 7 and 8 use GRUB v2. We can left version 1 installed as is, but if we want to upgrade to RHEL 8, we must upgrade GRUB to version 2. 
+
+==== Install the software
+
+[source,bash]
+-----------------------------------------
+yum install grub2 grub2-tools grubby
+-----------------------------------------
+
+==== Determine which disk
+
+It is important to double check in which disk is going to be installed grub.
+
+[source,bash]
+-----------------------------------------
+grub2-install /dev/sda
+-----------------------------------------
+
+==== Create the grub file
+
+Just copy and paste this block.
+
+[source,bash]
+-----------------------------------------
+cat >/etc/default/grub <<EOF
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="\$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="$(grep '^\s*kernel /vmlinuz-3' /boot/grub/grub.conf | head -1 | sed -r -e 's,^\s*kernel /vmlinuz\S+ ,,' -e 's,\<root=\S+ ,,' -e 's,\<ro ,,')"
+GRUB_DISABLE_RECOVERY="true"
+EOF
+-----------------------------------------
+
+It should be look this way.
+
+[source,bash]
+-----------------------------------------
+cat /etc/default/grub
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="rd.lvm.lv=vg_hostname/lv_root rd.lvm.lv=vg_hostname/lv_swap crashkernel=auto quiet"
+GRUB_DISABLE_RECOVERY="true"
+-----------------------------------------
+
+==== Buld the grub file
+
+[source,bash]
+-----------------------------------------
+grub2-mkconfig -o /boot/grub2/grub.cfg
+-----------------------------------------
+
+Then reboot.
+
+=== Upgrading to RHEL 8.2
+
+If we plan to upgrade to version 8 (which is the recommendation) it is needed to update to the last RHEL 7 minor version. In this case, the procedure described above just bring us to 7.6 version. We need to update to 7.8 version. From now on, we can do the upgrading process using the same procedure described in this document, used for upgrading from RHEL 7 to RHEL 8.
 
