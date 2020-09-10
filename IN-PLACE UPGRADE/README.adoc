@@ -564,7 +564,7 @@ We need to add the repositories and install the software needed.
 [source,bash]
 -----------------------------------------
 subscription-manager repos --enable rhel-6-server-extras-rpms
-subscription-manager repos --enable rhel-6-server-optinal-rpms
+subscription-manager repos --enable rhel-6-server-optional-rpms
 -----------------------------------------
 
 === Installing the software for RHEL 6 upgrade
