@@ -1,0 +1,253 @@
+--------------------------- DRAFT
+
+Let's assume also the following convention.
+
+Nodes:
+ha1.test.com -> node 1
+ha2.test.com -> node 2
+ha3.test.com- > node 3
+str.test.com -> iscsi target
+
+All commands are in red and italics.
+All text result of command are in green and italics
+
+------------------------------------------
+A) Configure the iscsi target server
+
+1) Install SW
+In which server: [str.test.com]
+
+yum install -y targetcli
+
+2) Discover iqns cluster nodes
+In which server: [ALL]
+
+cat /etc/iscsi/initiatorname.iscsi
+
+InitiatorName=iqn.1994-05.com.redhat:xxxxxxxxxxxxxxxxxx
+
+take note on this. Every server must have the "xxxxxxxxxxxxxxx" part diferent from each other. If not, we have to generate a unique number on this.
+
+3) Configure ISCSI TARGET
+In which server: [str]
+
+Let's assume we have create a disk using whichever method called /dev/mapper/vdo which has 128GB in space
+
+targetcli
+...
+
+/> cd /backstores/block
+/backstores/block> create iscsi_shared_storage /dev/mapper/vdo
+Created block storage object iscsi_shared_storage using /dev/mapper/vdo
+
+/backstores/block> cd /iscsi
+/iscsi> create
+
+Created target iqn.2003-01.org.linux-iscsi.storage.x8664:sn.aaaaaaaaaaaaaaaaaaa.
+Created TPG 1.
+Global pref auto_add_default_portal=true
+Created default portal listening on all IPs (0.0.0.0), port 3260.
+
+/iscsi> cd iqn.2003-01.org.linux-iscsi.storage.x8664:sn.aaaaaaaaaaaaaaaaaaa/tpg1/acls  << Change as per the output of previous command
+/iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:111111111111111111  << ha1
+Created Node ACL for iqn.1994-05.com.redhat:11111111111111111111111
+/iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:2222222222222222  << ha2
+Created Node ACL for iqn.1994-05.com.redhat:22222222222222222222
+/iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:3333333333333333  << ha3
+Created Node ACL for iqn.1994-05.com.redhat:33333333333333333333
+
+/iscsi/iqn.20...e18/tpg1/acls> cd /iscsi/iqn.2003-01.org.linux-iscsi.storage.x8664:sn.aaaaaaaaaaaaaaaaaaa/tpg1/luns
+/iscsi/iqn.20...e18/tpg1/luns> create /backstores/block/iscsi_shared_storage
+
+Created LUN 0.
+Created LUN 0->0 mapping in node ACL iqn.1994-05.com.redhat:1111111111111111111111
+Created LUN 0->0 mapping in node ACL iqn.1994-05.com.redhat:2222222222222222222222
+Created LUN 0->0 mapping in node ACL iqn.1994-05.com.redhat:3333333333333333333333
+
+/iscsi/iqn.20...e18/tpg1/luns> cd /
+...
+/> saveconfig
+Configuration saved to /etc/target/saveconfig.json
+/> exit
+Global pref auto_save_on_exit=true
+Last 10 configs saved in /etc/target/backup/.
+Configuration saved to /etc/target/saveconfig.json
+
+4) Enable iscsi services
+In which server: [str]
+
+systemctl enable --now target
+systemctl restart target
+
+5) Enable firewall
+In which server: [str]
+
+firewall-cmd --permanent --add-port=3260/tcp
+firewall-cmd --reload
+
+
+-------------------------------------------
+B) Prepare the base for the Cluster
+
+
+1) Define the naming convention in /etc/hosts
+In which nodes: [ALL]
+
+Change the IPs by how your servers are configured
+
+192.168.56.154 ha1.test.com ha1
+192.168.56.160 ha2.test.com ha2
+192.168.56.159 ha3.test.com ha3
+192.168.56.157 str.test.com str
+
+2) Create Trust among Servers
+In which servers: [ALL]
+
+ssh-keygen
+ssh-copy-id ha1
+ssh-copy-id ha2
+ssh-copy-id ha3
+ssh-copy-id str
+
+3) Enabling repositories
+
+In which servers: [ALL]
+subscription-manager list --available
+subscription-manager attach  --pool= "the pool which contains HA and resiliente storage"
+
+subscription-manager repos --enable=rhel-8-for-x86_64-highavailability-rpms
+subscription-manager repos --enable=rhel-8-for-x86_64-resilientstorage-rpms
+
+4) Install SW
+In which servers: [ALL]
+
+yum install -y pcs fence-agents-all pcp-zeroconf
+yum -y install iscsi-initiator-utils
+yum install -y lvm2-lockd gfs2-utils dlm
+
+5) Enable Firewall
+In which servers: [ALL]
+
+firewall-cmd --permanent --add-service=high-availability
+firewall-cmd --add-service=high-availability
+firewall-cmd --reload
+
+6) Set password for hacluster user
+In which servers: [ALL]
+passwd hacluster
+
+7) Start Cluster Service
+In which servers: [ALL]
+
+systemctl enable --now pcsd
+
+
+-----------------------------------------------
+C) Creating a high availability cluster
+
+1) Authenticate the pcs user hacluster for each node
+In which servers: [ha1]
+
+pcs host auth ha1.test.com ha2.test.com ha3.test.com -u hacluster -p youpassword
+
+2) Creating the 3-node cluster named "cluster"
+In which servers: [ha1]
+
+pcs cluster setup ha_cluster --start ha1.test.com ha2.test.com ha3.test.com
+
+3) Enable the cluster to start on boot
+In which servers: [ha1]
+
+pcs cluster enable --all
+
+4) Check the configuration so far
+
+pcs status
+
+------------------------------------
+D) Configure the shared storage in the cluster
+
+1) Configure iscsi in all nodes
+In which servers: [ALL]
+
+iscsiadm -m discovery -t sendtargets -p str
+iscsiadm -m node -L automatic
+
+2) Configure Stonish
+In which servers: [ha1]
+
+The iscsi target has been mapped on /dev/sdb and in this lab is 128G length
+
+pcs stonith create scsi-shooter fence_scsi pcmk_host_list="ha1.test.com ha2.test.com ha3.test.com" devices=/dev/sdb  meta provides=unfencing
+
+ssh $i pcs property set stonith-enabled=true; \
+ssh $i pcs property set no-quorum-policy=freeze; \
+
+3) Create and clone the lockinf resource
+In which servers: [ha1]
+
+pcs resource create dlm --group locking ocf:pacemaker:controld op monitor interval=30s on-fail=fence
+pcs resource clone locking interleave=true
+
+pcs status --full
+
+4) Create a Volume Group
+In which servers: [ha1]
+
+vgcreate --shared shared_vg1 /dev/sdb
+
+5) Start the locking in the rest of the servers
+In which servers: [ha2 ha3]
+
+vgchange --lock-start shared_vg1
+
+6) Create a logical volume on shared_vg1 called shared_lv1
+In which servers: [h1]
+
+lvcreate --activate sy -L30G -n shared_lv1 shared_vg1
+
+7) Create the filesystem on the logical volume
+In which servers: [ha1]
+
+mkfs.gfs2 -j3 -p lock_dlm -t ha_cluster:data /dev/shared_vg1/shared_lv1
+
+*how to check the cluster name
+pcs property list cluster-name
+
+8) Create the shared filesystem resource
+In which servers: [ha1]
+
+pcs resource create sharedlv1 --group shared_vg1 ocf:heartbeat:LVM-activate lvname=shared_lv1 vgname=shared_vg1 \
+activation_mode=shared vg_access_mode=lvmlockd
+
+pcs resource clone shared_vg1 interleave=true
+
+pcs constraint order start locking-clone then shared_vg1-clone
+
+pcs constraint colocation add shared_vg1-clone with locking-clone
+
+9) Check logical volumes on all nodes
+In which servers: [All]
+
+lvs
+
+  LV         VG         Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  root       rhel       -wi-ao---- 13.39g
+  swap       rhel       -wi-ao----  1.60g
+  shared_lv1 shared_vg1 -wi-ao---- 30.00g
+ 
+10) Create the Resource for automatically mount the filesystem in all nodes
+In which servers: [ha1]
+
+pcs resource create sharedfs1 --group shared_vg1 ocf:heartbeat:Filesystem device="/dev/shared_vg1/shared_lv1" directory="/data" fstype="gfs2" options=noatime op monitor interval=10s on-fail=fence
+
+11) Check the status of the configuracion
+In which servers: [ha1]
+
+pcs status --full
+
+
+12) Check all servers have mounted the filesystem on /data
+In which servers: [ALL]
+
+df -kh | grep data
