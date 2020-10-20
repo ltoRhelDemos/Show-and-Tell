@@ -252,7 +252,7 @@ systemctl restart target
 ==== Enabling the firewall port 
 In which server: [str]
 
-We need to enabling the oport that by default pertain to the target service.
+We need to enabling the port that by default pertain to the target service.
 
 [source, bash]
 ------------------------
@@ -264,82 +264,128 @@ So far we only have configured the server which is going to share the disk for t
 
 === Preparing the base for the Cluster
 
-Our next step 
-1) Define the naming convention in /etc/hosts
-In which nodes: [ALL]
+Our next step defines de base of our cluster which will have 3 nodes.
 
-Change the IPs by how your servers are configured
+==== Defining the naming convention in /etc/hosts
+In which nodes: [cluster]
+
+Change the IPs accordingly your servers are configured
+
+[source, bash]
+------------------------
+vim /etc/hosts
 
 192.168.56.154 ha1.test.com ha1
 192.168.56.160 ha2.test.com ha2
 192.168.56.159 ha3.test.com ha3
 192.168.56.157 str.test.com str
+------------------------
 
-2) Create Trust among Servers
+===== Creating trust among servers
 In which servers: [ALL]
 
+Let's create a circle of trust for having SSH passwordless channels between servers.
+
+As root, let's get access to each server and execute the following sequence.
+
+[source, bash]
+------------------------
 ssh-keygen
 ssh-copy-id ha1
 ssh-copy-id ha2
 ssh-copy-id ha3
 ssh-copy-id str
+------------------------
 
-3) Enabling repositories
+==== Enabling the proper repositories
+In which servers: [cluster]
 
-In which servers: [ALL]
+[source, bash]
+------------------------
 subscription-manager list --available
-subscription-manager attach  --pool= "the pool which contains HA and resiliente storage"
+subscription-manager attach  --pool= "the pool ID which contains HA and resiliente storage"
 
 subscription-manager repos --enable=rhel-8-for-x86_64-highavailability-rpms
 subscription-manager repos --enable=rhel-8-for-x86_64-resilientstorage-rpms
+------------------------
 
-4) Install SW
-In which servers: [ALL]
+==== Installing Software
+In which servers: [cluster]
 
+[source, bash]
+------------------------
 yum install -y pcs fence-agents-all pcp-zeroconf
 yum -y install iscsi-initiator-utils
 yum install -y lvm2-lockd gfs2-utils dlm
+------------------------
 
-5) Enable Firewall
-In which servers: [ALL]
+==== Enabling the Firewall
+In which servers: [cluster]
 
+[source, bash]
+------------------------
 firewall-cmd --permanent --add-service=high-availability
 firewall-cmd --add-service=high-availability
 firewall-cmd --reload
+------------------------
 
-6) Set password for hacluster user
-In which servers: [ALL]
+==== Set password for hacluster user
+In which servers: [cluster]
+
+We must define a password for administering the cluster with the hacluster user.
+
+[source, bash]
+------------------------
 passwd hacluster
+------------------------
 
-7) Start Cluster Service
-In which servers: [ALL]
+==== Configuring the Cluster Service to be enabled and starts automatically at boot
+In which servers: [cluster]
 
+[source, bash]
+------------------------
 systemctl enable --now pcsd
+------------------------
 
+=== Creating a high availability cluster
 
------------------------------------------------
-C) Creating a high availability cluster
+At this point we have installed the cluster software and enabled all the services needed for what comes next. We are going to create the cluster itself with the 3 nodes.
 
-1) Authenticate the pcs user hacluster for each node
+From now on, we are going to use cluster commands like "pcs" which only need to be issued from one of the cluster members.
+
+==== Authenticating the pcs user hacluster for each node
 In which servers: [ha1]
 
-pcs host auth ha1.test.com ha2.test.com ha3.test.com -u hacluster -p youpassword
+[source, bash]
+------------------------
+pcs host auth ha1.test.com ha2.test.com ha3.test.com -u hacluster -p yourpassword
+------------------------
 
-2) Creating the 3-node cluster named "cluster"
+==== Creating the 3-node cluster named "cluster"
 In which servers: [ha1]
 
+[source, bash]
+------------------------
 pcs cluster setup ha_cluster --start ha1.test.com ha2.test.com ha3.test.com
+------------------------
 
-3) Enable the cluster to start on boot
+==== Enabling the cluster to start on boot
 In which servers: [ha1]
 
+[source, bash]
+------------------------
 pcs cluster enable --all
+------------------------
 
-4) Check the configuration so far
+==== Checking the configuration so far
 
+Let´s see if everything is working as expected.
+
+[source, bash]
+------------------------
 pcs status
+------------------------
 
-------------------------------------
 D) Configure the shared storage in the cluster
 
 1) Configure iscsi in all nodes
