@@ -3,7 +3,7 @@
 :toc2:
 :imagesdir: images
 
-= High Availability on RHEL - LTO Show & Tell Series
+= High Availability add-on on RHEL - LTO Show & Tell Series
 
 == Description
 This Show&Tell is aimed to share some of the most important concepts and features of the High Availability posibilities RHEL propose.
@@ -13,6 +13,50 @@ Audience: IT Managers, Architects and technical staff who operates Linux
 :numbered:
 
 == Introduction
+
+The High Availability Add-On is a clustered system that provides reliability, scalability, and availability to critical production services.
+
+A cluster is two or more computers (called nodes or members) that work together to perform a task. Clusters can be used to provide highly available services or resources. The redundancy of multiple machines is used to guard against failures of many types.
+
+== Components
+
+Mayor components are listed below:
+
+* Cluster infrastructure — Provides fundamental functions for nodes to work together as a cluster: configuration file management, membership management, lock management, and fencing.
+* High availability service management — Provides failover of services from one cluster node to another in case a node becomes inoperative.
+* Cluster administration tools — Configuration and management tools for setting up, configuring, and managing the High Availability Add-On. The tools are for use with the cluster infrastructure components, the high availability and service management components, and storage.
+
+Some supplements can be used for the High Availability Add-On with the following components:
+
+* Red Hat GFS2 (Global File System 2) — Part of the Resilient Storage Add-On, this provides a cluster file system for use with the High Availability Add-On. GFS2 allows multiple nodes to share storage at a block level as if the storage were connected locally to each cluster node. GFS2 cluster file system requires a cluster infrastructure.
+* LVM Locking Daemon (lvmlockd) — Part of the Resilient Storage Add-On, this provides volume management of cluster storage. lvmlockd support also requires cluster infrastructure.
+* Load Balancer Add-On — Routing software that provides high availability load balancing and failover in layer 4 (TCP) and layer 7 (HTTP, HTTPS) services. The Load Balancer Add-On runs in a cluster of redundant virtual routers that uses load algorithms to distribute client requests to real servers, collectively acting as a virtual server. It is not necessary to use the Load Balancer Add-On in conjunction with Pacemaker.
+
+== Pacemaker
+
+Pacemaker is a cluster resource manager. It achieves maximum availability for your cluster services and resources by making use of the cluster infrastructure’s messaging and membership capabilities to deter and recover from node and resource-level failure.
+
+=== Pacemaker components
+
+* Cluster Information Base (CIB)
+The Pacemaker information daemon, which uses XML internally to distribute and synchronize current configuration and status information from the Designated Coordinator (DC) — a node assigned by Pacemaker to store and distribute cluster state and actions by means of the CIB — to all other cluster nodes.
+
+*Cluster Resource Management Daemon (CRMd)
+Pacemaker cluster resource actions are routed through this daemon. Resources managed by CRMd can be queried by client systems, moved, instantiated, and changed when needed.
+
+Each cluster node also includes a local resource manager daemon (LRMd) that acts as an interface between CRMd and resources. LRMd passes commands from CRMd to agents, such as starting and stopping and relaying status information.
+
+* Shoot the Other Node in the Head (STONITH)
+STONITH is the Pacemaker fencing implementation. It acts as a cluster resource in Pacemaker that processes fence requests, forcefully shutting down nodes and removing them from the cluster to ensure data integrity. STONITH is configured in the CIB and can be monitored as a normal cluster resource. 
+
+* corosync
+corosync is the component - and a daemon of the same name - that serves the core membership and member-communication needs for high availability clusters. It is required for the High Availability Add-On to function.
+
+Other corosync functions are:
+
+- Manages quorum rules and determination.
+- Provides messaging capabilities for applications that coordinate or operate across multiple members of the cluster and thus must communicate stateful or other information - between instances.
+- Uses the kronosnet library as its network transport to provide multiple redundant links and automatic failover.
 
 
 
