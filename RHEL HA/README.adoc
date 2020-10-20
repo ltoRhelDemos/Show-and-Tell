@@ -122,6 +122,8 @@ Or, if we need to execute a command on all servers of the cluster the tag should
 
 In which server[cluster]
 
+Where cluster is comprised of ha1.test.com, ha2.test.com and ha3.test.com
+
 So, you get my idea of the scoping.
 
 === Configure the iscsi target server
@@ -181,8 +183,14 @@ Take note on this. Every server must have the "xxxxxxxxxxxxxxx" part diferent fr
 ==== Configuring ISCSI TARGET
 In which server: [str.test.com]
 
-Let's assume we have create a disk using whichever method called /dev/mapper/vdo which has 128GB in space
+Let's assume we have created a disk using whichever method called /dev/mapper/vdo which has 128GB in space. <you can see a procedure in this https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/VDO[Show & Tell].
 
+But could be any disk available in the server or the one designated for being a shared volume.
+
+
+
+[source, bash]
+------------------------
 targetcli
 ...
 
@@ -222,6 +230,8 @@ Configuration saved to /etc/target/saveconfig.json
 Global pref auto_save_on_exit=true
 Last 10 configs saved in /etc/target/backup/.
 Configuration saved to /etc/target/saveconfig.json
+
+-----------------------------
 
 4) Enable iscsi services
 In which server: [str]
