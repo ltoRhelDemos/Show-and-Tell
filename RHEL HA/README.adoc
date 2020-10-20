@@ -101,27 +101,71 @@ image::cluster_depicted.png[]
 
 In the next procedure we are going implement a simple web service on 3 nodes. This service will be in charge to serve a web page with apache and the content of this page is going to be stored in a shared iscsi storage. Simple, no?... let's get our hands dirty.
 
-Let's assume also the following convention.
+=== Some conventions for the rest of this document.
 
-Nodes:
+Let's assume the following server layout.
+
 ha1.test.com -> node 1
 ha2.test.com -> node 2
 ha3.test.com- > node 3
 str.test.com -> iscsi target
 
-All commands are in red and italics.
-All text result of command are in green and italics
+Every procedure explained in the next sections will have a scope of action that we are going describe with a tag and the scope. 
 
-------------------------------------------
-A) Configure the iscsi target server
+TAG [scope]
 
-1) Install SW
-In which server: [str.test.com]
+For example if we need to execute a command or procedure on ha1 server, the scope should look like this.
 
+In which Server[ha1]
+
+Or, if we need to execute a command on all servers of the cluster the tag should be represented by:
+
+In which server[cluster]
+
+So, you get my idea of the scoping.
+
+=== Configure the iscsi target server
+
+We need an entity that shares a storage for this excercise. One easy way to do it is setting a server to serve an iscsi volume, which precisely is what we are going to do in the following simple steps.
+
+So, our server is called str.test.com. Is a regular RHEL 8.2 server installed with all defaults. We have to install the software needed for enable this node to serve a volume using the iscsi protocol.
+
+==== Installing the software
+In which server[str.test.com]
+
+Get access to the server via ssh then become root or use "sudo" for all the commands that are described below.
+
+[source, bash]
+------------------------
 yum install -y targetcli
 
-2) Discover iqns cluster nodes
-In which server: [ALL]
+
+Updating Subscription Management repositories.
+Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)                         726 kB/s |  19 MB     00:27
+Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)                            815 kB/s |  22 MB     00:27
+Dependencies resolved.
+=================================================================================================================
+ Package                    Architecture  Version                  Repository                               Size
+=================================================================================================================
+Installing:
+ targetcli                  noarch        2.1.51-4.el8_2           rhel-8-for-x86_64-appstream-rpms         79 k
+Installing dependencies:
+ python3-configshell        noarch        1:1.1.27-1.el8           rhel-8-for-x86_64-baseos-rpms            74 k
+ python3-kmod               x86_64        0.9-20.el8               rhel-8-for-x86_64-baseos-rpms            90 k
+ python3-pyparsing          noarch        2.1.10-7.el8             rhel-8-for-x86_64-baseos-rpms           142 k
+ python3-rtslib             noarch        2.1.71-4.el8             rhel-8-for-x86_64-baseos-rpms           101 k
+ python3-urwid              x86_64        1.3.1-4.el8              rhel-8-for-x86_64-baseos-rpms           783 k
+ target-restore             noarch        2.1.71-4.el8             rhel-8-for-x86_64-baseos-rpms            24 k
+
+Transaction Summary
+=================================================================================================================
+Install  7 Packages
+...
+Complete!
+------------------------
+
+==== Discovering iqns cluster nodes
+In which server: [cluster]
 
 cat /etc/iscsi/initiatorname.iscsi
 
