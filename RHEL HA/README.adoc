@@ -95,6 +95,7 @@ The Red Hat High Availability Add-On provides support for LVM volumes in two dis
 
 == A general diagram of a cluster implemented
 
+image::cluster_depicted.png[]
 
 
 --------------------------- DRAFT
