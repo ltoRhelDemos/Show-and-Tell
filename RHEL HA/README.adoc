@@ -41,7 +41,7 @@ Pacemaker is a cluster resource manager. It achieves maximum availability for yo
 * Cluster Information Base (CIB)
 The Pacemaker information daemon, which uses XML internally to distribute and synchronize current configuration and status information from the Designated Coordinator (DC) — a node assigned by Pacemaker to store and distribute cluster state and actions by means of the CIB — to all other cluster nodes.
 
-*Cluster Resource Management Daemon (CRMd)
+* Cluster Resource Management Daemon (CRMd)
 Pacemaker cluster resource actions are routed through this daemon. Resources managed by CRMd can be queried by client systems, moved, instantiated, and changed when needed.
 
 Each cluster node also includes a local resource manager daemon (LRMd) that acts as an interface between CRMd and resources. LRMd passes commands from CRMd to agents, such as starting and stopping and relaying status information.
