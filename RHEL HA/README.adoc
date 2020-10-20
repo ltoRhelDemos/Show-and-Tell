@@ -34,7 +34,7 @@ Some supplements can be used for the High Availability Add-On with the following
 
 === Pacemaker
 
-Pacemaker is a cluster resource manager. It achieves maximum availability for your cluster services and resources by making use of the cluster infrastructure’s messaging and membership capabilities to deter and recover from node and resource-level failure.
+Pacemaker is a cluster resource manager. It achieves maximum availability for our cluster services and resources by making use of the cluster infrastructure’s messaging and membership capabilities to deter and recover from node and resource-level failure.
 
 ==== Pacemaker components
 
@@ -99,7 +99,7 @@ image::cluster_depicted.png[]
 
 == A practical HA implementation
 
---------------------------- DRAFT
+In the next procedure we are going implement a simple web service on 3 nodes. This service will be in charge to serve a web page with apache and the content of this page is going to be stored in a shared iscsi storage. Simple, no?... let's get our hands dirty.
 
 Let's assume also the following convention.
 
