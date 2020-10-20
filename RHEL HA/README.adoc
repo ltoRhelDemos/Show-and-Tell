@@ -167,14 +167,19 @@ Complete!
 ==== Discovering iqns cluster nodes
 In which server: [cluster]
 
+Once we have the software installed we need to know which IQN have each of the cluster members. For this we only need to show the content of the initiatorname.iscsi files.
+
+[source, bash]
+------------------------
 cat /etc/iscsi/initiatorname.iscsi
 
 InitiatorName=iqn.1994-05.com.redhat:xxxxxxxxxxxxxxxxxx
+------------------------
 
-take note on this. Every server must have the "xxxxxxxxxxxxxxx" part diferent from each other. If not, we have to generate a unique number on this.
+Take note on this. Every server must have the "xxxxxxxxxxxxxxx" part diferent from each other. If not, we have to generate a unique number on this.
 
-3) Configure ISCSI TARGET
-In which server: [str]
+==== Configuring ISCSI TARGET
+In which server: [str.test.com]
 
 Let's assume we have create a disk using whichever method called /dev/mapper/vdo which has 128GB in space
 
