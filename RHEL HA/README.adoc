@@ -183,11 +183,18 @@ Take note on this. Every server must have the "xxxxxxxxxxxxxxx" part diferent fr
 ==== Configuring ISCSI TARGET
 In which server: [str.test.com]
 
-Let's assume we have created a disk using whichever method called /dev/mapper/vdo which has 128GB in space. <you can see a procedure in this https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/VDO[Show & Tell].
+Let's assume we have created a disk using whichever method called */dev/mapper/vdo* which has 128GB in space. <you can see a procedure in this https://github.com/ltoRhelDemos/Show-and-Tell/tree/master/VDO[Show & Tell].
 
 But could be any disk available in the server or the one designated for being a shared volume.
 
+Let's start the targetcli command for configure the target and which should have access to the shared iscsi volume. 
 
+The convention here for the IQNs are:
+
+Storage Server: iqn.2003-01.org.linux-iscsi.storage.x8664:sn.aaaaaaaaaaaaaaaaaaa
+ha1 server: iqn.1994-05.com.redhat:111111111111111111
+ha2 server: iqn.1994-05.com.redhat:222222222222222222
+ha3 server: iqn.1994-05.com.redhat:333333333333333333
 
 [source, bash]
 ------------------------
@@ -208,12 +215,11 @@ Created default portal listening on all IPs (0.0.0.0), port 3260.
 
 /iscsi> cd iqn.2003-01.org.linux-iscsi.storage.x8664:sn.aaaaaaaaaaaaaaaaaaa/tpg1/acls  << Change as per the output of previous command
 /iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:111111111111111111  << ha1
-Created Node ACL for iqn.1994-05.com.redhat:11111111111111111111111
+Created Node ACL for iqn.1994-05.com.redhat:111111111111111111
 /iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:2222222222222222  << ha2
-Created Node ACL for iqn.1994-05.com.redhat:22222222222222222222
+Created Node ACL for iqn.1994-05.com.redhat:2222222222222222
 /iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:3333333333333333  << ha3
-Created Node ACL for iqn.1994-05.com.redhat:33333333333333333333
-
+Created Node ACL for iqn.1994-05.com.redhat:3333333333333333
 /iscsi/iqn.20...e18/tpg1/acls> cd /iscsi/iqn.2003-01.org.linux-iscsi.storage.x8664:sn.aaaaaaaaaaaaaaaaaaa/tpg1/luns
 /iscsi/iqn.20...e18/tpg1/luns> create /backstores/block/iscsi_shared_storage
 
@@ -230,21 +236,31 @@ Configuration saved to /etc/target/saveconfig.json
 Global pref auto_save_on_exit=true
 Last 10 configs saved in /etc/target/backup/.
 Configuration saved to /etc/target/saveconfig.json
+------------------------
 
------------------------------
-
-4) Enable iscsi services
+==== Enabling iscsi services
 In which server: [str]
 
+After configuring the target it is time to activate the service as follow:
+
+[source, bash]
+------------------------
 systemctl enable --now target
 systemctl restart target
+------------------------
 
-5) Enable firewall
+==== Enabling the firewall port 
 In which server: [str]
 
+We need to enabling the oport that by default pertain to the target service.
+
+[source, bash]
+------------------------
 firewall-cmd --permanent --add-port=3260/tcp
 firewall-cmd --reload
+------------------------
 
+So far we only have configured the server which is goinf to share the disk for the cluster. This could have been a storage array by itself. For the purpose of this excercise the iscsi protocol is enough.
 
 -------------------------------------------
 B) Prepare the base for the Cluster
