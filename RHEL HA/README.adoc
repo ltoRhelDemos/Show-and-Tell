@@ -32,11 +32,11 @@ Some supplements can be used for the High Availability Add-On with the following
 * LVM Locking Daemon (lvmlockd) — Part of the Resilient Storage Add-On, this provides volume management of cluster storage. lvmlockd support also requires cluster infrastructure.
 * Load Balancer Add-On — Routing software that provides high availability load balancing and failover in layer 4 (TCP) and layer 7 (HTTP, HTTPS) services. The Load Balancer Add-On runs in a cluster of redundant virtual routers that uses load algorithms to distribute client requests to real servers, collectively acting as a virtual server. It is not necessary to use the Load Balancer Add-On in conjunction with Pacemaker.
 
-== Pacemaker
+=== Pacemaker
 
 Pacemaker is a cluster resource manager. It achieves maximum availability for your cluster services and resources by making use of the cluster infrastructure’s messaging and membership capabilities to deter and recover from node and resource-level failure.
 
-=== Pacemaker components
+==== Pacemaker components
 
 * Cluster Information Base (CIB)
 The Pacemaker information daemon, which uses XML internally to distribute and synchronize current configuration and status information from the Designated Coordinator (DC) — a node assigned by Pacemaker to store and distribute cluster state and actions by means of the CIB — to all other cluster nodes.
@@ -58,11 +58,11 @@ Other corosync functions are:
 - Provides messaging capabilities for applications that coordinate or operate across multiple members of the cluster and thus must communicate stateful or other information - between instances.
 - Uses the kronosnet library as its network transport to provide multiple redundant links and automatic failover.
 
-== The fencing mechanism
+=== The fencing mechanism
 
 If communication with a single node in the cluster fails, then other nodes in the cluster must be able to restrict or release access to resources that the failed cluster node may have access to. Because the node itself may not be responsive this cannot be accomplished by contacting the cluster failed node. Instead, we must provide an external method, which is called fencing with a fence agent. A fence device is an external device that can be used by the cluster to restrict access to shared resources by an errant node, or to issue a hard reboot on the cluster node.
 
-== The Quorum Mechanism
+=== The Quorum Mechanism
 
 In order to maintain cluster integrity and availability, cluster systems use a concept known as quorum to prevent data corruption and loss. A cluster has quorum when more than half of the cluster nodes are online. To mitigate the chance of data corruption due to failure, Pacemaker by default stops all resources if the cluster does not have quorum.
 
@@ -72,7 +72,7 @@ The quorum features in Pacemaker prevent what is also known as split-brain, a ph
 
 A Red Hat Enterprise Linux High Availability Add-On cluster uses the votequorum service, in conjunction with fencing, to avoid split brain situations. A number of votes is assigned to each system in the cluster, and cluster operations are allowed to proceed only when a majority of votes is present.
 
-== What is a Resource?
+=== What is a Resource?
 
 An instance of program, data, or application to be managed by the cluster service is called A cluster resource. Agents abtracts these resources providing a standard interface for managing the resource in a cluster environment.
 
@@ -93,10 +93,11 @@ The Red Hat High Availability Add-On provides support for LVM volumes in two dis
 * High availability LVM volumes (HA-LVM) in active/passive failover configurations in which only a single node of the cluster accesses the storage at any one time.
 * LVM volumes that use the lvmlockd daemon to manage storage devices in active/active configurations in which more than one node of the cluster requires access to the storage at the same time. The lvmlockd daemon is part of the Resilient Storage Add-On.
 
-== A general diagram of a cluster implemented
+=== A general diagram of a cluster implemented
 
 image::cluster_depicted.png[]
 
+== A practical HA implementation
 
 --------------------------- DRAFT
 
