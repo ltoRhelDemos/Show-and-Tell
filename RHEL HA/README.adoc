@@ -260,12 +260,11 @@ firewall-cmd --permanent --add-port=3260/tcp
 firewall-cmd --reload
 ------------------------
 
-So far we only have configured the server which is goinf to share the disk for the cluster. This could have been a storage array by itself. For the purpose of this excercise the iscsi protocol is enough.
+So far we only have configured the server which is going to share the disk for the cluster. This could have been a storage array by itself. For the purpose of this excercise the iscsi protocol is enough.
 
--------------------------------------------
-B) Prepare the base for the Cluster
+=== Preparing the base for the Cluster
 
-
+Our next step 
 1) Define the naming convention in /etc/hosts
 In which nodes: [ALL]
 
