@@ -1,3 +1,21 @@
+:scrollbar:
+:data-uri:
+:toc2:
+:imagesdir: images
+
+= High Availability on RHEL - LTO Show & Tell Series
+
+== Description
+This Show&Tell is aimed to share some of the most important concepts and features of the High Availability posibilities RHEL propose.
+
+Audience: IT Managers, Architects and technical staff who operates Linux
+
+:numbered:
+
+== Introduction
+
+
+
 --------------------------- DRAFT
 
 Let's assume also the following convention.
