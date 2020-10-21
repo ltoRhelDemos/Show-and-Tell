@@ -508,35 +508,75 @@ Look at the sed part of the of the pcs command. This is only to show the "active
 
 === Configuring a shared storage in the cluster
 
-For the purpose of this exercise, we are going to use the iscsi server to present a common volume to all 3 nodes that are going to be members of the cluster that we just built. In this volume all nodes will have the possibility to read and write in sync and controlled by the cluster.
+For the purpose of this exercise, we are going to use the iscsi server to present a common volume to all 3 nodes that are going to be members of the cluster that we just built. 
+
+In this volume all nodes will have the possibility to read and write in sync and controlled by the cluster.
 
 ==== Configuring iscsi in all nodes
-In which servers: [ALL]
+In which servers: [cluster]
+
+You can execute this from any server. 
 
 [source, bash]
 ------------------------
-iscsiadm -m discovery -t sendtargets -p str
-iscsiadm -m node -L automatic
+for server in ha1 ha2 ha3; do
+echo Setting iscsi volume on server $server
+ssh $server iscsiadm -m discovery -t sendtargets -p str.test.com
+ssh $server iscsiadm -m node -L automatic
+echo
+done
+
+Setting iscsi volume on server ha1
+192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
+Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
+Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
+
+Setting iscsi volume on server ha2
+192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
+Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
+Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
+
+Setting iscsi volume on server ha3
+192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
+Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
+Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
 ------------------------
 
-2) Configuring Shut The Other Node In The Head (STONITH)
+==== Check for the disks presented in each node
+
+[source, bash]
+------------------------
+for server in ha1 ha2 ha3; do
+echo server $server: $(ssh $server lsblk | grep sdb)
+done
+
+server ha1: sdb 8:16 0 16G 0 disk
+server ha2: sdb 8:16 0 16G 0 disk
+server ha3: sdb 8:16 0 16G 0 disk
+------------------------
+
+==== Configuring Shut The Other Node In The Head (STONITH)
 In which servers: [ha1]
 
-The iscsi target has been mapped on /dev/sdb and in this lab is 128G length
+The iscsi target has been mapped on /dev/sdb and in this exercise is 16G size.
 
 [source, bash]
 ------------------------
 pcs stonith create scsi-shooter fence_scsi pcmk_host_list="ha1.test.com ha2.test.com ha3.test.com" devices=/dev/sdb  meta provides=unfencing
+pcs property set stonith-enabled=true
+pcs property set no-quorum-policy=freeze
+------------------------
 
-ssh $i pcs property set stonith-enabled=true; \
-ssh $i pcs property set no-quorum-policy=freeze; \
-
-3) Create and clone the lockinf resource
+==== Create and clone the locking resource
 In which servers: [ha1]
 
+[source, bash]
+------------------------
 pcs resource create dlm --group locking ocf:pacemaker:controld op monitor interval=30s on-fail=fence
 pcs resource clone locking interleave=true
+------------------------
 
+==== Let's check the status of the cluster
 pcs status --full
 
 4) Create a Volume Group
