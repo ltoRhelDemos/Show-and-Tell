@@ -322,13 +322,26 @@ Our next step defines de base of our cluster which will have 3 nodes.
 ==== Enabling the proper repositories
 In which servers: [cluster]
 
+Check in which pool exists HA and resilient storage. Take note of the pool id.
+
 [source, bash]
 ------------------------
 subscription-manager list --available
-subscription-manager attach  --pool= "the pool ID which contains HA and resiliente storage"
+------------------------
 
-subscription-manager repos --enable=rhel-8-for-x86_64-highavailability-rpms
-subscription-manager repos --enable=rhel-8-for-x86_64-resilientstorage-rpms
+Then attach the corresponding pool and enable the proper repositories. This is needed for install the software required for this exercise.
+
+[source, bash]
+------------------------
+for server in ha1 ha2 ha3; do
+echo Enabling repositories on server $server
+echo ************************************************************
+echo ************************************************************
+echo ************************************************************
+ssh $server subscription-manager attach  --pool=8a85f99b727637b201729983324d0540
+ssh $server subscription-manager repos --enable=rhel-8-for-x86_64-highavailability-rpms
+ssh $server subscription-manager repos --enable=rhel-8-for-x86_64-resilientstorage-rpms
+done
 ------------------------
 
 ==== Installing Software
@@ -336,9 +349,14 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-yum install -y pcs fence-agents-all pcp-zeroconf
-yum -y install iscsi-initiator-utils
-yum install -y lvm2-lockd gfs2-utils dlm
+for server in ha1 ha2 ha3; do
+echo Installing software on server $server
+echo ************************************************************
+echo ************************************************************
+echo ************************************************************
+ssh $server yum install -y pcs fence-agents-all pcp-zeroconf iscsi-initiator-utils lvm2-lockd gfs2-utils dlm
+echo
+done
 ------------------------
 
 ==== Enabling the Firewall
