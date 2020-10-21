@@ -126,7 +126,7 @@ Where cluster is comprised of ha1.test.com, ha2.test.com and ha3.test.com
 
 So, you get my idea of the scoping.
 
-==== Creating trust among servers
+=== Creating trust among servers
 In which servers: [ALL]
 
 Let's create a circle of trust for having SSH passwordless channels between servers.
