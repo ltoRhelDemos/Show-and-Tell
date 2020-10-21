@@ -858,15 +858,15 @@ In which servers: [cluster]
 [source, bash]
 ------------------------
 for server in ha1 ha2 ha3; do
+echo ------------------------------
 echo Server $server
-echo ******************************
-echo ******************************
-echo ******************************
 ssh $server df -kh | grep data
+echo
 done
 
 Server ha1
 /dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
+
 Server ha2
 /dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
 Server ha3
