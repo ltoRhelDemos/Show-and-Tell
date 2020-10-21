@@ -138,7 +138,7 @@ In each server execute the following sequence.
 [source, bash]
 ------------------------
 ssh-keygen
-for server in ha1 ha2 ha3 str; do ssh-copy-id $server; done
+for node in ha1 ha2 ha3 str; do ssh-copy-id $node; done
 ------------------------
 
 === Defining the naming convention in /etc/hosts
@@ -178,9 +178,9 @@ ssh ha2
 We can chack what we just do it by executing the following from str:
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do \
-echo $server; \
-ssh $server cat /etc/hosts; \
+for node in ha1 ha2 ha3; do \
+echo $node; \
+ssh $node cat /etc/hosts; \
 done
 ------------------------
 
@@ -233,7 +233,7 @@ Having created the circle of trust, from str.test.com server we can get the IQN 
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do echo -n $server: $(ssh $server cat /etc/iscsi/initiatorname.iscsi); echo; done
+for node in ha1 ha2 ha3; do echo -n $node: $(ssh $node cat /etc/iscsi/initiatorname.iscsi); echo; done
 
 ha1: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9f
 ha2: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9e
@@ -333,14 +333,12 @@ Then attach the corresponding pool and enable the proper repositories. This is n
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo Enabling repositories on server $server
-echo ************************************************************
-echo ************************************************************
-echo ************************************************************
-ssh $server subscription-manager attach  --pool=8a85f99b727637b201729983324d0540
-ssh $server subscription-manager repos --enable=rhel-8-for-x86_64-highavailability-rpms
-ssh $server subscription-manager repos --enable=rhel-8-for-x86_64-resilientstorage-rpms
+for node in ha1 ha2 ha3; do
+echo ------------------------------
+echo Enabling repositories on node $node
+ssh $node subscription-manager attach  --pool=8a85f99b727637b201729983324d0540
+ssh $node subscription-manager repos --enable=rhel-8-for-x86_64-highavailability-rpms
+ssh $node subscription-manager repos --enable=rhel-8-for-x86_64-resilientstorage-rpms
 done
 ------------------------
 
@@ -349,12 +347,10 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo Installing software on server $server
-echo ************************************************************
-echo ************************************************************
-echo ************************************************************
-ssh $server yum install -y pcs fence-agents-all pcp-zeroconf iscsi-initiator-utils lvm2-lockd gfs2-utils dlm
+for node in ha1 ha2 ha3; do
+echo ------------------------------
+echo Installing software on node $node
+ssh $node yum install -y pcs fence-agents-all pcp-zeroconf iscsi-initiator-utils lvm2-lockd gfs2-utils dlm
 echo
 done
 ------------------------
@@ -364,12 +360,12 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do 
-echo Setting firewall on $server 
-ssh $server systemctl enable --now firewalld 
-ssh $server firewall-cmd --permanent --add-service=high-availability 
-ssh $server firewall-cmd --add-service=high-availability 
-ssh $server firewall-cmd --reload 
+for node in ha1 ha2 ha3; do 
+echo Setting firewall on $node 
+ssh $node systemctl enable --now firewalld 
+ssh $node firewall-cmd --permanent --add-service=high-availability 
+ssh $node firewall-cmd --add-service=high-availability 
+ssh $node firewall-cmd --reload 
 done
 ------------------------
 
@@ -377,8 +373,8 @@ Then we can check is the ha service is enabled.
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo Services enabled on $server: $(ssh $server firewall-cmd --list-services)
+for node in ha1 ha2 ha3; do
+echo Services enabled on $node: $(ssh $node firewall-cmd --list-services)
 done
 
 Services enabled on ha1: cockpit dhcpv6-client high-availability ssh
@@ -393,9 +389,9 @@ We must define a password for administering the cluster with the hacluster user.
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo Enter the password for $server
-ssh $server passwd hacluster
+for node in ha1 ha2 ha3; do
+echo Enter the password for $node
+ssh $node passwd hacluster
 echo
 done
 ------------------------
@@ -405,9 +401,9 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo enabling pcsd on $server
-ssh $server systemctl enable --now pcsd
+for node in ha1 ha2 ha3; do
+echo enabling pcsd on $node
+ssh $node systemctl enable --now pcsd
 echo
 done
 ------------------------
@@ -416,9 +412,9 @@ Then check the service on each node.
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo $server ----------------
-ssh $server systemctl status pcsd | sed ''/active/s//$(printf "\033[32mactive\033[0m")/''
+for node in ha1 ha2 ha3; do
+echo $node ----------------
+ssh $node systemctl status pcsd | sed ''/active/s//$(printf "\033[32mactive\033[0m")/''
 echo
 done
 ------------------------
@@ -537,24 +533,24 @@ You can execute this from any server.
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo Setting iscsi volume on server $server
-ssh $server iscsiadm -m discovery -t sendtargets -p str.test.com
-ssh $server iscsiadm -m node -L automatic
+for node in ha1 ha2 ha3; do
+echo Setting iscsi volume on node $node
+ssh $node iscsiadm -m discovery -t sendtargets -p str.test.com
+ssh $node iscsiadm -m node -L automatic
 echo
 done
 
-Setting iscsi volume on server ha1
+Setting iscsi volume on node ha1
 192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
 Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
 Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
 
-Setting iscsi volume on server ha2
+Setting iscsi volume on node ha2
 192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
 Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
 Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
 
-Setting iscsi volume on server ha3
+Setting iscsi volume on node ha3
 192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
 Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
 Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
@@ -564,13 +560,13 @@ Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4fa
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo server $server: $(ssh $server lsblk | grep sdb)
+for node in ha1 ha2 ha3; do
+echo node $node: $(ssh $node lsblk | grep sdb)
 done
 
-server ha1: sdb 8:16 0 16G 0 disk
-server ha2: sdb 8:16 0 16G 0 disk
-server ha3: sdb 8:16 0 16G 0 disk
+node ha1: sdb 8:16 0 16G 0 disk
+node ha2: sdb 8:16 0 16G 0 disk
+node ha3: sdb 8:16 0 16G 0 disk
 ------------------------
 
 ==== Configuring Shut The Other Node In The Head (STONITH)
@@ -623,8 +619,8 @@ In which servers: [ha2 ha3]
 
 [source, bash]
 ------------------------
-for server in ha2 ha3; do
-echo server $server: $(ssh $server vgchange --lock-start shared_vg1)
+for node in ha2 ha3; do
+echo node $node: $(ssh $node vgchange --lock-start shared_vg1)
 done
 ------------------------
 
@@ -767,11 +763,10 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
-echo Server $server
-echo *****************************
-echo *****************************
-ssh $server lvs
+for node in ha1 ha2 ha3; do
+echo ------------------------------
+echo node $node
+ssh $node lvs
 echo
 done
 ------------------------
@@ -857,23 +852,104 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for server in ha1 ha2 ha3; do
+for node in ha1 ha2 ha3; do
 echo ------------------------------
-echo Server $server
-ssh $server df -kh | grep data
+echo node $node
+ssh $node df -kh | grep data
 echo
 done
 
 ------------------------------
-Server ha1
+node ha1
 /dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
-
 ------------------------------
-Server ha2
+node ha2
 /dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
-
 ------------------------------
-Server ha3
+node ha3
 /dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
-
 ------------------------
+
+=== Creating a Web server in High Availability
+
+Now that we have our storage ready to be used is time to create the resources required to have Apache in HA. 
+
+==== Installing Apache
+In which servers: [cluster]
+
+[source, bash]
+------------------------
+for node in ha1 ha2 ha3; do
+echo ------------------------------
+echo Installing apache on node $node
+ssh $node yum -y install httpd wget
+echo
+done
+------------------------------
+
+Then in each node add the following selector in /etc/httpd/conf/httpd.conf.
+
+[source, bash]
+------------------------
+ssh ha1 
+
+cat <<EOF >> /etc/httpd/conf/httpd.conf
+<Location /server-status>
+    SetHandler server-status
+    Require local
+</Location>
+EOF
+
+ssh ha2
+...
+------------------------
+
+When we use the apache resource agent to manage Apache, it does not use systemd. Because of this, you must edit the logrotate script supplied with Apache so that it does not use systemctl to reload Apache.
+
+Remove the following line in the /etc/logrotate.d/httpd file on each node in the cluster.
+
+[source, bash]
+------------------------
+/bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+------------------------
+
+Replace the line you removed with the following three lines.
+
+[source, bash]
+------------------------
+/usr/bin/test -f /var/run/httpd.pid >/dev/null 2>/dev/null &&
+/usr/bin/ps -q /usr/bin/cat /var/run/httpd.pid >/dev/null 2>/dev/null &&
+/usr/sbin/httpd -f /etc/httpd/conf/httpd.conf -c "PidFile /var/run/httpd.pid" -k graceful > /dev/null 2>/dev/null || true
+------------------------
+
+Now let´s replace the default root directory that apache use in each node.
+
+[source, bash]
+------------------------
+for node in ha1 ha2 ha3; do 
+echo Changing Apache Root Directory on node $node; 
+ssh $node cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bck; 
+ssh "$node" 'sed -i "s/\/var\/www/\/data\/www/g" /etc/httpd/conf/httpd.conf.bck' > /etc/httpd/conf/httpd.conf; 
+done
+------------------------
+
+After change the root directory is time to create some directories in the new /data directory.
+[source, bash]
+------------------------
+mkdir /data/www/html
+mkdir /data/www/cgi-bin
+mkdir /data/www/error
+restorecon -R /data/www
+------------------------
+
+Now create a simple web page.
+
+[source, bash]
+------------------------
+cat <<EOF >/data/www/html/index.html
+<html>
+<body>Hello</body>
+</html>
+EOF
+------------------------
+
