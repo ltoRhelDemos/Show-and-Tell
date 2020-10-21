@@ -126,6 +126,64 @@ Where cluster is comprised of ha1.test.com, ha2.test.com and ha3.test.com
 
 So, you get my idea of the scoping.
 
+==== Creating trust among servers
+In which servers: [ALL]
+
+Let's create a circle of trust for having SSH passwordless channels between servers.
+
+As root, let's get access to each server and execute the following sequence.
+
+In each server execute the following sequence.
+
+[source, bash]
+------------------------
+ssh-keygen
+for server in ha1 ha2 ha3 str; do ssh-copy-id $server; done
+------------------------
+
+=== Defining the naming convention in /etc/hosts
+In which nodes: [ALL]
+
+Change the IPs accordingly your servers are configured. 
+
+Logged-in in the str.test.com server we can configure /etc/hosts as follow. First modify /etc/host in str.test.com.
+
+[source, bash]
+------------------------
+cat <<EOF >> /etc/hosts
+192.168.56.154 ha1.test.com ha1
+192.168.56.160 ha2.test.com ha2
+192.168.56.159 ha3.test.com ha3
+192.168.56.157 str.test.com str
+EOF
+------------------------
+
+Then, modify all the cluster node members accessing every node:
+
+[source, bash]
+------------------------
+ssh ha1
+
+cat <<EOF >> /etc/hosts 
+192.168.56.154 ha1.test.com ha1 
+192.168.56.160 ha2.test.com ha2 
+192.168.56.159 ha3.test.com ha3 
+192.168.56.157 str.test.com str 
+EOF
+
+ssh ha2
+...
+------------------------
+
+We can chack what we just do it by executing the following from str:
+[source, bash]
+------------------------
+for server in ha1 ha2 ha3; do \
+echo $server; \
+ssh $server cat /etc/hosts; \
+done
+------------------------
+
 === Configure the iscsi target server
 
 We need an entity that shares a storage for this excercise. One easy way to do it is setting a server to serve an iscsi volume, which precisely is what we are going to do in the following simple steps.
@@ -171,14 +229,18 @@ In which server: [cluster]
 
 Once we have the software installed we need to know which IQN have each of the cluster members. For this we only need to show the content of the initiatorname.iscsi files.
 
+Having created the circle of trust, from str.test.com server we can get the IQN from each server as follow:
+
 [source, bash]
 ------------------------
-cat /etc/iscsi/initiatorname.iscsi
+for server in ha1 ha2 ha3; do echo -n $server: $(ssh $server cat /etc/iscsi/initiatorname.iscsi); echo; done
 
-InitiatorName=iqn.1994-05.com.redhat:xxxxxxxxxxxxxxxxxx
+ha1: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9f
+ha2: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9e
+ha3: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9d
 ------------------------
 
-Take note on this. Every server must have the "xxxxxxxxxxxxxxx" part diferent from each other. If not, we have to generate a unique number on this.
+Take note on this. Every server must have the last hexadecimal part diferent from each other. If not, we have to generate a unique number on this.
 
 ==== Configuring ISCSI TARGET
 In which server: [str.test.com]
@@ -265,37 +327,6 @@ So far we only have configured the server which is going to share the disk for t
 === Preparing the base for the Cluster
 
 Our next step defines de base of our cluster which will have 3 nodes.
-
-==== Defining the naming convention in /etc/hosts
-In which nodes: [cluster]
-
-Change the IPs accordingly your servers are configured
-
-[source, bash]
-------------------------
-vim /etc/hosts
-
-192.168.56.154 ha1.test.com ha1
-192.168.56.160 ha2.test.com ha2
-192.168.56.159 ha3.test.com ha3
-192.168.56.157 str.test.com str
-------------------------
-
-===== Creating trust among servers
-In which servers: [ALL]
-
-Let's create a circle of trust for having SSH passwordless channels between servers.
-
-As root, let's get access to each server and execute the following sequence.
-
-[source, bash]
-------------------------
-ssh-keygen
-ssh-copy-id ha1
-ssh-copy-id ha2
-ssh-copy-id ha3
-ssh-copy-id str
-------------------------
 
 ==== Enabling the proper repositories
 In which servers: [cluster]
@@ -386,19 +417,26 @@ Let´s see if everything is working as expected.
 pcs status
 ------------------------
 
-D) Configure the shared storage in the cluster
+=== Configuring a shared storage in the cluster
 
-1) Configure iscsi in all nodes
+For the purpose of this exercise, we are going to use the iscsi server to present a common volume to all 3 nodes that are going to be members of the cluster that we just built. In this volume all nodes will have the possibility to read and write in sync and controlled by the cluster.
+
+==== Configuring iscsi in all nodes
 In which servers: [ALL]
 
+[source, bash]
+------------------------
 iscsiadm -m discovery -t sendtargets -p str
 iscsiadm -m node -L automatic
+------------------------
 
-2) Configure Stonish
+2) Configuring Shut The Other Node In The Head (STONITH)
 In which servers: [ha1]
 
 The iscsi target has been mapped on /dev/sdb and in this lab is 128G length
 
+[source, bash]
+------------------------
 pcs stonith create scsi-shooter fence_scsi pcmk_host_list="ha1.test.com ha2.test.com ha3.test.com" devices=/dev/sdb  meta provides=unfencing
 
 ssh $i pcs property set stonith-enabled=true; \
