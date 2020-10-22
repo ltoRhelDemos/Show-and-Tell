@@ -953,3 +953,7 @@ cat <<EOF >/data/www/html/index.html
 EOF
 ------------------------
 
+shared_vg1
+pcs resource create VirtualIP IPaddr2 ip=192.168.56.170 \
+cidr_netmask=24 --group shared_vg1
+
