@@ -494,7 +494,7 @@ Cluster Summary:
   * 0 resource instances configured
 
 Node List:
-  * Online: [ ha1.test.com ha2.test.com ha3.test.com ]
+  * Online: [ ha1.test.com ha2.test.com ]
 
 Full List of Resources:
   * No resources
@@ -558,7 +558,7 @@ The iscsi target has been mapped on /dev/sdb and in this exercise is 16G size.
 
 [source, bash]
 ------------------------
-pcs stonith create scsi-shooter fence_scsi pcmk_host_list="ha1.test.com ha2.test.com ha3.test.com" devices=/dev/sdb  meta provides=unfencing
+pcs stonith create scsi-shooter fence_scsi pcmk_host_list="ha1.test.com ha2.test.com" devices=/dev/sdb  meta provides=unfencing
 pcs property set stonith-enabled=true
 pcs property set no-quorum-policy=freeze
 ------------------------
@@ -571,9 +571,35 @@ pcs stonith config scsi-shooter
 ------------------------
 
 ==== Setting up the disk for storing data
-In which servers: [ha1]
+
+On both nodes of the cluster, perform the following steps to set the value for the LVM system ID to the value of the uname identifier for the system. The LVM system ID will be used to ensure that only the cluster is capable of activating the volume group.
+
+Set the system_id_source configuration option in the */etc/lvm/lvm.conf* configuration file to uname.
+
+In which servers: [cluster]
+[source, bash]
+------------------------
+system_id_source = "uname"
+------------------------
+
+Verify that the LVM system ID on the node matches the uname for the node.
+
+[source, bash]
+------------------------
+for node in ha1 ha2; do
+ssh $node lvm systemid
+ssh $node uname -n
+done
+
+system ID: ha1
+ha1
+system ID: ha2
+ha2
+------------------------
 
 Create a physical volume on the first partition of /dev/sdb.
+
+In which servers: [ha1]
 
 [source, bash]
 ------------------------
@@ -678,9 +704,9 @@ Replace the line you removed with the following three lines.
 
 [source, bash]
 ------------------------
-/usr/bin/test -f /var/run/httpd.pid >/dev/null 2>/dev/null &&
-/usr/bin/ps -q /usr/bin/cat /var/run/httpd.pid >/dev/null 2>/dev/null &&
-/usr/sbin/httpd -f /etc/httpd/conf/httpd.conf -c "PidFile /var/run/httpd.pid" -k graceful > /dev/null 2>/dev/null || true
+      /usr/bin/test -f /var/run/httpd.pid >/dev/null 2>/dev/null &&
+      /usr/bin/ps -q /usr/bin/cat /var/run/httpd.pid >/dev/null 2>/dev/null &&
+      /usr/sbin/httpd -f /etc/httpd/conf/httpd.conf -c "PidFile /var/run/httpd.pid" -k graceful > /dev/null 2>/dev/null || true
 ------------------------
 
 Now let's create a simple web page and directory layout on our disk.
@@ -725,393 +751,55 @@ END
 umount /var/www
 ------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-==== Create and clone the locking resource
+==== Creating resources and group of resources
 In which servers: [ha1]
 
-[source, bash]
-------------------------
-pcs resource create dlm --group locking ocf:pacemaker:controld op monitor interval=30s on-fail=fence
-pcs resource clone locking interleave=true
-------------------------
-
-==== Setting up lvmlockd resource
-In which servers: [ha1]
+The following creates a resource calles apache_lvm which take cares of apache_volume_group and also creates the group called apachegroup and group this resource in that newly created group.
 
 [source, bash]
 ------------------------
-pcs resource create lvmlockd --group locking ocf:heartbeat:lvmlockd op monitor interval=30s on-fail=fence
+pcs resource create apache_lvm ocf:heartbeat:LVM-activate vgname=apache_volume_group vg_access_mode=system_id --group apachegroup
 ------------------------
 
-==== Let's check the status of the cluster
-pcs status --full
+The following commands create the remaining resources for the configuration, adding them to the existing resource group apachegroup.
 
-=== Volume Group Creation
-In which servers: [ha1]
+The filesystem to be mounted on the active node which is going to be mounted on /var/www.
 
 [source, bash]
 ------------------------
-vgcreate --shared shared_vg1 /dev/sdb
-
-Physical volume "/dev/sdb" successfully created.
-Volume group "shared_vg1" successfully created
-VG shared_vg1 starting dlm lockspace
-Starting locking.  Waiting until locks are ready...
+pcs resource create ha_apache_fs Filesystem \
+device="/dev/apache_volume_group/apache_data_volume" directory="/var/www" fstype="ext4" \
+--group apachegroup
+[source, bash]
 ------------------------
 
-=== Starting the locking mechanism in the rest of the servers
-In which servers: [ha2 ha3]
+The virtual IP Address is going to be configured by the cluster in the active node as a secundary ip.
 
 [source, bash]
 ------------------------
-for node in ha2 ha3; do
-echo node $node: $(ssh $node vgchange --lock-start shared_vg1)
-done
+pcs resource create apache_virtualIP IPaddr2 ip=192.168.56.40 \
+cidr_netmask=24 --group apachegroup
+[source, bash]
 ------------------------
 
-=== Checking what we have done so far
-In which servers: [ha1]
-
-We can seek the lvmlockd started in the 3 nodes.
+The web service itself is managed by the apache agent.
 
 [source, bash]
 ------------------------
-pcs status --full
-
-
-Cluster name: ha_cluster
-Cluster Summary:
-  * Stack: corosync
-  * Current DC: ha1.test.com (1) (version 2.0.3-5.el8_2.1-4b1f869f0f) - partition with quorum
-  * Last updated: Wed Oct 21 13:47:47 2020
-  * Last change:  Wed Oct 21 13:41:12 2020 by root via cibadmin on ha1.test.com
-  * 3 nodes configured
-  * 7 resource instances configured
-
-Node List:
-  * Online: [ ha1.test.com (1) ha2.test.com (2) ha3.test.com (3) ]
-
-Full List of Resources:
-  * scsi-shooter        (stonith:fence_scsi):   Started ha1.test.com
-  * Clone Set: locking-clone [locking]:
-    * Resource Group: locking:0:
-      * dlm     (ocf::pacemaker:controld):      Started ha1.test.com
-      * lvmlockd        (ocf::heartbeat:lvmlockd):      Started ha1.test.com
-    * Resource Group: locking:1:
-      * dlm     (ocf::pacemaker:controld):      Started ha2.test.com
-      * lvmlockd        (ocf::heartbeat:lvmlockd):      Started ha2.test.com
-    * Resource Group: locking:2:
-      * dlm     (ocf::pacemaker:controld):      Started ha3.test.com
-      * lvmlockd        (ocf::heartbeat:lvmlockd):      Started ha3.test.com
-    * Started: [ ha1.test.com ha2.test.com ha3.test.com ]
-
-Migration Summary:
-
-Fencing History:
-  * unfencing of ha3.test.com successful: delegate=ha3.test.com, client=pacemaker-controld.10269, origin=ha1.test.com, completed='2020-10-21 13:31:49 -05:00'
-  * unfencing of ha1.test.com successful: delegate=ha1.test.com, client=pacemaker-controld.10269, origin=ha1.test.com, completed='2020-10-21 13:31:48 -05:00'
-  * unfencing of ha2.test.com successful: delegate=ha2.test.com, client=pacemaker-controld.10269, origin=ha1.test.com, completed='2020-10-21 13:31:48 -05:00'
-
-Tickets:
-
-PCSD Status:
-  ha1.test.com: Online
-  ha2.test.com: Online
-  ha3.test.com: Online
-
-Daemon Status:
-  corosync: active/enabled
-  pacemaker: active/enabled
-  pcsd: active/enabled
-------------------------
-
-==== Creating a logical volume on shared_vg1 called shared_lv1
-In which servers: [ha1]
-
-Now it is time to create the logical volume wich is going to be mounted in each node for hosting data. This volume is going to be configured with 10G, so we can have the option of growing in later time.
-
+pcs resource create new_app apache \
+configfile="/etc/httpd/conf/httpd.conf" \
+statusurl="http://127.0.0.1/server-status" --group apachegroup
 [source, bash]
 ------------------------
-lvcreate --activate sy -L10G -n shared_lv1 shared_vg1
-------------------------
 
-=== Creating the filesystem on the logical volume
-In which servers: [ha1]
-
-[source, bash]
-------------------------
-mkfs.gfs2 -j3 -p lock_dlm -t ha_cluster:data /dev/shared_vg1/shared_lv1
-
-/dev/shared_vg1/shared_lv1 is a symbolic link to /dev/dm-2
-This will destroy any data on /dev/dm-2
-Are you sure you want to proceed? [y/n] y
-Discarding device contents (may take a while on large devices): Done
-Adding journals: Done
-Building resource groups: Done
-Creating quota file: Done
-Writing superblock and syncing: Done
-Device:                    /dev/shared_vg1/shared_lv1
-Block size:                4096
-Device size:               10.00 GB (2621440 blocks)
-Filesystem size:           10.00 GB (2621437 blocks)
-Journals:                  3
-Journal size:              32MB
-Resource groups:           43
-Locking protocol:          "lock_dlm"
-Lock table:                "ha_cluster:data"
-UUID:                      1fee69d3-6ef5-4c8f-995b-ed682b3270a3
-------------------------
-
-*how to check the cluster name
-pcs property list cluster-name
-
-==== Creating the shared filesystem resource
-In which servers: [ha1]
-
-Having the volume group and logical volume created on ha1.test.com server, we now need to create the resource responsible for declare the device on all nodes's /dev directory as a functional disk in each node.
-
-[source, bash]
-------------------------
-pcs resource create sharedlv1 --group shared_vg1 ocf:heartbeat:LVM-activate lvname=shared_lv1 vgname=shared_vg1 \
-activation_mode=shared vg_access_mode=lvmlockd
-------------------------
-
-The resource is going to be started on any node... we need to clone the resource so all nodes have the resource started.
-
-[source, bash]
-------------------------
-pcs resource clone shared_vg1 interleave=true
-------------------------
-
-==== Configuring the order in which the resource starts. 
-In which servers: [ha1]
-
-We need make this resource to be started at first.
-
-[source, bash]
-------------------------
-pcs constraint order start locking-clone then datadisk-clone
-
-Adding locking-clone shared_vg1-clone (kind: Mandatory) (Options: first-action=start then-action=start)
-------------------------
-
-Also we need to start the volume group resource group in the same node as the locking resource group.
-
-[source, bash]
-------------------------
-pcs constraint colocation add shared_vg1-clone with locking-clone
-------------------------
-
-==== Check logical volumes on all nodes
-In which servers: [cluster]
-
-[source, bash]
-------------------------
-for node in ha1 ha2 ha3; do
-echo ------------------------------
-echo node $node
-ssh $node lvs
-echo
-done
-------------------------
- 
-==== Creating the Resource for automatically mount the filesystem in all nodes
-In which servers: [ha1]
-
-So far the logical volume can be seen from all nodes. Now we need to create a resource for mounting the volume in the /data directory.
-
-[source, bash]
-------------------------
-pcs resource create sharedfs1 --group shared_vg1 ocf:heartbeat:Filesystem device="/dev/shared_vg1/shared_lv1" directory="/data" fstype="gfs2" options=noatime op monitor interval=10s on-fail=fence
-------------------------
-
-==== Check the status of the configuracion
-In which servers: [ha1]
+Config the firewall for accepting a regular web page traffic.
 
 
 [source, bash]
 ------------------------
-pcs status --full
-
-Cluster name: ha_cluster
-Cluster Summary:
-  * Stack: corosync
-  * Current DC: ha1.test.com (1) (version 2.0.3-5.el8_2.1-4b1f869f0f) - partition with quorum
-  * Last updated: Wed Oct 21 14:11:35 2020
-  * Last change:  Wed Oct 21 14:11:28 2020 by root via cibadmin on ha1.test.com
-  * 3 nodes configured
-  * 13 resource instances configured
-
-Node List:
-  * Online: [ ha1.test.com (1) ha2.test.com (2) ha3.test.com (3) ]
-
-Full List of Resources:
-  * scsi-shooter        (stonith:fence_scsi):   Started ha1.test.com
-  * Clone Set: locking-clone [locking]:
-    * Resource Group: locking:0:
-      * dlm     (ocf::pacemaker:controld):      Started ha1.test.com
-      * lvmlockd        (ocf::heartbeat:lvmlockd):      Started ha1.test.com
-    * Resource Group: locking:1:
-      * dlm     (ocf::pacemaker:controld):      Started ha2.test.com
-      * lvmlockd        (ocf::heartbeat:lvmlockd):      Started ha2.test.com
-    * Resource Group: locking:2:
-      * dlm     (ocf::pacemaker:controld):      Started ha3.test.com
-      * lvmlockd        (ocf::heartbeat:lvmlockd):      Started ha3.test.com
-    * Started: [ ha1.test.com ha2.test.com ha3.test.com ]
-  * Clone Set: shared_vg1-clone [shared_vg1]:
-    * Resource Group: shared_vg1:0:
-      * sharedlv1       (ocf::heartbeat:LVM-activate):  Started ha1.test.com
-      * sharedfs1       (ocf::heartbeat:Filesystem):    Started ha1.test.com
-    * Resource Group: shared_vg1:1:
-      * sharedlv1       (ocf::heartbeat:LVM-activate):  Started ha2.test.com
-      * sharedfs1       (ocf::heartbeat:Filesystem):    Started ha2.test.com
-    * Resource Group: shared_vg1:2:
-      * sharedlv1       (ocf::heartbeat:LVM-activate):  Started ha3.test.com
-      * sharedfs1       (ocf::heartbeat:Filesystem):    Started ha3.test.com
-    * Started: [ ha1.test.com ha2.test.com ha3.test.com ]
-
-Migration Summary:
-
-Fencing History:
-  * unfencing of ha3.test.com successful: delegate=ha3.test.com, client=pacemaker-controld.10269, origin=ha1.test.com, completed='2020-10-21 13:31:49 -05:00'
-  * unfencing of ha1.test.com successful: delegate=ha1.test.com, client=pacemaker-controld.10269, origin=ha1.test.com, completed='2020-10-21 13:31:48 -05:00'
-  * unfencing of ha2.test.com successful: delegate=ha2.test.com, client=pacemaker-controld.10269, origin=ha1.test.com, completed='2020-10-21 13:31:48 -05:00'
-
-Tickets:
-
-PCSD Status:
-  ha1.test.com: Online
-  ha2.test.com: Online
-  ha3.test.com: Online
-
-Daemon Status:
-  corosync: active/enabled
-  pacemaker: active/enabled
-  pcsd: active/enabled
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --add-port=80/tcp
 ------------------------
 
 
-==== Checking all servers have mounted the filesystem on /data
-In which servers: [cluster]
-
-[source, bash]
-------------------------
-for node in ha1 ha2 ha3; do
-echo ------------------------------
-echo node $node
-ssh $node df -kh | grep data
-echo
-done
-
-------------------------------
-node ha1
-/dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
-------------------------------
-node ha2
-/dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
-------------------------------
-node ha3
-/dev/mapper/shared_vg1-shared_lv1   10G  100M   10G   1% /data
-------------------------
-
-=== Creating a Web server in High Availability
-
-Now that we have our storage ready to be used is time to create the resources required to have Apache in HA. 
-
-==== Installing Apache
-In which servers: [cluster]
-
-[source, bash]
-------------------------
-for node in ha1 ha2 ha3; do
-echo ------------------------------
-echo Installing apache on node $node
-ssh $node yum -y install httpd wget
-echo
-done
-------------------------------
-
-Then in each node add the following selector in /etc/httpd/conf/httpd.conf.
-
-[source, bash]
-------------------------
-ssh ha1 
-
-cat <<EOF >> /etc/httpd/conf/httpd.conf
-<Location /server-status>
-    SetHandler server-status
-    Require local
-</Location>
-EOF
-
-ssh ha2
-...
-------------------------
-
-When we use the apache resource agent to manage Apache, it does not use systemd. Because of this, you must edit the logrotate script supplied with Apache so that it does not use systemctl to reload Apache.
-
-Remove the following line in the /etc/logrotate.d/httpd file on each node in the cluster.
-
-[source, bash]
-------------------------
-/bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
-------------------------
-
-Replace the line you removed with the following three lines.
-
-[source, bash]
-------------------------
-/usr/bin/test -f /var/run/httpd.pid >/dev/null 2>/dev/null &&
-/usr/bin/ps -q /usr/bin/cat /var/run/httpd.pid >/dev/null 2>/dev/null &&
-/usr/sbin/httpd -f /etc/httpd/conf/httpd.conf -c "PidFile /var/run/httpd.pid" -k graceful > /dev/null 2>/dev/null || true
-------------------------
-
-Now let´s replace the default root directory that apache use in each node.
-
-[source, bash]
-------------------------
-for node in ha1 ha2 ha3; do 
-echo Changing Apache Root Directory on node $node; 
-ssh $node cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.bck; 
-ssh "$node" 'sed -i "s/\/var\/www/\/data\/www/g" /etc/httpd/conf/httpd.conf.bck' > /etc/httpd/conf/httpd.conf; 
-done
-------------------------
-
-After change the root directory is time to create some directories in the new /data directory.
-[source, bash]
-------------------------
-mkdir /data/www/html
-mkdir /data/www/cgi-bin
-mkdir /data/www/error
-restorecon -R /data/www
-------------------------
-
-Now create a simple web page.
-
-[source, bash]
-------------------------
-cat <<EOF >/data/www/html/index.html
-<html>
-<body>Hello</body>
-</html>
-EOF
-------------------------
-
-shared_vg1
-pcs resource create VirtualIP IPaddr2 ip=192.168.56.170 \
-cidr_netmask=24 --group shared_vg1
 
