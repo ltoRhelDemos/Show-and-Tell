@@ -99,16 +99,15 @@ image::cluster_depicted.png[]
 
 == A practical HA implementation
 
-In the next procedure we are going implement a simple web service on 3 nodes. This service will be in charge to serve a web page with apache and the content of this page is going to be stored in a shared iscsi storage. Simple, no?... let's get our hands dirty.
+In the next procedure we are going implement a simple web service on 2 nodes. This service will be in charge to serve a web page with apache and the content of this page is going to be stored in a shared iscsi storage. Simple, no?... let's get our hands dirty.
 
 === Some conventions for the rest of this document.
 
 Let's assume the following server layout.
 
-ha1.test.com -> node 1
-ha2.test.com -> node 2
-ha3.test.com- > node 3
-str.test.com -> iscsi target
+ha1.test.com - node 1
+ha2.test.com - node 2
+str.test.com - iscsi target
 
 Every procedure explained in the next sections will have a scope of action that we are going describe with a tag and the scope. 
 
@@ -116,13 +115,17 @@ TAG [scope]
 
 For example if we need to execute a command or procedure on ha1 server, the scope should look like this.
 
-In which Server[ha1]
+In which servers[ha1]
 
 Or, if we need to execute a command on all servers of the cluster the tag should be represented by:
 
 In which server[cluster]
 
-Where cluster is comprised of ha1.test.com, ha2.test.com and ha3.test.com
+Where cluster is comprised of ha1.test.com, ha2.test.com
+
+In which servers[ALL]
+
+In this case we consider the nodes of the cluster + the storage server.
 
 So, you get my idea of the scoping.
 
@@ -138,7 +141,7 @@ In each server execute the following sequence.
 [source, bash]
 ------------------------
 ssh-keygen
-for node in ha1 ha2 ha3 str; do ssh-copy-id $node; done
+for node in ha1 ha2 str; do ssh-copy-id $node; done
 ------------------------
 
 === Defining the naming convention in /etc/hosts
@@ -153,7 +156,6 @@ Logged-in in the str.test.com server we can configure /etc/hosts as follow. Firs
 cat <<EOF >> /etc/hosts
 192.168.56.154 ha1.test.com ha1
 192.168.56.160 ha2.test.com ha2
-192.168.56.159 ha3.test.com ha3
 192.168.56.157 str.test.com str
 EOF
 ------------------------
@@ -167,7 +169,6 @@ ssh ha1
 cat <<EOF >> /etc/hosts 
 192.168.56.154 ha1.test.com ha1 
 192.168.56.160 ha2.test.com ha2 
-192.168.56.159 ha3.test.com ha3 
 192.168.56.157 str.test.com str 
 EOF
 
@@ -178,7 +179,7 @@ ssh ha2
 We can chack what we just do it by executing the following from str:
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do \
+for node in ha1 ha2; do \
 echo $node; \
 ssh $node cat /etc/hosts; \
 done
@@ -237,7 +238,6 @@ for node in ha1 ha2 ha3; do echo -n $node: $(ssh $node cat /etc/iscsi/initiatorn
 
 ha1: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9f
 ha2: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9e
-ha3: InitiatorName=iqn.1994-05.com.redhat:9b97b0b38c9d
 ------------------------
 
 Take note on this. Every server must have the last hexadecimal part diferent from each other. If not, we have to generate a unique number on this.
@@ -271,15 +271,12 @@ Created default portal listening on all IPs (0.0.0.0), port 3260.
 Created Node ACL for iqn.1994-05.com.redhat:9b97b0b38c9f
 /iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:9b97b0b38c9e  << ha2
 Created Node ACL for iqn.1994-05.com.redhat:9b97b0b38c9e
-/iscsi/iqn.20...e18/tpg1/acls> create iqn.1994-05.com.redhat:9b97b0b38c9d  << ha3
-Created Node ACL for iqn.1994-05.com.redhat:9b97b0b38c9d
 /iscsi/iqn.20...e18/tpg1/acls> cd /iscsi/iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172/tpg1/luns
 /iscsi/iqn.20...e18/tpg1/luns> create /backstores/block/iscsi_shared_storage
 
 Created LUN 0.
 Created LUN 0->0 mapping in node ACL iqn.1994-05.com.redhat:9b97b0b38c9f
 Created LUN 0->0 mapping in node ACL iqn.1994-05.com.redhat:9b97b0b38c9e
-Created LUN 0->0 mapping in node ACL iqn.1994-05.com.redhat:9b97b0b38c9d
 
 /iscsi/iqn.20...e18/tpg1/luns> cd /
 ...
@@ -333,7 +330,7 @@ Then attach the corresponding pool and enable the proper repositories. This is n
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo ------------------------------
 echo Enabling repositories on node $node
 ssh $node subscription-manager attach  --pool=8a85f99b727637b201729983324d0540
@@ -347,7 +344,7 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo ------------------------------
 echo Installing software on node $node
 ssh $node yum install -y pcs fence-agents-all pcp-zeroconf iscsi-initiator-utils lvm2-lockd gfs2-utils dlm
@@ -360,7 +357,7 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do 
+for node in ha1 ha2; do 
 echo Setting firewall on $node 
 ssh $node systemctl enable --now firewalld 
 ssh $node firewall-cmd --permanent --add-service=high-availability 
@@ -373,13 +370,12 @@ Then we can check is the ha service is enabled.
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo Services enabled on $node: $(ssh $node firewall-cmd --list-services)
 done
 
 Services enabled on ha1: cockpit dhcpv6-client high-availability ssh
 Services enabled on ha2: cockpit dhcpv6-client high-availability ssh
-Services enabled on ha3: cockpit dhcpv6-client high-availability ssh
 ------------------------
 
 ==== Set password for hacluster user
@@ -389,7 +385,7 @@ We must define a password for administering the cluster with the hacluster user.
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo Enter the password for $node
 ssh $node passwd hacluster
 echo
@@ -401,7 +397,7 @@ In which servers: [cluster]
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo enabling pcsd on $node
 ssh $node systemctl enable --now pcsd
 echo
@@ -412,7 +408,7 @@ Then check the service on each node.
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo $node ----------------
 ssh $node systemctl status pcsd | sed ''/active/s//$(printf "\033[32mactive\033[0m")/''
 echo
@@ -432,44 +428,37 @@ Use the password ltodemos configured in previous steps.
 
 [source, bash]
 ------------------------
-pcs host auth ha1.test.com ha2.test.com ha3.test.com -u hacluster -p ltodemos
+pcs host auth ha1.test.com ha2.test.com -u hacluster -p ltodemos
 
 ha1.test.com: Authorized
 ha2.test.com: Authorized
-ha3.test.com: Authorized
 ------------------------
 
-==== Creating the 3-node cluster named "cluster"
+==== Creating the 2-node cluster named "apache_cluster"
 In which servers: [ha1]
 
 [source, bash]
 ------------------------
-pcs cluster setup ha_cluster --start ha1.test.com ha2.test.com ha3.test.com
+pcs cluster setup apache_cluster --start ha1.test.com ha2.test.com
 
 No addresses specified for host 'ha1.test.com', using 'ha1.test.com'
 No addresses specified for host 'ha2.test.com', using 'ha2.test.com'
-No addresses specified for host 'ha3.test.com', using 'ha3.test.com'
-Destroying cluster on hosts: 'ha1.test.com', 'ha2.test.com', 'ha3.test.com'...
+Destroying cluster on hosts: 'ha1.test.com', 'ha2.test.com'...
 ha1.test.com: Successfully destroyed cluster
 ha2.test.com: Successfully destroyed cluster
-ha3.test.com: Successfully destroyed cluster
-Requesting remove 'pcsd settings' from 'ha1.test.com', 'ha2.test.com', 'ha3.test.com'
+Requesting remove 'pcsd settings' from 'ha1.test.com', 'ha2.test.com'
 ha1.test.com: successful removal of the file 'pcsd settings'
 ha2.test.com: successful removal of the file 'pcsd settings'
-ha3.test.com: successful removal of the file 'pcsd settings'
-Sending 'corosync authkey', 'pacemaker authkey' to 'ha1.test.com', 'ha2.test.com', 'ha3.test.com'
+Sending 'corosync authkey', 'pacemaker authkey' to 'ha1.test.com', 'ha2.test.com'
 ha2.test.com: successful distribution of the file 'corosync authkey'
 ha2.test.com: successful distribution of the file 'pacemaker authkey'
-ha3.test.com: successful distribution of the file 'corosync authkey'
-ha3.test.com: successful distribution of the file 'pacemaker authkey'
 ha1.test.com: successful distribution of the file 'corosync authkey'
 ha1.test.com: successful distribution of the file 'pacemaker authkey'
 Sending 'corosync.conf' to 'ha1.test.com', 'ha2.test.com', 'ha3.test.com'
 ha1.test.com: successful distribution of the file 'corosync.conf'
 ha2.test.com: successful distribution of the file 'corosync.conf'
-ha3.test.com: successful distribution of the file 'corosync.conf'
 Cluster has been successfully set up.
-Starting cluster on hosts: 'ha1.test.com', 'ha2.test.com', 'ha3.test.com'...
+Starting cluster on hosts: 'ha1.test.com', 'ha2.test.com'...
 ------------------------
 
 ==== Enabling the cluster to start on boot
@@ -481,7 +470,6 @@ pcs cluster enable --all
 
 ha1.test.com: Cluster Enabled
 ha2.test.com: Cluster Enabled
-ha3.test.com: Cluster Enabled
 ------------------------
 
 ==== Checking the configuration so far
@@ -492,7 +480,7 @@ Let´s see if everything is working as expected.
 ------------------------
 pcs status | sed ''/active/s//$(printf "\033[32mactive\033[0m")/''
 
-Cluster name: ha_cluster
+Cluster name: apache_cluster
 
 WARNINGS:
 No stonith devices and stonith-enabled is not false
@@ -533,7 +521,7 @@ You can execute this from any server.
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo Setting iscsi volume on node $node
 ssh $node iscsiadm -m discovery -t sendtargets -p str.test.com
 ssh $node iscsiadm -m node -L automatic
@@ -549,24 +537,18 @@ Setting iscsi volume on node ha2
 192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
 Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
 Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
-
-Setting iscsi volume on node ha3
-192.168.56.157:3260,1 iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172
-Logging in to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260]
-Login to [iface: default, target: iqn.2003-01.org.linux-iscsi.str.x8664:sn.cc4faab82172, portal: 192.168.56.157,3260] successful.
 ------------------------
 
 ==== Check for the disks presented in each node
 
 [source, bash]
 ------------------------
-for node in ha1 ha2 ha3; do
+for node in ha1 ha2; do
 echo node $node: $(ssh $node lsblk | grep sdb)
 done
 
 node ha1: sdb 8:16 0 16G 0 disk
 node ha2: sdb 8:16 0 16G 0 disk
-node ha3: sdb 8:16 0 16G 0 disk
 ------------------------
 
 ==== Configuring Shut The Other Node In The Head (STONITH)
@@ -580,6 +562,183 @@ pcs stonith create scsi-shooter fence_scsi pcmk_host_list="ha1.test.com ha2.test
 pcs property set stonith-enabled=true
 pcs property set no-quorum-policy=freeze
 ------------------------
+
+Now check for the configuration made.
+
+[source, bash]
+------------------------
+pcs stonith config scsi-shooter
+------------------------
+
+==== Setting up the disk for storing data
+In which servers: [ha1]
+
+Create a physical volume on the first partition of /dev/sdb.
+
+[source, bash]
+------------------------
+pvcreate /dev/sdb1
+
+Physical volume "/dev/sdb1" successfully created.
+------------------------
+
+Now we will create a Volume Group for in later time create a logical volume.
+
+[source, bash]
+------------------------
+vgcreate apache_volume_group /dev/sdb1
+
+Volume group "apache_volume_group" successfully created
+------------------------
+
+Let's see what we have created so far
+
+[source, bash]
+------------------------
+vgs -o+systemid
+ 
+  VG                  #PV #LV #SN Attr   VSize    VFree    System ID
+  apache_volume_group   1   0   0 wz--n- <128.00g <128.00g
+  rhel                  1   2   0 wz--n-  <15.00g       0
+------------------------
+
+Now it is time to create de logical volume.
+
+[source, bash]
+------------------------
+lvcreate -L10G -n apache_data_volume apache_volume_group
+
+  Logical volume "apache_data_volume" created.
+------------------------
+
+Then check it.
+
+[source, bash]
+------------------------
+lvs
+
+  LV                 VG                  Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  apache_data_volume apache_volume_group -wi-a----- 10.00g
+  root               rhel                -wi-ao---- 13.39g
+  swap               rhel                -wi-ao----  1.60g
+------------------------
+
+Let's format the volume with ext4.
+
+[source, bash]
+------------------------
+mkfs.ext4 /dev/apache_volume_group/apache_data_volume
+
+mke2fs 1.45.4 (23-Sep-2019)
+Creating filesystem with 2621440 4k blocks and 655360 inodes
+Filesystem UUID: 7bdc13d4-9bde-467e-9fbe-27d62b26c975
+Superblock backups stored on blocks:
+        32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632
+
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (16384 blocks): done
+Writing superblocks and filesystem accounting information: done
+------------------------
+
+==== Configuring APACHE
+In which servers: [cluster]
+
+[source, bash]
+------------------------
+for node in ha1 ha2; do
+ssh $node yum install -y httpd wget
+done
+------------------------
+
+In order for the Apache resource agent to get the status of the Apache HTTP Server, ensure that the following text is present in the /etc/httpd/conf/httpd.conf file on each node in the cluster, and ensure that it has not been commented out. If this text is not already present, add the text to the end of the file.
+
+In each node we can configure this.
+
+[source, bash]
+------------------------
+cat <<EOF >> /etc/httpd/conf/httpd.conf
+<Location /server-status>
+    SetHandler server-status
+    Require local
+</Location>
+EOF
+------------------------
+
+When you use the apache resource agent to manage Apache, it does not use systemd. Because of this, you must edit the logrotate script supplied with Apache so that it does not use systemctl to reload Apache.
+
+Remove the following line in the /etc/logrotate.d/httpd file on each node in the cluster.
+
+[source, bash]
+------------------------
+/bin/systemctl reload httpd.service > /dev/null 2>/dev/null || true
+------------------------
+
+Replace the line you removed with the following three lines.
+
+[source, bash]
+------------------------
+/usr/bin/test -f /var/run/httpd.pid >/dev/null 2>/dev/null &&
+/usr/bin/ps -q /usr/bin/cat /var/run/httpd.pid >/dev/null 2>/dev/null &&
+/usr/sbin/httpd -f /etc/httpd/conf/httpd.conf -c "PidFile /var/run/httpd.pid" -k graceful > /dev/null 2>/dev/null || true
+------------------------
+
+Now let's create a simple web page and directory layout on our disk.
+
+[source, bash]
+------------------------
+mount /dev/apache_volume_group/apache_data_volume /var/www
+mkdir /var/www/html
+mkdir /var/www/cgi-bin
+mkdir /var/www/error
+restorecon -R /var/www
+cat <<-END >/var/www/html/index.html
+<html>
+<!-- Text between angle brackets is an HTML tag and is not displayed.
+Most tags, such as the HTML and /HTML tags that surround the contents of
+a page, come in pairs; some tags, like HR, for a horizontal rule, stand 
+alone. Comments, such as the text you're reading, are not displayed when
+the Web page is shown. The information between the HEAD and /HEAD tags is 
+not displayed. The information between the BODY and /BODY tags is displayed.-->
+<head>
+<title>Enter a title, displayed at the top of the window.</title>
+</head>
+<!-- The information between the BODY and /BODY tags is displayed.-->
+<body>
+<h1>Enter the main heading, usually the same as the title.</h1>
+<p>Be <b>bold</b> in stating your key points. Put them in a list: </p>
+<ul>
+<li>The first item in your list</li>
+<li>The second item; <i>italicize</i> key words</li>
+</ul>
+<p>Improve your image by including an image. </p>
+<p><img src="http://www.mygifs.com/CoverImage.gif" alt="A Great HTML Resource"></p>
+<p>Add a link to your favorite <a href="https://www.dummies.com/">Web site</a>.
+Break up your page with a horizontal rule or two. </p>
+<hr>
+<p>Finally, link to <a href="page2.html">another page</a> in your own Web site.</p>
+<!-- And add a copyright notice.-->
+<p>&#169; Wiley Publishing, 2011</p>
+</body>
+</html>
+END
+umount /var/www
+------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ==== Create and clone the locking resource
 In which servers: [ha1]
@@ -723,7 +882,7 @@ pcs property list cluster-name
 ==== Creating the shared filesystem resource
 In which servers: [ha1]
 
-Having the volume group and logical volume created on ha1.test.com server, we now need to create the resource responsible for mounting the logical volume as a functional disk in each node.
+Having the volume group and logical volume created on ha1.test.com server, we now need to create the resource responsible for declare the device on all nodes's /dev directory as a functional disk in each node.
 
 [source, bash]
 ------------------------
@@ -736,7 +895,6 @@ The resource is going to be started on any node... we need to clone the resource
 [source, bash]
 ------------------------
 pcs resource clone shared_vg1 interleave=true
-[source, bash]
 ------------------------
 
 ==== Configuring the order in which the resource starts. 
@@ -746,7 +904,7 @@ We need make this resource to be started at first.
 
 [source, bash]
 ------------------------
-pcs constraint order start locking-clone then shared_vg1-clone
+pcs constraint order start locking-clone then datadisk-clone
 
 Adding locking-clone shared_vg1-clone (kind: Mandatory) (Options: first-action=start then-action=start)
 ------------------------
@@ -774,7 +932,7 @@ done
 ==== Creating the Resource for automatically mount the filesystem in all nodes
 In which servers: [ha1]
 
-So far the logical volume can be seen from all nodes. Now we need to creaate a resource for mounting the volume in the /data directory.
+So far the logical volume can be seen from all nodes. Now we need to create a resource for mounting the volume in the /data directory.
 
 [source, bash]
 ------------------------
