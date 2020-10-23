@@ -789,12 +789,91 @@ statusurl="http://127.0.0.1/server-status" --group apachegroup
 
 Config the firewall for accepting a regular web page traffic.
 
-
 [source, bash]
 ------------------------
 firewall-cmd --permanent --add-port=80/tcp
 firewall-cmd --add-port=80/tcp
 ------------------------
+
+==== Moving around resources
+
+It is possible to migrate resources from one node to other using some features of pacemaker.
+
+Let´s see where is our resource group apachegroup active.
+
+[source, bash]
+------------------------
+pcs cluster status
+
+Cluster Status:
+ Cluster Summary:
+   * Stack: corosync
+   * Current DC: ha2.test.com (version 2.0.3-5.el8_2.1-4b1f869f0f) - partition with quorum
+   * Last updated: Fri Oct 23 05:52:10 2020
+   * Last change:  Thu Oct 22 18:38:22 2020 by root via crm_resource on ha1.test.com
+   * 2 nodes configured
+   * 5 resource instances configured
+ Node List:
+   * Online: [ ha1.test.com ha2.test.com ]
+
+PCSD Status:
+  ha2.test.com: Online
+  ha1.test.com: Online
+------------------------
+
+We can see where a resource or resource group is being serving.
+
+[source, bash]
+------------------------
+pcs resource status
+
+  * Resource Group: apachegroup:
+    * apache_lvm        (ocf::heartbeat:LVM-activate):  Started ha2.test.com
+    * ha_apache_fs      (ocf::heartbeat:Filesystem):    Started ha2.test.com
+    * apache_virtualIP  (ocf::heartbeat:IPaddr2):       Started ha2.test.com
+    * new_app   (ocf::heartbeat:apache):        Started ha2.test.com
+------------------------
+
+
+Let's move the resourcegroup apachegroup from node ha2 to ha1.
+
+[source, bash]
+------------------------
+pcs resource move apachegroup ha1.test.com
+
+pcs resource status
+  * Resource Group: apachegroup:
+    * apache_lvm        (ocf::heartbeat:LVM-activate):  Started ha1.test.com
+    * ha_apache_fs      (ocf::heartbeat:Filesystem):    Started ha1.test.com
+    * apache_virtualIP  (ocf::heartbeat:IPaddr2):       Started ha1.test.com
+    * new_app   (ocf::heartbeat:apache):        Started ha1.test.com
+------------------------
+
+We can disable a resource for start at boot.
+
+[source, bash]
+------------------------
+pcs resource sdisable apachegroup
+
+pcs resource status
+  * Resource Group: apachegroup:
+    * apache_lvm        (ocf::heartbeat:LVM-activate):  Stopped (disabled)
+    * ha_apache_fs      (ocf::heartbeat:Filesystem):    Stopped (disabled)
+    * apache_virtualIP  (ocf::heartbeat:IPaddr2):       Stopped (disabled)
+    * new_app   (ocf::heartbeat:apache):        Stopped (disabled)
+------------------------
+
+To enable back the resouce just intercange disable by the enable directive.
+
+If we need to know which resource groups and resources available in the cluster we can execute.
+
+[source, bash]
+------------------------
+pcs resource group list
+
+apachegroup: apache_lvm ha_apache_fs apache_virtualIP new_app
+------------------------
+
 
 
 
