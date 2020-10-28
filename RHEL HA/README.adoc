@@ -765,7 +765,6 @@ The filesystem to be mounted on the active node which is going to be mounted on 
 pcs resource create ha_apache_fs Filesystem \
 device="/dev/apache_volume_group/apache_data_volume" directory="/var/www" fstype="ext4" \
 --group apachegroup
-[source, bash]
 ------------------------
 
 The virtual IP Address is going to be configured by the cluster in the active node as a secundary ip.
@@ -774,7 +773,6 @@ The virtual IP Address is going to be configured by the cluster in the active no
 ------------------------
 pcs resource create apache_virtualIP IPaddr2 ip=192.168.56.40 \
 cidr_netmask=24 --group apachegroup
-[source, bash]
 ------------------------
 
 The web service itself is managed by the apache agent.
@@ -784,7 +782,6 @@ The web service itself is managed by the apache agent.
 pcs resource create new_app apache \
 configfile="/etc/httpd/conf/httpd.conf" \
 statusurl="http://127.0.0.1/server-status" --group apachegroup
-[source, bash]
 ------------------------
 
 Config the firewall for accepting a regular web page traffic.
@@ -873,6 +870,128 @@ pcs resource group list
 
 apachegroup: apache_lvm ha_apache_fs apache_virtualIP new_app
 ------------------------
+
+=== Managing the cluster
+
+After the cluster is configured and running there are some actions that we could execute.
+
+==== Check Health
+
+===== Cluster
+
+[source, bash]
+------------------------
+pcs cluster status
+
+Cluster Status:
+ Cluster Summary:
+   * Stack: corosync
+   * Current DC: ha1.test.com (version 2.0.3-5.el8_2.1-4b1f869f0f) - partition with quorum
+   * Last updated: Wed Oct 28 07:24:20 2020
+   * Last change:  Tue Oct 27 15:25:40 2020 by root via cibadmin on ha1.test.com
+   * 2 nodes configured
+   * 5 resource instances configured
+ Node List:
+   * Online: [ ha1.test.com ha2.test.com ]
+
+PCSD Status:
+  ha2.test.com: Online
+  ha1.test.com: Online
+------------------------
+
+===== Resources
+
+[source, bash]
+------------------------
+pcs resource status
+
+  * Resource Group: apachegroup:
+    * apache_lvm        (ocf::heartbeat:LVM-activate):  Started ha2.test.com
+    * ha_apache_fs      (ocf::heartbeat:Filesystem):    Started ha2.test.com
+    * apache_virtualIP  (ocf::heartbeat:IPaddr2):       Started ha2.test.com
+    * new_app   (ocf::heartbeat:apache):        Started ha2.test.com
+------------------------
+
+==== Managing nodes
+
+===== Make a node to be standby
+Put specified node(s) into standby mode (the node specified will no longer be able to host resources), if no nodes or options are specified the current node will be put into standby mode, if --all is specified all nodes will be put into standby mode.
+
+[source, bash]
+------------------------
+pcs node standby ha2.test.com
+------------------------
+
+===== Return a node to be operative from standby state
+
+Remove node(s) from standby mode (the node specified will now be able to host resources), if no nodes or options are specified the current node will be removed from standby mode, if --all is specified all nodes will be removed from standby mode.
+
+[source, bash]
+------------------------
+pcs node unstandby ha2.test.com
+------------------------
+
+===== Make a node to be in maintenance
+
+Put specified node(s) into maintenance mode, if no nodes or options are specified the current node will be put into maintenance mode, if --all is specified all nodes will be put into maintenance mode. If --wait is specified, pcs will wait up to 'n' seconds for the node(s) to be put into maintenance mode and then return 0 on success or 1 if the operation not succeeded yet. If 'n' is not specified it defaults to 60 minutes.
+
+[source, bash]
+------------------------
+pcs node maintenance ha2.test.com
+------------------------
+
+For return the node to a operative state just use unmaintenance.
+
+==== Managing the cluster
+
+===== Start or stop a cluster 
+
+A cluster can be started or stopped with a node granularity. This action starts or stops all the process required for a node to be in the cluster operative or not.
+
+Some examples below.
+
+[source, bash]
+------------------------
+pcs cluster start --all
+------------------------
+
+[source, bash]
+------------------------
+pcs cluster stop --all
+------------------------
+
+[source, bash]
+------------------------
+pcs cluster start ha1.test.com
+------------------------
+
+[source, bash]
+------------------------
+pcs cluster stop ha2.test.com
+------------------------
+
+===== Enable or disable a cluster node for starting at boot time.
+
+A cluster also can be instructed to start each node at boot time.
+
+This example enable all node.
+
+[source, bash]
+------------------------
+pcs cluster enable --all
+------------------------
+
+If we need a cluster node to not joing the cluster at boot time just use "disable"
+
+This example operates on node ha1.test.com
+
+[source, bash]
+------------------------
+pcs cluster disbale ha1.test.com
+------------------------
+
+
+
 
 
 
