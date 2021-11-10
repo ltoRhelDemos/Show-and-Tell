@@ -629,21 +629,21 @@ First things first. We need to create a directory tree to get things with some s
 
 [source,bash]
 -----------------
-# cd /root
-# mkdir containers
-# cd containers
-# mkdir -p engine/chatbotApp webchat/chatbotApp
-# git clone https://github.com/ltoRhelDemos/python-ansible-chatbot.git
-# cp python-ansible-chatbot/* webchat/chatbotApp/.
-# cp python-ansible-chatbot/* engine/chatbotApp/.
+cd /root
+mkdir containers
+cd containers
+mkdir -p engine/chatbotApp webchat/chatbotApp
+git clone https://github.com/ltoRhelDemos/python-ansible-chatbot.git
+cp python-ansible-chatbot/* webchat/chatbotApp/.
+cp python-ansible-chatbot/* engine/chatbotApp/.
 -----------------
 
 Let's build the web chat container.
 
 [source,bash]
 -----------------
-# cd /root/containers/webchat
-# vim Dockerfile
+cd /root/containers/webchat
+vim Dockerfile
 
 *Dockerfile content*
 FROM registry.access.redhat.com/ubi8/ubi
